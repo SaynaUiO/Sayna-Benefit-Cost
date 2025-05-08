@@ -1,0 +1,17 @@
+{
+  "name": "jira-full-forge-app-benefit-cost",
+  "version": "1.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@forge/api": "^5.2.0",
+    "@forge/events": "^1.0.1",
+    "@forge/resolver": "^1.5.19",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.51.0",
+    "eslint-plugin-react-hooks": "^4.6.0"
+  }
+}

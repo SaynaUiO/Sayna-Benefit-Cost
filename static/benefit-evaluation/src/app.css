@@ -1,0 +1,66 @@
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hideScrollBar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hideScrollBar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.grid-item {
+  width: 48%;
+  /* Two columns on larger screens with a small gap */
+  margin-bottom: 1rem;
+}
+
+.grid-item-full {
+  width: 100%;
+  /* Two columns on larger screens with a small gap */
+  margin-bottom: 1rem;
+}
+
+/* Adjust layout for smaller screens */
+@media (max-width: 66.25rem) {
+  .grid-item {
+    width: 100%;
+    /* Single column on smaller screens */
+  }
+}
+
+.apexcharts-xaxis-tick {
+  display: none;
+}
+
+.introduction-text {
+  font-size: 1.05rem;
+}
+
+.apexcharts-canvas>svg {
+  transform: translate(-10px, -25px) !important;
+}
+
+.noMarginTop {
+  width: 450px;
+  position: sticky;
+  top: 0px;
+  z-index: 10000;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+}
+
+.noMarginTop ul {
+  margin-top: 0px !important;
+}

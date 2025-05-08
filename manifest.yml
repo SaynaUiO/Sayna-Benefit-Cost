@@ -1,0 +1,30 @@
+modules:
+  jira:projectPage:
+    - key: benefit-evaluation
+      resource: main
+      queue: queue-name
+      resolver:
+        function: resolver
+      title: Sayna:)
+      layout: blank
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: static/benefit-evaluation/build
+    tunnel:
+      port: 3000
+permissions:
+  content:
+    styles:
+      - unsafe-inline
+  scopes:
+    - read:jira-work
+    - write:jira-work
+    - manage:jira-project
+    - storage:app
+app:
+  id: ari:cloud:ecosystem::app/4217fcbb-b604-4772-9c01-2f603e0a7712 # Own Atlassian App ID
+  runtime:
+    name: nodejs20.x
