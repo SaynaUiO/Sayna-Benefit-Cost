@@ -6,5 +6,6 @@ export const PortfolioItems = (portfolioId: string): GoalTier => ({
   type: GoalTierTypeEnum.PORTFOLIO_ITEM,
   name: "Portfolio Items",
   description: "",
-  tier: "",
+  tier: "", //Sayna har adda
+  status: "",//Sayna har adda
 })

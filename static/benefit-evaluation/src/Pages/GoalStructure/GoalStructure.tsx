@@ -24,7 +24,9 @@ import { AdminGoalCollection } from "./AdminGoalCollection";
 import { DeleteGoalCollection } from "./DeleteGoalCollection";
 
 //Sayna Inports:
-import NewGoalTierDropdown from "../../SaynaSineFiler/NewGoalTierButton";
+import NewGoalTierButton from "../../SaynaSineFiler/NewGoalTierButton";
+import GoalTierTableTree from "../../SaynaSineFiler/GoalTierTableTree";
+import { GOAL_TYPE_DROPDOWN_ITEMS } from "../../SaynaSineFiler/goalDropdownItems";
 
 // * Goal Tier
 type option = {
@@ -471,11 +473,19 @@ export const GoalStructure = () => {
       )}
 
       <div>
-        <NewGoalTierDropdown
-          onSelect={(type) => {
-            console.log("User selected:", type);
+        {/* This is the button "Nytt Mål Nivå" */}
+        <NewGoalTierButton
+          buttonLabel="Nytt mål nivå"
+          dropdownItems={GOAL_TYPE_DROPDOWN_ITEMS}
+          onSave={(type) => {
+            console.log("Saving new goal tier:", type);
+            // Logic to save the new goal tier
           }}
+          isPrimary={true}
         />
+
+        {/* This is the table three */}
+        <GoalTierTableTree />
       </div>
     </>
   );

@@ -5,14 +5,26 @@ import DropdownMenu, {
 } from "@atlaskit/dropdown-menu";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import React, { useState } from "react";
-import GoalDrawer from "./CreateGoalDrawer";
+import GoalDrawer from "./GoalDrawer";
 import GoalTierTableTree from "./GoalTierTableTree";
 
+// This component Adds a new goal tier, both a new root one and a subtier
+
 type Props = {
-  onSelect: (type: string) => void;
+  buttonLabel: string; // Label for the button
+  dropdownItems: { label: string; value: string }[]; // Dropdown options
+  onSave: (type: string, parentId?: string) => void; // Callback for saving
+  isPrimary?: boolean; // Optional: Make the button primary
+  parentId?: string; // Optional: Parent ID for child rows
 };
 
-const NewGoalTierDropdown = ({ onSelect }: Props) => {
+const NewGoalTierButton = ({
+  buttonLabel,
+  dropdownItems,
+  onSave,
+  isPrimary = true,
+  parentId,
+}: Props) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
@@ -21,56 +33,62 @@ const NewGoalTierDropdown = ({ onSelect }: Props) => {
     setDrawerOpen(true);
   };
 
+  const handleSave = () => {
+    if (selectedType) {
+      onSave(selectedType, parentId); // Pass the selected type and parent ID
+      setDrawerOpen(false);
+      setSelectedType(null);
+    }
+  };
+
   return (
     <>
       <DropdownMenu
         trigger={({ triggerRef, ...triggerProps }) => (
           <Button
             {...triggerProps}
-            appearance="primary"
-            iconBefore={<AddIcon size="small" label="" />}
+            appearance={isPrimary ? "primary" : "subtle-link"}
+            iconBefore={
+              isPrimary ? <AddIcon size="small" label="" /> : undefined
+            }
             ref={triggerRef}
           >
-            Nytt mål nivå
+            {buttonLabel}
           </Button>
         )}
         shouldRenderToParent
       >
         <DropdownItemGroup>
-          <DropdownItem onClick={() => handleSelect("Formål")}>
-            Formål
-          </DropdownItem>
-          <DropdownItem
-            onClick={() => handleSelect("Prosjektets Nyttevirkning")}
-          >
-            Prosjektets Nyttevirkning
-          </DropdownItem>
-          <DropdownItem onClick={() => handleSelect("Prosjektets Produkt")}>
-            Prosjektets Produkt
-          </DropdownItem>
-          <DropdownItem onClick={() => handleSelect("Epic")}>Epic</DropdownItem>
+          {dropdownItems.map((item) => (
+            <DropdownItem
+              key={item.value}
+              onClick={() => handleSelect(item.value)}
+            >
+              {item.label}
+            </DropdownItem>
+          ))}
         </DropdownItemGroup>
       </DropdownMenu>
 
-      {/* Drawer:  */}
+      {/* Drawer */}
       {selectedType && (
         <GoalDrawer
-          title="Et av Tiersene"
+          title={`Add ${selectedType}`}
           goalType={selectedType}
+          parentId={parentId} // Pass parentId for child rows
           isOpen={drawerOpen}
           onClose={(shouldRefresh) => {
-            setDrawerOpen(false);
-            setSelectedType(null);
             if (shouldRefresh) {
-              // Optionally refresh goal structure
+              handleSave(); //Save new goal tier
+            } else {
+              setDrawerOpen(false);
+              setSelectedType(null);
             }
           }}
         />
       )}
-
-      <GoalTierTableTree></GoalTierTableTree>
     </>
   );
 };
 
-export default NewGoalTierDropdown;
+export default NewGoalTierButton;

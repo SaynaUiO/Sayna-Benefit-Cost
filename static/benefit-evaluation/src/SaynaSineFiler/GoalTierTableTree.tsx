@@ -9,12 +9,22 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "../Contexts/AppContext";
 import { useAPI } from "../Contexts/ApiContext";
 import Button from "@atlaskit/button";
-import GoalDrawer from "./CreateGoalDrawer";
+import GoalDrawer from "./GoalDrawer";
+import NewGoalTierButton from "./NewGoalTierButton";
+
+import { IconButton } from "@atlaskit/button/new";
+import MoreIcon from "@atlaskit/icon/glyph/more";
+import DropdownMenu, {
+  DropdownItem,
+  DropdownItemGroup,
+} from "@atlaskit/dropdown-menu";
+import { GOAL_TYPE_DROPDOWN_ITEMS } from "./goalDropdownItems";
 
 type Tier = {
   id: string;
   title: string;
   description: string;
+  status?: string;
   subtask?: Tier[];
 };
 
@@ -27,39 +37,42 @@ const GoalTierTableTree = () => {
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
 
-  const [selectedGoalType, setSelectedGoalType] = useState<string | null>(null);
-
   const fetchData = async () => {
-    const allGoals = await api.goalCollection.getAll(scope.id);
+    try {
+      const allGoals = await api.goalCollection.getAll(scope.id);
 
-    const goalMap: Map<string, Tier> = new Map();
+      const goalMap: Map<string, Tier> = new Map();
 
-    // Step 1: Map all goals into Tier objects
-    allGoals.forEach((goal: any) => {
-      goalMap.set(goal.id, {
-        id: goal.id,
-        title: goal.tier || goal.name,
-        description: goal.description,
-        subtask: [],
+      // Step 1: Map all goals into Tier objects
+      allGoals.forEach((goal: any) => {
+        goalMap.set(goal.id, {
+          id: goal.id,
+          title: goal.tier || goal.name,
+          description: goal.description,
+          status: goal.status || "Unknown",
+          subtask: [],
+        });
       });
-    });
 
-    const rootItems: Tier[] = [];
+      const rootItems: Tier[] = [];
 
-    // Step 2: Organize into parent-child hierarchy
-    allGoals.forEach((goal: any) => {
-      const parentId = goal.parentId;
-      if (parentId && goalMap.has(parentId)) {
-        // This is a child, add it to the parent's subtask
-        const parent = goalMap.get(parentId)!;
-        parent.subtask!.push(goalMap.get(goal.id)!);
-      } else {
-        // This is a top-level item
-        rootItems.push(goalMap.get(goal.id)!);
-      }
-    });
+      // Step 2: Organize into parent-child hierarchy
+      allGoals.forEach((goal: any) => {
+        const parentId = goal.parentId;
+        if (parentId && goalMap.has(parentId)) {
+          // This is a child, add it to the parent's subtask
+          const parent = goalMap.get(parentId)!;
+          parent.subtask!.push(goalMap.get(goal.id)!);
+        } else {
+          // This is a top-level item
+          rootItems.push(goalMap.get(goal.id)!);
+        }
+      });
 
-    setItems(rootItems);
+      setItems(rootItems);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   useEffect(() => {
@@ -69,9 +82,12 @@ const GoalTierTableTree = () => {
   return (
     <TableTree label="Målstruktur">
       <Headers>
-        <Header width={150}>Title</Header>
-        <Header width={300}>Description</Header>
-        <Header width={300}>Handling</Header>
+        <Header width={600}>Title</Header>
+        <Header width={150}>Description</Header>
+        <Header width={150}>Nytte poeng</Header>
+        <Header width={150}>Status</Header>
+        <Header width={150}>Frist</Header>
+        <Header width={150}>Handling</Header>
       </Headers>
       <Rows
         items={items}
@@ -79,18 +95,75 @@ const GoalTierTableTree = () => {
           <Row itemId={id} items={subtask} hasChildren={subtask.length > 0}>
             <Cell>{title}</Cell>
             <Cell>{description}</Cell>
+            <Cell>0</Cell>
+            <Cell>{status || "Unknown"}</Cell>
+            <Cell>19.05.1999</Cell>
             <Cell>
-              <Button
-                appearance="subtle-link"
-                spacing="none"
-                onClick={() => {
-                  setSelectedTier({ id, title, description, subtask });
-                  setDrawerOpen(true);
-                  setSelectedParentId(id); // 👈 set the parent ID
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
-                ＋
-              </Button>
+                {/* New Goal Tier Button for Subtasks */}
+                <NewGoalTierButton
+                  buttonLabel="+"
+                  dropdownItems={GOAL_TYPE_DROPDOWN_ITEMS}
+                  //Logic to save:
+                  onSave={(type, parentId) => {
+                    console.log(
+                      "Saving new goal tier:",
+                      type,
+                      "under parent ID:",
+                      parentId
+                    );
+                    setSelectedParentId(parentId || null); // Set the parent ID for the drawer
+                    setDrawerOpen(true); // Open the drawer
+                  }}
+                  isPrimary={false} //Style
+                  parentId={id} // Pass the parent ID dynamically
+                />
+
+                {/*DropdownMenu for Edit/Delete: */}
+                <DropdownMenu
+                  trigger={({ triggerRef, ...triggerProps }) => (
+                    <Button
+                      {...triggerProps}
+                      iconBefore={<MoreIcon label="more" />}
+                      ref={triggerRef}
+                      aria-label="More actions"
+                    />
+                  )}
+                  shouldRenderToParent
+                >
+                  <DropdownItemGroup>
+                    <DropdownItem
+                      onClick={() => {
+                        setSelectedTier({
+                          id,
+                          title,
+                          description,
+                          status,
+                          subtask: subtask || [], // Ensure subtask is always an array
+                        });
+                        setDrawerOpen(true); // Open the drawer
+                      }}
+                    >
+                      Edit
+                    </DropdownItem>
+
+                    <DropdownItem
+                      onClick={() => {
+                        console.log("Deleting tier:", id);
+                        // Logic to delete the tier
+                      }}
+                    >
+                      Delete
+                    </DropdownItem>
+                  </DropdownItemGroup>
+                </DropdownMenu>
+              </div>
             </Cell>
           </Row>
         )}
@@ -107,16 +180,7 @@ const GoalTierTableTree = () => {
             setSelectedTier(null);
             setSelectedParentId(null);
             if (shouldRefresh) {
-              fetchData(); // 👈 this is all you need!
-            }
-            if (shouldRefresh) {
-              api.goalCollection.getAll(scope.id).then((allGoals) => {
-                const mapped: Tier[] = allGoals.map((goal: any) => ({
-                  id: goal.id,
-                  title: goal.tier || goal.name,
-                  description: goal.description,
-                }));
-              });
+              fetchData();
             }
           }}
         />

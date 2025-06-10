@@ -87,7 +87,8 @@ export const AdminGoalCollection = (props: AdminGoalCollectionProps) => {
       type: GoalTierTypeEnum.GOAL_COLLECTION,
       name: data.name,
       description: data.description,
-      tier: "",
+      tier: "", // Sayna har adda
+      status: "", // Sayna har adda
     };
     if (scope) {
       api.goalCollection

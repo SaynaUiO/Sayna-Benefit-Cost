@@ -17,6 +17,7 @@ export interface GoalTier {
   name: string;
   description: string;
   tier?: string //Sayna har adda
+  status: string //Sayna har adda
   parentId?: string //Sayna har adda
   /* monetaryValue: boolean; */
 }
