@@ -1,9 +1,10 @@
 import { flushGoals } from "./GoalService";
 import { GCDA, GCHeadDA } from "../dataAccess/GoalCollectionDA";
-import { deleteIdFromHead, getAllIds, getNextId } from "../heads/GoalCollectionHead";
+import { deleteIdFromHead, getAllIds, addIdToHead} from "../heads/GoalCollectionHead";
 import { GoalCollection, PortfolioItems, GoalTierTypeEnum } from "../models";
 import { Result } from "@forge/api";
 import { getSelectedIssueType } from "./ProjectService";
+
 
 export const deleteGoalCollection = async (scopeId: string, id: string) => {
   console.log(`Delete Goal Collection: gc-${scopeId}-${id}`)
@@ -57,7 +58,8 @@ export const changeRanking = async (scopeId: string, id1: string, id2: string) =
       }
     }
     ids.splice(new_index, 0, ids.splice(index, 1)[0]);
-    return GCHeadDA.set(scopeId, { nextId: head.nextId, goalCollectionIds: ids });
+    // return GCHeadDA.set(scopeId, { nextId: head.nextId, goalCollectionIds: ids });
+    return GCHeadDA.set(scopeId, { goalCollectionIds: ids });
   });
 }
 
@@ -130,15 +132,18 @@ export const getSubGoalCollection = async (scopeId: string, goalCollectionId: st
   }
 }
 
+// --- Keep ONLY this (the second/bottom-most) one, with the changes below: ---
 export const createGoalCollection = async (scopeId: string, goalCollection: GoalCollection) => {
-  console.log(`Create New Goal Collection: gc-${scopeId}-`)
-  return getNextId(scopeId).then((response) => {
-    const id = response;
-    goalCollection.id = id;
-    //OG: 
-    // goalCollection.type = GoalTierTypeEnum.GOAL_COLLECTION;
-    //SaynaSinendring: 
-    // goalCollection.type = goalCollection.type ?? GoalTierTypeEnum.GOAL_COLLECTION;
-    return GCDA.set(scopeId, goalCollection)
-  });
-}
+  console.log(`Create New Goal Collection: gc-${scopeId}-`);
+
+  // --- START OF CHANGES ---
+  // No longer use getNextId or overwrite the ID
+  // The goalCollection.id already contains the UUID from the frontend.
+
+  // Add the client-generated UUID to the head
+  await addIdToHead(scopeId, goalCollection.id); // <--- NEW LINE
+
+  // Store the goal with the UUID
+  return GCDA.set(scopeId, goalCollection);
+  // --- END OF CHANGES ---
+};

@@ -22,38 +22,9 @@ import {
   mapEnumToGoalTypeString,
 } from "./enums/goal";
 
+import { v4 as uuidv4 } from "uuid";
+
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
-
-//Dette fjernes:
-// const mapGoalTypeToEnum = (type: string): GoalTierTypeEnum => {
-//   switch (type) {
-//     case "Formål":
-//       return GoalTierTypeEnum.FORMAAL;
-//     case "Prosjektets Nyttevirkning":
-//       return GoalTierTypeEnum.NYTTEVIRKNING;
-//     case "Prosjektets Produkt":
-//       return GoalTierTypeEnum.PRODUKT;
-//     case "Epic":
-//       return GoalTierTypeEnum.EPIC;
-//     default:
-//       return GoalTierTypeEnum.GOAL_COLLECTION;
-//   }
-// };
-
-// const mapEnumToGoalType = (enumValue: GoalTierTypeEnum): string => {
-//   switch (enumValue) {
-//     case GoalTierTypeEnum.FORMAAL:
-//       return "Formål";
-//     case GoalTierTypeEnum.NYTTEVIRKNING:
-//       return "Prosjektets Nyttevirkning";
-//     case GoalTierTypeEnum.PRODUKT:
-//       return "Prosjektets Produkt";
-//     case GoalTierTypeEnum.EPIC:
-//       return "Epic";
-//     default:
-//       return "Unknown";
-//   }
-// };
 
 type Props = {
   title: string; // The title of the drawer (e.g., "Create Goal" or "Edit Goal")
@@ -65,6 +36,7 @@ type Props = {
   initialName?: string; // Optional: Initial name for editing
   initialDescription?: string; // Optional: Initial description for editing
   initialStatus?: string; // Optional: Initial status for editing
+  onGoalSaved?: () => void;
 };
 
 const GoalDrawer = ({
@@ -77,8 +49,9 @@ const GoalDrawer = ({
   initialName = "",
   initialDescription = "",
   initialStatus = "To Do", // Default status for new goals
+  onGoalSaved,
 }: Props) => {
-  const [name, setName] = useState<string>(initialName);
+  // const [name, setName] = useState<string>(initialName);
   const [description, setDescription] = useState<string>(initialDescription);
   const [status, setStatus] = useState<string>(initialStatus); // Default status
 
@@ -86,7 +59,7 @@ const GoalDrawer = ({
   const api = useAPI();
 
   useEffect(() => {
-    setName(initialName);
+    // setName(initialName);
     setDescription(initialDescription);
     setStatus(initialStatus);
   }, [isOpen, initialName, initialDescription, initialStatus]); // Dependencies trigger reset/load
@@ -96,6 +69,10 @@ const GoalDrawer = ({
     //   alert("name is required");
     //   return;
     // } //Dette er for name is required, men jeg vil kanskej ikke ha mae, bare description
+    if (!description || description.trim() === "") {
+      alert("Description is required.");
+      return;
+    }
     if (!status || status.trim() === "") {
       alert("Status is required.");
       return;
@@ -103,10 +80,10 @@ const GoalDrawer = ({
 
     // Prepare GoalCollection data to send to backend
     const goalData: GoalCollection = {
-      id: goalId || "0", // Use the provided goal ID for editing, or "0" for creating
+      id: goalId || uuidv4(), // Use the provided goal ID for editing, or "0" for creating
       scopeId: scope.id,
       type: mapGoalTypeStringToEnum(goalType),
-      name: name,
+      name: description,
       description: description,
       status: status,
       tier: goalType,
@@ -126,22 +103,17 @@ const GoalDrawer = ({
         console.log("Goal created:", goalData);
       }
       onClose(true); // Close the drawer and refresh
+      console.log("GoalDrawer: Called onClose(true)."); // This log was meant to confirm onClose was called
+      if (onGoalSaved) {
+        onGoalSaved();
+      }
     } catch (err) {
+      console.error("Failed to save goal:", err);
+      console.log("GoalDrawer: Calling onClose(false) due to save error.");
       console.error("Failed to save goal:", err);
       onClose(false); // Close the drawer without refreshing
     }
   };
-
-  // useEffect(() => {
-  //   setName(initialName || "");
-  //   setDescription(initialDescription || "");
-  //   setStatus("To Do"); // Reset status to default or initial value
-  //   // Map the goalType enum to its string name for display
-  //   if (goalType) {
-  //     const mappedGoalType = mapEnumToGoalType(mapGoalTypeToEnum(goalType));
-  //     setName(mappedGoalType); // Set the mapped name
-  //   }
-  // }, [isOpen, initialName, initialDescription]);
 
   const statusOptions = [
     { label: "To Do", value: "To Do" },

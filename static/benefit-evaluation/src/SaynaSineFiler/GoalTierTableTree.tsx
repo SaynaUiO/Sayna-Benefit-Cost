@@ -24,11 +24,17 @@ import { useAPI } from "../Contexts/ApiContext";
 import GoalDrawer from "./CreateGoalDrawer";
 import NewGoalTierButton from "./NewGoalTierButton";
 import { GOAL_TYPE_DROPDOWN_ITEMS } from "./goalDropdownItems";
+import refresh from "@atlaskit/icon/glyph/refresh";
 
 // Import shared types
 // Import shared enums and mapping functions
 
-const GoalTierTableTree = () => {
+// Define props for GoalTierTableTree to accept refreshTrigger
+type GoalTierTableTreeProps = {
+  refreshTrigger: boolean;
+};
+
+const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
   const [items, setItems] = useState<Tier[]>([]);
   const [scope] = useAppContext();
   const api = useAPI();
@@ -42,7 +48,6 @@ const GoalTierTableTree = () => {
   const [createGoalType, setCreateGoalType] = useState<string | null>(null); // String type for new goal creation
 
   // Centralized data fetching and tree building logic
-
   const fetchData = useCallback(async () => {
     try {
       const allGoals = await api.goalCollection.getAll(scope.id);
@@ -112,7 +117,7 @@ const GoalTierTableTree = () => {
   // Effect to fetch data on component mount and when scope.id changes
   useEffect(() => {
     fetchData();
-  }, [fetchData]); // Dependency array: fetchData itself
+  }, [fetchData, refreshTrigger]); // Dependency array: fetchData itself
 
   // Helper for opening drawer in edit mode
   const handleEditClick = (goal: Tier) => {

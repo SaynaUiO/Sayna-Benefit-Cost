@@ -9,7 +9,7 @@ export const GCKey = (scopeId: string, goalCollectionId: string): string => {
 }
 
 export type GCHead = {
-  nextId: number;
+  // nextId: number; //Remove
   goalCollectionIds: string[];
 }
 

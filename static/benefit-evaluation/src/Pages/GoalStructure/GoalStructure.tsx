@@ -17,6 +17,9 @@ export const GoalStructure = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [createGoalType, setCreateGoalType] = useState<string | null>(null);
 
+  //New state to trigger refresh in GoalTierTableTree
+  const [refreshTableTree, setRefreshTableTree] = useState(false);
+
   //Handler for when a type is selected for a new top-level goal
   const handleTopLevelGoalCreation = (selectedType: string) => {
     setCreateGoalType(selectedType);
@@ -25,8 +28,24 @@ export const GoalStructure = () => {
 
   // Handler for closing the top-level goal creation drawer
   const handleTopLevelDrawerClose = (shouldRefresh?: boolean) => {
+    console.log(
+      "GoalStructure: handleTopLevelDrawerClose called, shouldRefresh:",
+      shouldRefresh
+    );
     setIsDrawerOpen(false);
     setCreateGoalType(null);
+
+    if (shouldRefresh) {
+      setRefreshTableTree((prev) => {
+        console.log(
+          "GoalStructure: Toggling refreshTableTree from",
+          prev,
+          "to",
+          !prev
+        ); // Keep this log!
+        return !prev;
+      });
+    }
   };
 
   return (
@@ -54,7 +73,7 @@ export const GoalStructure = () => {
         )}
 
         {/* The TableTree component, which will now handle its own data fetching and rendering */}
-        <GoalTierTableTree />
+        <GoalTierTableTree refreshTrigger={refreshTableTree} />
       </div>
     </>
   );
