@@ -5,7 +5,7 @@ import DropdownMenu, {
 } from "@atlaskit/dropdown-menu";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import React, { useState } from "react";
-import GoalDrawer from "./GoalDrawer";
+import GoalDrawer from "./CreateGoalDrawer";
 import GoalTierTableTree from "./GoalTierTableTree";
 
 // This component Adds a new goal tier, both a new root one and a subtier
@@ -13,7 +13,7 @@ import GoalTierTableTree from "./GoalTierTableTree";
 type Props = {
   buttonLabel: string; // Label for the button
   dropdownItems: { label: string; value: string }[]; // Dropdown options
-  onSave: (type: string, parentId?: string) => void; // Callback for saving
+  onTypeSelectedForCreation: (selectedType: string, parentId?: string) => void; // CHANGED PROP NAME
   isPrimary?: boolean; // Optional: Make the button primary
   parentId?: string; // Optional: Parent ID for child rows
 };
@@ -21,26 +21,10 @@ type Props = {
 const NewGoalTierButton = ({
   buttonLabel,
   dropdownItems,
-  onSave,
+  onTypeSelectedForCreation, // Use the new prop name
   isPrimary = true,
   parentId,
 }: Props) => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState<string | null>(null);
-
-  const handleSelect = (type: string) => {
-    setSelectedType(type);
-    setDrawerOpen(true);
-  };
-
-  const handleSave = () => {
-    if (selectedType) {
-      onSave(selectedType, parentId); // Pass the selected type and parent ID
-      setDrawerOpen(false);
-      setSelectedType(null);
-    }
-  };
-
   return (
     <>
       <DropdownMenu
@@ -62,31 +46,15 @@ const NewGoalTierButton = ({
           {dropdownItems.map((item) => (
             <DropdownItem
               key={item.value}
-              onClick={() => handleSelect(item.value)}
+              onClick={() => {
+                onTypeSelectedForCreation(item.value, parentId); // Pass type and parentId UP
+              }}
             >
               {item.label}
             </DropdownItem>
           ))}
         </DropdownItemGroup>
       </DropdownMenu>
-
-      {/* Drawer */}
-      {selectedType && (
-        <GoalDrawer
-          title={`Add ${selectedType}`}
-          goalType={selectedType}
-          parentId={parentId} // Pass parentId for child rows
-          isOpen={drawerOpen}
-          onClose={(shouldRefresh) => {
-            if (shouldRefresh) {
-              handleSave(); //Save new goal tier
-            } else {
-              setDrawerOpen(false);
-              setSelectedType(null);
-            }
-          }}
-        />
-      )}
     </>
   );
 };

@@ -20,3 +20,5 @@ export interface GoalTier {
   parentId?: string; //Sayna har adda 
   /* monetaryValue: boolean; */
 }
+
+//Kanskje ikke bruke dette? 
