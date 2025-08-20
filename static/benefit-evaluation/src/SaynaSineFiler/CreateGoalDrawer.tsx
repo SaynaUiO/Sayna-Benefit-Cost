@@ -36,6 +36,7 @@ type Props = {
   initialName?: string; // Optional: Initial name for editing
   initialDescription?: string; // Optional: Initial description for editing
   initialStatus?: string; // Optional: Initial status for editing
+  initialTierString?: string; // Add this prop
   onGoalSaved?: () => void;
 };
 
@@ -49,9 +50,9 @@ const GoalDrawer = ({
   initialName = "",
   initialDescription = "",
   initialStatus = "To Do", // Default status for new goals
+  initialTierString,
   onGoalSaved,
 }: Props) => {
-  // const [name, setName] = useState<string>(initialName);
   const [description, setDescription] = useState<string>(initialDescription);
   const [status, setStatus] = useState<string>(initialStatus); // Default status
 
@@ -65,10 +66,6 @@ const GoalDrawer = ({
   }, [isOpen, initialName, initialDescription, initialStatus]); // Dependencies trigger reset/load
 
   const handleSave = async () => {
-    // if (!name || name.trim() === "") {
-    //   alert("name is required");
-    //   return;
-    // } //Dette er for name is required, men jeg vil kanskej ikke ha mae, bare description
     if (!description || description.trim() === "") {
       alert("Description is required.");
       return;
@@ -83,10 +80,10 @@ const GoalDrawer = ({
       id: goalId || uuidv4(), // Use the provided goal ID for editing, or "0" for creating
       scopeId: scope.id,
       type: mapGoalTypeStringToEnum(goalType),
-      name: description,
+      name: initialName,
       description: description,
       status: status,
-      tier: goalType,
+      tier: initialTierString || goalType,
       parentId: parentId || undefined, // Include parentId for creating subtasks
     };
 
@@ -153,11 +150,6 @@ const GoalDrawer = ({
               ? `This is where you add a subtask to the ${goalType}.`
               : `This is where you create a new ${goalType}.`}
           </p>
-          {/* <TextField
-            value={name}
-            onChange={(e) => setName((e.target as HTMLInputElement).value)}
-            placeholder="Enter title..."
-          /> */}
 
           <TextField
             value={description}

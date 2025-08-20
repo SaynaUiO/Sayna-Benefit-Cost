@@ -270,9 +270,9 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
           <GoalDrawer
             goalId={editGoalData?.id}
             // IMPORTANT: initialName should be the actual editable name, not the display type title
-            initialName={editGoalData?.description} // <--- FIX: This was initially missing and then incorrectly mapped
+            initialName={editGoalData?.name}
             initialDescription={editGoalData?.description}
-            // Pass the string representation of the type to GoalDrawer
+            initialTierString={editGoalData?.tierString || ""} // <-- Pass the correct tier string            // Pass the string representation of the type to GoalDrawer
             goalType={
               editGoalData?.type !== undefined
                 ? mapEnumToGoalTypeString(editGoalData.type) // Convert numeric enum to string for drawer
