@@ -24,7 +24,8 @@ import { useAPI } from "../Contexts/ApiContext";
 import GoalDrawer from "./CreateGoalDrawer";
 import NewGoalTierButton from "./NewGoalTierButton";
 import { GOAL_TYPE_DROPDOWN_ITEMS } from "./goalDropdownItems";
-import refresh from "@atlaskit/icon/glyph/refresh";
+import Lozenge from "@atlaskit/lozenge";
+import { statusAppearanceMap } from "./utils/statusMapping"; // Import the status mapping
 
 // Import shared types
 // Import shared enums and mapping functions
@@ -199,7 +200,14 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
               <Cell>{title}</Cell>
               <Cell>{description}</Cell>
               <Cell>0</Cell>
-              <Cell>{status || "Unknown"}</Cell>
+              <Cell>
+                <Lozenge
+                  appearance={statusAppearanceMap[status || "To Do"]}
+                  isBold
+                >
+                  {status || "Unknown"}
+                </Lozenge>
+              </Cell>
               <Cell>19.05.1999</Cell>
               <Cell>
                 <div
