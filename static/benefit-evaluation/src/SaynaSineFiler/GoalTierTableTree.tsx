@@ -73,10 +73,13 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
         goalMap.set(goal.id, {
           id: goal.id,
           title: displayTitle, // The human-readable title for display
+          name: goal.name,
           description: goal.description,
           status: goal.status || "To Do", // Default status
           type: parsedType, // Store the numeric enum value for 'type'
+          parentId: goal.parentId,
           subtask: [], // Initialize subtask array
+          tierString: goal.tier, // Store the backend 'tier' string for referenc
         });
       });
 
@@ -122,7 +125,7 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
   // Helper for opening drawer in edit mode
   const handleEditClick = (goal: Tier) => {
     setEditGoalData(goal);
-    setNewSubtaskParentId(null);
+    setNewSubtaskParentId(goal.parentId || null); //<- legger til goal.parentID istedet for null
     setCreateGoalType(null); // Ensure creation mode is off
     setIsDrawerOpen(true);
   };
@@ -188,6 +191,9 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
             subtask = [],
             status,
             type, // This `type` is the numeric enum
+            name,
+            parentId,
+            tierString,
           }: Tier) => (
             <Row itemId={id} items={subtask} hasChildren={subtask.length > 0}>
               <Cell>{title}</Cell>
@@ -230,10 +236,13 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
                           handleEditClick({
                             id,
                             title, // title is the display string, so no need to map here
+                            name,
                             description,
                             status,
                             type, // Pass the numeric enum type
+                            parentId,
                             subtask: subtask || [],
+                            tierString,
                           });
                         }}
                       >

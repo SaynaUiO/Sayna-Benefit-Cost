@@ -30,9 +30,12 @@ export interface GoalCollection {
 export interface Tier {
     id: string;
     title: string;          // Human-readable string (e.g., "Formål", "Epic")
+    name: string;           // Name of the goal
     description: string;
     status?: string;
     type?: GoalTierTypeEnum; // Numeric enum from backend
+    parentId?: string; 
     subtask?: Tier[];
+    tierString?: string;
     // Add other properties if needed for display that are part of GoalCollection
   }
