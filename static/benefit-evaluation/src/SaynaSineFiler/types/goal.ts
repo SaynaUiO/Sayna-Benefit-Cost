@@ -16,8 +16,9 @@ export interface GoalCollection {
     description: string;
     tier: string; 
     status: string;
-    parentId?: string; // Optional: Parent ID for subtasks
-    //Add other properties if your backend GoalCollection has more fields
+    parentId?: string;
+    dueDate?: string; 
+    
 
 }
 
@@ -33,9 +34,9 @@ export interface Tier {
     name: string;           // Name of the goal
     description: string;
     status?: string;
-    type?: GoalTierTypeEnum; // Numeric enum from backend
+    type?: GoalTierTypeEnum; 
     parentId?: string; 
     subtask?: Tier[];
     tierString?: string;
-    // Add other properties if needed for display that are part of GoalCollection
+    dueDate?: string;       
   }

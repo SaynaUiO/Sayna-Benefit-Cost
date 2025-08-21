@@ -89,6 +89,8 @@ export const AdminGoalCollection = (props: AdminGoalCollectionProps) => {
       description: data.description,
       tier: "", // Sayna har adda
       status: "", // Sayna har adda
+      parentId: "", // Sayna har adda
+      dueDate: "", // Sayna har adda
     };
     if (scope) {
       api.goalCollection

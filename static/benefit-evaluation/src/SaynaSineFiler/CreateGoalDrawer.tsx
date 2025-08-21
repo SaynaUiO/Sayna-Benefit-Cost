@@ -23,6 +23,7 @@ import {
 } from "./enums/goal";
 
 import { v4 as uuidv4 } from "uuid";
+import { DatePicker } from "@atlaskit/datetime-picker";
 
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
 
@@ -37,6 +38,7 @@ type Props = {
   initialDescription?: string; // Optional: Initial description for editing
   initialStatus?: string; // Optional: Initial status for editing
   initialTierString?: string; // Add this prop
+  initialDueDate?: string;
   onGoalSaved?: () => void;
 };
 
@@ -51,10 +53,12 @@ const GoalDrawer = ({
   initialDescription = "",
   initialStatus = "To Do", // Default status for new goals
   initialTierString,
+  initialDueDate = "",
   onGoalSaved,
 }: Props) => {
   const [description, setDescription] = useState<string>(initialDescription);
   const [status, setStatus] = useState<string>(initialStatus); // Default status
+  const [dueDate, setDueDate] = useState<string>(initialDueDate);
 
   const [scope] = useAppContext();
   const api = useAPI();
@@ -63,6 +67,7 @@ const GoalDrawer = ({
     // setName(initialName);
     setDescription(initialDescription);
     setStatus(initialStatus);
+    setDueDate(initialDueDate);
   }, [isOpen, initialName, initialDescription, initialStatus]); // Dependencies trigger reset/load
 
   const handleSave = async () => {
@@ -85,6 +90,7 @@ const GoalDrawer = ({
       status: status,
       tier: initialTierString || goalType,
       parentId: parentId || undefined, // Include parentId for creating subtasks
+      dueDate: dueDate,
     };
 
     console.log("GoalDrawer: Attempting to save with goalData:", goalData); // This should appear now!
@@ -166,6 +172,16 @@ const GoalDrawer = ({
             onChange={(selectedOption) =>
               setStatus(selectedOption?.value || "To Do")
             }
+          />
+
+          <DatePicker
+            clearControlLabel="Clear start date"
+            shouldShowCalendarButton
+            inputLabel="Start date"
+            openCalendarLabel="open calendar"
+            onChange={(date) => {
+              setDueDate(date || "");
+            }}
           />
 
           <div style={{ display: "flex", justifyContent: "flex-end" }}>

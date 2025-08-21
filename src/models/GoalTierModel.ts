@@ -18,6 +18,7 @@ export interface GoalTier {
   status: string; //Sayna har adda
   tier?: string; //Sayna har adda 
   parentId?: string; //Sayna har adda 
+  dueDate?: string; //Sayna har adda
   /* monetaryValue: boolean; */
 }
 

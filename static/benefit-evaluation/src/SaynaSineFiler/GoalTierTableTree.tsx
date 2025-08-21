@@ -81,6 +81,7 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
           parentId: goal.parentId,
           subtask: [], // Initialize subtask array
           tierString: goal.tier, // Store the backend 'tier' string for referenc
+          dueDate: goal.dueDate || "", // Store the due date, default to empty string if not set
         });
       });
 
@@ -195,6 +196,7 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
             name,
             parentId,
             tierString,
+            dueDate,
           }: Tier) => (
             <Row itemId={id} items={subtask} hasChildren={subtask.length > 0}>
               <Cell>{title}</Cell>
@@ -208,7 +210,8 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
                   {status || "Unknown"}
                 </Lozenge>
               </Cell>
-              <Cell>19.05.1999</Cell>
+              <Cell>{dueDate || "Ikke satt"}</Cell>
+
               <Cell>
                 <div
                   style={{
@@ -251,6 +254,7 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
                             parentId,
                             subtask: subtask || [],
                             tierString,
+                            dueDate,
                           });
                         }}
                       >
@@ -280,7 +284,8 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
             // IMPORTANT: initialName should be the actual editable name, not the display type title
             initialName={editGoalData?.name}
             initialDescription={editGoalData?.description}
-            initialTierString={editGoalData?.tierString || ""} // <-- Pass the correct tier string            // Pass the string representation of the type to GoalDrawer
+            initialTierString={editGoalData?.tierString || ""}
+            initialDueDate={editGoalData?.dueDate || ""}
             goalType={
               editGoalData?.type !== undefined
                 ? mapEnumToGoalTypeString(editGoalData.type) // Convert numeric enum to string for drawer
@@ -301,9 +306,9 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
       </TableTree>
 
       {/* Viser til storage Json kode på siden  */}
-      <pre className="text-xs mt-4 bg-gray-100 p-2">
+      {/* <pre className="text-xs mt-4 bg-gray-100 p-2">
         {JSON.stringify(items, null, 3)}
-      </pre>
+      </pre> */}
     </div>
   );
 };

@@ -8,4 +8,6 @@ export const PortfolioItems = (portfolioId: string): GoalTier => ({
   description: "",
   tier: "", //Sayna har adda
   status: "",//Sayna har adda
+  parentId: "", //Sayna har adda
+  dueDate: "", //Sayna har adda
 })
