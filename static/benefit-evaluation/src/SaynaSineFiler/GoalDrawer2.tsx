@@ -8,19 +8,13 @@ import {
 import TextField from "@atlaskit/textfield";
 import { useAppContext } from "../Contexts/AppContext";
 import { useAPI } from "../Contexts/ApiContext";
-//import { GoalCollection, GoalTierTypeEnum } from "../Models";
 import Button from "@atlaskit/button";
-import Form, { Field, FormFooter, HelperMessage } from "@atlaskit/form";
-import { useEffect, useCallback } from "react";
-import Select, { type OptionsType } from "@atlaskit/select";
+import { useEffect } from "react";
+import Select from "@atlaskit/select";
 
 //Ny interface jeg har laget:
-import { GoalCollection } from "./types/goal";
-import {
-  GoalTierTypeEnum,
-  mapGoalTypeStringToEnum,
-  mapEnumToGoalTypeString,
-} from "./enums/goal";
+import { GoalCollection2 } from "./types/goal2";
+import { mapGoalTypeStringToEnum } from "./enums/goal";
 
 import { v4 as uuidv4 } from "uuid";
 import { DatePicker } from "@atlaskit/datetime-picker";
@@ -28,107 +22,127 @@ import { DatePicker } from "@atlaskit/datetime-picker";
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
 
 type Props = {
-  title: string; // The title of the drawer (e.g., "Create Goal" or "Edit Goal")
-  goalType: string; // The type of the goal (e.g., "Formål", "Epic")
-  isOpen: boolean; // Whether the drawer is open
-  parentId?: string; // Optional: The ID of the parent goal (for subtasks)
-  onClose: (shouldRefresh?: boolean) => void; // Callback when the drawer is closed
-  goalId?: string; // Optional: The ID of the goal being edited
-  initialName?: string; // Optional: Initial name for editing
-  initialDescription?: string; // Optional: Initial description for editing
-  initialStatus?: string; // Optional: Initial status for editing
-  initialTierString?: string; // Add this prop
-  initialDueDate?: string;
-  onGoalSaved?: () => void;
+  title: string;
+  goalType: "Objective" | "Benefit" | "Epic" | string;
+  isOpen: boolean;
+  parentId?: string;
+  onClose: (shouldRefresh?: boolean) => void;
 };
 
-const GoalDrawer2 = ({
-  title,
-  goalType, //String representation of f.eks formål, epic, etc.
-  isOpen,
-  parentId,
-  onClose,
-  goalId,
-  initialName = "",
-  initialDescription = "",
-  initialStatus = "To Do", // Default status for new goals
-  initialTierString,
-  initialDueDate = "",
-  onGoalSaved,
-}: Props) => {
-  const [description, setDescription] = useState<string>(initialDescription);
-  const [status, setStatus] = useState<string>(initialStatus); // Default status
-  const [dueDate, setDueDate] = useState<string>(initialDueDate);
+// Initial state for all possible fields
+interface FormData {
+  name: string;
+  description: string;
+  timeEstimate?: number;
+  costEstimate?: number;
+}
 
+// --- Component ---
+const GoalDrawer2 = ({ title, goalType, isOpen, parentId, onClose }: Props) => {
   const [scope] = useAppContext();
   const api = useAPI();
 
+  // Initialize all fields in a single state object
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    description: "",
+    timeEstimate: undefined,
+    costEstimate: undefined,
+  });
+
+  // Reset form data when the drawer opens
   useEffect(() => {
-    // setName(initialName);
-    setDescription(initialDescription);
-    setStatus(initialStatus);
-    setDueDate(initialDueDate);
-  }, [isOpen, initialName, initialDescription, initialStatus]); // Dependencies trigger reset/load
-
-  const handleSave = async () => {
-    if (!description || description.trim() === "") {
-      alert("Description is required.");
-      return;
+    if (isOpen) {
+      setFormData({
+        name: "",
+        description: "",
+        timeEstimate: undefined,
+        costEstimate: undefined,
+      });
     }
-    if (!status || status.trim() === "") {
-      alert("Status is required.");
-      return;
-    }
+  }, [isOpen]);
 
-    // Prepare GoalCollection data to send to backend
-    const goalData: GoalCollection = {
-      id: goalId || uuidv4(), // Use the provided goal ID for editing, or "0" for creating
-      scopeId: scope.id,
-      type: mapGoalTypeStringToEnum(goalType),
-      name: initialName,
-      description: description,
-      status: status,
-      tier: initialTierString || goalType,
-      parentId: parentId || undefined, // Include parentId for creating subtasks
-      dueDate: dueDate,
-    };
-
-    console.log("GoalDrawer: Attempting to save with goalData:", goalData); // This should appear now!
-
-    try {
-      if (goalId) {
-        // Editing an existing goal
-        await api.goalCollection.update(scope.id, goalData);
-        console.log("Goal updated:", goalData);
-      } else {
-        // Creating a new goal
-        await api.goalCollection.create(scope.id, goalData);
-        console.log("Goal created:", goalData);
-      }
-      onClose(true); // Close the drawer and refresh
-      console.log("GoalDrawer: Called onClose(true)."); // This log was meant to confirm onClose was called
-      if (onGoalSaved) {
-        onGoalSaved();
-      }
-    } catch (err) {
-      console.error("Failed to save goal:", err);
-      console.log("GoalDrawer: Calling onClose(false) due to save error.");
-      console.error("Failed to save goal:", err);
-      onClose(false); // Close the drawer without refreshing
-    }
+  // Generic handler for all text/number fields
+  const handleChange = (field: keyof FormData, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const statusOptions = [
-    { label: "To Do", value: "To Do" },
-    { label: "In Progress", value: "In Progress" },
-    { label: "Done", value: "Done" },
-  ];
+  const handleSave = async () => {
+    // Basic Validation
+    if (!formData.name || !formData.description) {
+      alert("Title and Description are required.");
+      return;
+    }
 
+    // Prepare GoalCollection data
+    const goalData: GoalCollection2 = {
+      id: uuidv4(),
+      scopeId: scope.id,
+      name: formData.name,
+      description: formData.description,
+      parentId: parentId || undefined,
+
+      // Conditionally add Epic fields
+      ...(goalType === "Epic" &&
+        formData.timeEstimate !== undefined && {
+          timeEstimate: formData.timeEstimate,
+        }),
+      ...(goalType === "Epic" &&
+        formData.costEstimate !== undefined && {
+          costEstimate: formData.costEstimate,
+        }),
+    };
+
+    console.log("GoalDrawer: Attempting to save with goalData:", goalData);
+
+    // NOTE: Uncomment and fix API call when ready:
+    // try {
+    //   await api.goalCollection.create(scope.id, goalData);
+    //   console.log("Goal created:", goalData);
+    //   onClose(true); // Close and refresh
+    // } catch (err) {
+    //   console.error("Failed to save goal:", err);
+    //   onClose(false);
+    // }
+
+    // Temporary log/close for demonstration
+    onClose(true);
+  };
+
+  // --- Conditional Field Renderer ---
+  const renderEpicFields = () => (
+    <>
+      <TextField
+        label="Time (t)"
+        type="number"
+        value={
+          formData.timeEstimate === undefined
+            ? ""
+            : String(formData.timeEstimate)
+        }
+        //onChange={(e) => handleChange("timeEstimate", Number(e.target.value))} // <-- ADDED onChange
+        placeholder="Estimated time in hours"
+      />
+      <TextField
+        label="Cost (kr)"
+        type="number"
+        value={
+          formData.costEstimate === undefined
+            ? ""
+            : String(formData.costEstimate)
+        }
+        //onChange={(e) => handleChange("costEstimate", Number(e.target.value))} // <-- ADDED onChange
+        placeholder="Estimated cost in currency"
+      />
+    </>
+  );
+
+  // --- Main Render Function (Moved outside handleSave) ---
   return (
     <Drawer
       isOpen={isOpen}
       onClose={() => onClose(false)}
-      label={goalId ? `Edit ${goalType}` : `Create ${goalType}`}
+      label={`Create ${goalType}`}
     >
       <DrawerSidebar>
         <DrawerCloseButton />
@@ -142,51 +156,26 @@ const GoalDrawer2 = ({
             padding: "1rem",
           }}
         >
-          <h2>
-            {goalId
-              ? `${title}`
-              : parentId
-              ? `Add Subtast to ${goalType}`
-              : `Create New ${goalType}`}
-          </h2>
-          <p>
-            {goalId
-              ? `Edit the details of the ${goalType}.`
-              : parentId
-              ? `This is where you add a subtask to the ${goalType}.`
-              : `This is where you create a new ${goalType}.`}
-          </p>
+          <h2>{`Create New ${goalType} for ${parentId || "Root"}`}</h2>
 
+          {/* 2. DESCRIPTION FIELD */}
           <TextField
-            value={description}
-            onChange={(e) =>
-              setDescription((e.target as HTMLTextAreaElement).value)
-            }
-            placeholder="Enter description..."
+            label="Description"
+            value={formData.description}
+            //onChange={(e) => handleChange("description", e.target.value)} // <-- Correct handler for description
+            placeholder="Detailed description"
             style={{ minHeight: 80 }}
+            isRequired
           />
 
-          <Select
-            options={statusOptions}
-            value={statusOptions.find((option) => option.value === status)}
-            onChange={(selectedOption) =>
-              setStatus(selectedOption?.value || "To Do")
-            }
-          />
+          {/* 3. Conditional Epic Fields */}
+          {goalType === "Epic" && renderEpicFields()}
 
-          <DatePicker
-            clearControlLabel="Clear start date"
-            shouldShowCalendarButton
-            inputLabel="Start date"
-            openCalendarLabel="open calendar"
-            onChange={(date) => {
-              setDueDate(date || "");
-            }}
-          />
+          {/* 4. Placeholder for Status (using Select) and Date (DatePicker) - Removed for now, but ready to be added back */}
 
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button appearance="primary" onClick={handleSave}>
-              {goalId ? "Save Changes" : parentId ? "Add Subtask" : "Create"}
+              Create {goalType}
             </Button>
           </div>
         </div>
