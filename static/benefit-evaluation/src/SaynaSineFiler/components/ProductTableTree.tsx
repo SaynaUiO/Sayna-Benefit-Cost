@@ -8,12 +8,19 @@ import TableTree, {
 } from "@atlaskit/table-tree";
 import { Epic } from "../types/Epic";
 import { PRODUCT_GOALS } from "../data/productMockData";
+import { Button } from "@forge/react"; // <-- Import Button
+import AddIcon from "@atlaskit/icon/glyph/add";
 
 // 1. Define the Root Container Type
 interface ProductRootItem {
   id: string;
   name: string;
   goals: Epic[];
+}
+
+interface ProductTableTreeProps {
+  // onAddGoal is a function that takes two strings and returns nothing.
+  onAddGoal: (parentId: string, goalType: string) => void;
 }
 
 // 2. Define the Union Type for Items
@@ -25,9 +32,10 @@ const PRODUCT_ROOT_ITEM: ProductRootItem = {
   goals: PRODUCT_GOALS,
 };
 
-export const ProductTableTree = () => {
-  // We only pass the root item to the TableTree
-  const items: ProductRootItem[] = [PRODUCT_ROOT_ITEM];
+export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
+  onAddGoal,
+}) => {
+  const items = [PRODUCT_ROOT_ITEM];
 
   return (
     <TableTree>
@@ -35,7 +43,8 @@ export const ProductTableTree = () => {
         <Header width={250}>Produkt Mål</Header>
         <Header width={400}>Beskrivelse</Header>
         <Header width={100}>Time</Header>
-        <Header width={100}>Kostnad</Header>
+        <Header width={400}>Kostnad</Header>
+        <Header width={200}>Handlinger</Header>
       </Headers>
 
       <Rows
@@ -44,13 +53,17 @@ export const ProductTableTree = () => {
         render={(item: TableItem) => {
           // Safely check if the item is the root container by checking for the 'goals' array
           const isRoot = (item as ProductRootItem).goals !== undefined;
-
           // Safely extract properties using type assertions
           const epic = item as Epic;
           const root = item as ProductRootItem;
-
           // Safely get children: if it's the root, use its 'goals'; otherwise, use an empty array.
           const children = isRoot ? root.goals : [];
+
+          // Logic to open the drawer with the correct context
+          const handleAddClick = () => {
+            // Pass the parent ID ("product-root") and the type ("Epic")
+            onAddGoal(root.id, "Epic");
+          };
 
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
@@ -61,6 +74,17 @@ export const ProductTableTree = () => {
               <Cell>{isRoot ? "" : epic.description}</Cell>
               <Cell>{isRoot ? "" : epic.timeEstimate}</Cell>
               <Cell>{isRoot ? "" : epic.costEstimate}</Cell>
+              <Cell>
+                {isRoot && (
+                  <Button
+                    //onClick={handleAddClick}
+                    appearance="primary"
+                    onClick={handleAddClick}
+                  >
+                    +
+                  </Button>
+                )}
+              </Cell>
             </Row>
           );
         }}
