@@ -29,6 +29,7 @@ import { statusAppearanceMap } from "./utils/statusMapping"; // Import the statu
 import { ProductTableTree } from "./components/ProductTableTree";
 import { BenefitTableTree } from "./components/BenefitTableTree";
 import { ObjectiveTableTree } from "./components/ObjectiveTableTree";
+import { GoalStructureView } from "./components/GoalStructureView";
 
 // Import shared types
 // Import shared enums and mapping functions
@@ -313,14 +314,16 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
         {JSON.stringify(items, null, 3)}
       </pre> */}
 
-      <h4 id="referenced-label">Formål</h4>
+      {/* <h4 id="referenced-label">Formål</h4>
       <ObjectiveTableTree></ObjectiveTableTree>
 
       <h4 id="referenced-label">Planlagte Nyttevirkninger</h4>
       <BenefitTableTree></BenefitTableTree>
 
       <h4 id="referenced-label">Produkt</h4>
-      <ProductTableTree></ProductTableTree>
+      <ProductTableTree></ProductTableTree> */}
+
+      <GoalStructureView />
     </div>
   );
 };
