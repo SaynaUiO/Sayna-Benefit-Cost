@@ -26,6 +26,9 @@ import NewGoalTierButton from "./NewGoalTierButton";
 import { GOAL_TYPE_DROPDOWN_ITEMS } from "./goalDropdownItems";
 import Lozenge from "@atlaskit/lozenge";
 import { statusAppearanceMap } from "./utils/statusMapping"; // Import the status mapping
+import { ProductTableTree } from "./components/ProductTableTree";
+import { BenefitTableTree } from "./components/BenefitTableTree";
+import { ObjectiveTableTree } from "./components/ObjectiveTableTree";
 
 // Import shared types
 // Import shared enums and mapping functions
@@ -309,6 +312,15 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
       {/* <pre className="text-xs mt-4 bg-gray-100 p-2">
         {JSON.stringify(items, null, 3)}
       </pre> */}
+
+      <h4 id="referenced-label">Formål</h4>
+      <ObjectiveTableTree></ObjectiveTableTree>
+
+      <h4 id="referenced-label">Planlagte Nyttevirkninger</h4>
+      <BenefitTableTree></BenefitTableTree>
+
+      <h4 id="referenced-label">Produkt</h4>
+      <ProductTableTree></ProductTableTree>
     </div>
   );
 };
