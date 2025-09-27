@@ -310,18 +310,9 @@ const GoalTierTableTree = ({ refreshTrigger }: GoalTierTableTreeProps) => {
       </TableTree>
 
       {/* Viser til storage Json kode på siden  */}
-      {/* <pre className="text-xs mt-4 bg-gray-100 p-2">
+      <pre className="text-xs mt-4 bg-gray-100 p-2">
         {JSON.stringify(items, null, 3)}
-      </pre> */}
-
-      {/* <h4 id="referenced-label">Formål</h4>
-      <ObjectiveTableTree></ObjectiveTableTree>
-
-      <h4 id="referenced-label">Planlagte Nyttevirkninger</h4>
-      <BenefitTableTree></BenefitTableTree>
-
-      <h4 id="referenced-label">Produkt</h4>
-      <ProductTableTree></ProductTableTree> */}
+      </pre>
 
       <GoalStructureView />
     </div>

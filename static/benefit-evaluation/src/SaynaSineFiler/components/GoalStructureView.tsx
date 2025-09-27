@@ -49,8 +49,9 @@ export const GoalStructureView = () => {
         title="test"
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        parentId={context.parentId} // Use context
-        goalType={createGoalType || "Goal"} // Use context
+        parentId={context.parentId}
+        goalType={context.goalType}
+        goalCategory={context.category}
       />
     </div>
   );
