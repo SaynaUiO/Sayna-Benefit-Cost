@@ -27,7 +27,7 @@ interface ProductTableTreeProps {
 type TableItem = Epic | ProductRootItem;
 
 const PRODUCT_ROOT_ITEM: ProductRootItem = {
-  id: "product-root",
+  id: "Produkt",
   name: "Produkt",
   goals: PRODUCT_GOALS,
 };
@@ -38,8 +38,6 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
   const items = [PRODUCT_ROOT_ITEM];
 
   const handleAddEpic = (parentId: string) => {
-    // CRITICAL FIX: Ensure "Product" is passed as the goalType
-    // The category can be left as undefined or empty string, as the drawer defaults it to "Epic".
     onAddGoal(parentId, "Product");
   };
 
@@ -64,12 +62,6 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
           const root = item as ProductRootItem;
           // Safely get children: if it's the root, use its 'goals'; otherwise, use an empty array.
           const children = isRoot ? root.goals : [];
-
-          // Logic to open the drawer with the correct context
-          const handleAddClick = () => {
-            // Pass the parent ID ("product-root") and the type ("Epic")
-            onAddGoal(root.id, "Epic");
-          };
 
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>

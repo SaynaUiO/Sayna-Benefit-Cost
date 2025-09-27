@@ -31,7 +31,7 @@ export const GoalStructureView = () => {
 
       {/* 1. Formål (Objectives) */}
       <div style={{ marginBottom: "40px" }}>
-        <ObjectiveTableTree />
+        <ObjectiveTableTree onAddGoal={handleOpenDrawer} />
       </div>
 
       {/* 2. Planlagte Nyttevirkninger (Benefits) */}

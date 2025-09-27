@@ -8,12 +8,19 @@ import TableTree, {
 } from "@atlaskit/table-tree";
 import { Objective } from "../types/objective";
 import { OBJECTIVE_GOALS } from "../data/objectiveMockData";
+import Button from "@atlaskit/button";
+import AddIcon from "@atlaskit/icon/glyph/add";
 
 //1. Define the Root Container Type
 interface ObjectiveRootItem {
   id: string;
   name: string;
   goals: Objective[];
+}
+
+interface ObjectiveTableTreeProps {
+  // onAddGoal is a function that takes three strings and returns nothing.
+  onAddGoal: (parentId: string, goalType: string, category?: string) => void;
 }
 
 //2. Define the Union Type for Items
@@ -25,18 +32,24 @@ const OBJECTIVE_ROOT_ITEM: ObjectiveRootItem = {
   goals: OBJECTIVE_GOALS,
 };
 
-export const ObjectiveTableTree = () => {
+export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
+  onAddGoal,
+}) => {
   // The items array only contains the root container
   const items = [OBJECTIVE_ROOT_ITEM];
 
-  // Define a Union Type that covers the root and the objectives
-  type TableItem = typeof OBJECTIVE_ROOT_ITEM | Objective;
+  const handleAddObjective = (parentId: string) => {
+    onAddGoal(parentId, "Objective");
+  };
 
   return (
     <TableTree>
       <Headers>
         <Header width={250}>Mål</Header>
-        <Header width={500}>Beskrivelse</Header>
+        <Header width={400}>Beskrivelse</Header>
+        <Header width={100}></Header>
+        <Header width={530}></Header>
+        <Header width={120}>Handlinger</Header>
       </Headers>
 
       <Rows
@@ -58,6 +71,18 @@ export const ObjectiveTableTree = () => {
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
               <Cell>{isRoot ? item.id : item.name}</Cell>
               <Cell>{isRoot ? "" : objective.description}</Cell>
+              <Cell></Cell>
+              <Cell></Cell>
+              <Cell>
+                {isRoot && (
+                  <Button
+                    appearance="subtle"
+                    // Pass the icon component *as JSX*
+                    iconBefore={<AddIcon size="small" label="Add Epic" />}
+                    onClick={() => handleAddObjective(item.id)}
+                  />
+                )}
+              </Cell>
             </Row>
           );
         }}
