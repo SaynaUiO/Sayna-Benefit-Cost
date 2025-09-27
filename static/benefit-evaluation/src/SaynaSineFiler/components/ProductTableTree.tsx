@@ -19,7 +19,6 @@ interface ProductRootItem {
 }
 
 interface ProductTableTreeProps {
-  // onAddGoal is a function that takes three strings and returns nothing.
   onAddGoal: (parentId: string, goalType: string, category?: string) => void;
 }
 

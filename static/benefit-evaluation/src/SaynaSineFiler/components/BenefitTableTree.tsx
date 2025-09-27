@@ -21,12 +21,13 @@ const CATEGORY_HEADERS: BenefitCategory[] = [
 ];
 import { GOAL_TYPE_DROPDOWN_ITEMS2 } from "../goalDropdownItems2";
 import { Button } from "@forge/react"; // <-- Import Button
+import { GoalCollection2 } from "../types/goal2";
 
 // 1. Define the Category Item structure (the new middle layer)
 interface CategoryItem {
   id: BenefitCategory; // e.g., "Samfunnsmål"
   name: BenefitCategory;
-  goals: BenefitGoal[]; // Children are the goals
+  goals: GoalCollection2[]; // Children are the goals
 }
 
 interface BenefitRootItem {
@@ -34,17 +35,6 @@ interface BenefitRootItem {
   name: string;
   goals: CategoryItem[];
 }
-
-const BENEFIT_ROOT_ITEM: BenefitRootItem = {
-  id: "benefit-root",
-  name: "Planlagte Nyttevirkninger",
-  goals: CATEGORY_HEADERS.map((category) => ({
-    id: category, // Use the category name as the unique ID for this row
-    name: category,
-    // Filter the main goal list to find goals that belong to this category
-    goals: BENEFIT_GOALS.filter((goal) => goal.category === category),
-  })),
-};
 
 const CATEGORY_DROPDOWN_ITEMS = [
   { label: "Legg til Samfunnsmål", value: "Samfunnsmål" },
@@ -54,18 +44,32 @@ const CATEGORY_DROPDOWN_ITEMS = [
 
 // Define the component props
 interface BenefitTableTreeProps {
-  // The handler will receive the category (value) and the parentId ("benefit-root")
+  data: GoalCollection2[];
   onAddGoal: (parentId: string, goalType: string, category: string) => void;
 }
 
 // --- Main Component ---
 export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   onAddGoal,
+  data,
 }) => {
+  // FIX 3: Update the implementation where you build the categories
+  const liveCategories = CATEGORY_HEADERS.map((category) => ({
+    id: category,
+    name: category,
+    goals: data.filter((goal) => goal.tier === category), // This line is correct
+  }));
+
+  const BENEFIT_ROOT_ITEM: BenefitRootItem = {
+    id: "benefit-root",
+    name: "Planlagte Nyttevirkninger",
+    goals: liveCategories, // This now matches the new BenefitRootItem type
+  };
+
   // Use the combined data structure
   const items: BenefitRootItem[] = [BENEFIT_ROOT_ITEM];
   // Define the Union Type for ALL possible items in the tree
-  type TableItem = BenefitRootItem | CategoryItem | BenefitGoal;
+  type TableItem = BenefitRootItem | CategoryItem | GoalCollection2;
 
   // Handler to bridge the dropdown component's output to the main GoalStructureView handler
   const handleCategorySelect = (category: string, parentId?: string) => {
@@ -86,35 +90,41 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
       <Rows
         items={items as TableItem[]}
         render={(item: TableItem) => {
-          // Determine the item type
-          const isBenefitGoal = (item as BenefitGoal).weight !== undefined;
           const isAbsoluteRoot = item.id === "benefit-root";
-          const isCategory =
-            !isBenefitGoal &&
-            !isAbsoluteRoot &&
-            (item as CategoryItem).goals !== undefined;
-          const isRoot = !isBenefitGoal && !isCategory;
           const root = item as BenefitRootItem;
 
           // Safely extract properties
-          const goal = item as BenefitGoal;
-          const container = item as BenefitRootItem | CategoryItem;
+          // Safely check if the item is a container (Root or Category)
+          const isContainer = (item as any).goals !== undefined;
+          const isLiveGoal = !isContainer;
 
-          // Determine children array for nesting
-          const children = isBenefitGoal ? [] : container.goals;
-          const hasChildren = children.length > 0;
+          // Safely get the children array, defaulting to []
+          const children = isContainer
+            ? (item as BenefitRootItem | CategoryItem).goals
+            : [];
+
+          const childrenArray =
+            children && Array.isArray(children) ? children : [];
+
+          const hasChildren = childrenArray.length > 0;
+
+          const goal = item as GoalCollection2;
 
           return (
-            <Row itemId={item.id} items={children} hasChildren={hasChildren}>
-              <Cell>{isBenefitGoal ? goal.id : item.name}</Cell>
+            <Row
+              itemId={item.id}
+              items={childrenArray}
+              hasChildren={hasChildren}
+            >
+              <Cell>{isLiveGoal ? goal.id : item.name}</Cell>
 
-              <Cell>{isBenefitGoal ? goal.description : ""}</Cell>
+              <Cell>{isLiveGoal ? goal.description : ""}</Cell>
 
-              <Cell>{isBenefitGoal ? `${goal.weight}%` : ""}</Cell>
+              <Cell>{isLiveGoal ? `${goal.weight || 0}%` : ""}</Cell>
               <Cell></Cell>
 
               <Cell>
-                {isRoot && (
+                {isAbsoluteRoot && (
                   <AddBenefitGoalDropdownButton
                     buttonLabel="+"
                     dropdownItems={CATEGORY_DROPDOWN_ITEMS}

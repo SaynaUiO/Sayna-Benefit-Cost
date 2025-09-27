@@ -19,7 +19,7 @@ interface ObjectiveRootItem {
 }
 
 interface ObjectiveTableTreeProps {
-  // onAddGoal is a function that takes three strings and returns nothing.
+  data: Objective[];
   onAddGoal: (parentId: string, goalType: string, category?: string) => void;
 }
 
