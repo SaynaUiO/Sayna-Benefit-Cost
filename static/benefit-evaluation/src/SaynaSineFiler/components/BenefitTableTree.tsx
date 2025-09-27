@@ -8,13 +8,19 @@ import TableTree, {
 } from "@atlaskit/table-tree";
 import { BenefitGoal, BenefitCategory } from "../types/benefit";
 import { BENEFIT_GOALS } from "../data/benefitMockData";
-
+import DropdownMenu, {
+  DropdownItemGroup,
+  DropdownItem,
+} from "@atlaskit/dropdown-menu";
+import AddBenefitGoalDropdownButton from "../AddBenefitGoalDropdown";
 // Define the three category headers we need to insert into the table
 const CATEGORY_HEADERS: BenefitCategory[] = [
   "Samfunnsmål",
   "Organisasjonsmål",
   "Effektmål",
 ];
+import { GOAL_TYPE_DROPDOWN_ITEMS2 } from "../goalDropdownItems2";
+import { Button } from "@forge/react"; // <-- Import Button
 
 // 1. Define the Category Item structure (the new middle layer)
 interface CategoryItem {
@@ -40,13 +46,32 @@ const BENEFIT_ROOT_ITEM: BenefitRootItem = {
   })),
 };
 
+const CATEGORY_DROPDOWN_ITEMS = [
+  { label: "Legg til Samfunnsmål", value: "Samfunnsmål" },
+  { label: "Legg til Organisasjonsmål", value: "Organisasjonsmål" },
+  { label: "Legg til Effektmål", value: "Effektmål" },
+];
+
+// Define the component props
+interface BenefitTableTreeProps {
+  // The handler will receive the category (value) and the parentId ("benefit-root")
+  onAddGoal: (parentId: string, goalType: string, category: string) => void;
+}
+
 // --- Main Component ---
-export const BenefitTableTree = () => {
+export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
+  onAddGoal,
+}) => {
   // Use the combined data structure
   const items: BenefitRootItem[] = [BENEFIT_ROOT_ITEM];
-
   // Define the Union Type for ALL possible items in the tree
   type TableItem = BenefitRootItem | CategoryItem | BenefitGoal;
+
+  // Handler to bridge the dropdown component's output to the main GoalStructureView handler
+  const handleCategorySelect = (category: string, parentId?: string) => {
+    // Goal type is fixed as "Benefit" here
+    onAddGoal(parentId || "benefit-root", "Benefit", category);
+  };
 
   return (
     <TableTree>
@@ -54,6 +79,8 @@ export const BenefitTableTree = () => {
         <Header width={250}>Mål</Header>
         <Header width={400}>Beskrivelse</Header>
         <Header width={100}>Weight %</Header>
+        <Header width={530}></Header>
+        <Header width={120}>Handlinger</Header>
       </Headers>
 
       <Rows
@@ -61,9 +88,13 @@ export const BenefitTableTree = () => {
         render={(item: TableItem) => {
           // Determine the item type
           const isBenefitGoal = (item as BenefitGoal).weight !== undefined;
+          const isAbsoluteRoot = item.id === "benefit-root";
           const isCategory =
-            !isBenefitGoal && (item as CategoryItem).goals !== undefined;
+            !isBenefitGoal &&
+            !isAbsoluteRoot &&
+            (item as CategoryItem).goals !== undefined;
           const isRoot = !isBenefitGoal && !isCategory;
+          const root = item as BenefitRootItem;
 
           // Safely extract properties
           const goal = item as BenefitGoal;
@@ -75,16 +106,24 @@ export const BenefitTableTree = () => {
 
           return (
             <Row itemId={item.id} items={children} hasChildren={hasChildren}>
-              <Cell>
-                {/* Display Goal ID (O1, EFF1) or Header Name (Samfunnsmål) */}
-                {isBenefitGoal ? goal.id : item.name}
-              </Cell>
+              <Cell>{isBenefitGoal ? goal.id : item.name}</Cell>
 
-              {/* Description Column */}
               <Cell>{isBenefitGoal ? goal.description : ""}</Cell>
 
-              {/* Weight % Column */}
               <Cell>{isBenefitGoal ? `${goal.weight}%` : ""}</Cell>
+              <Cell></Cell>
+
+              <Cell>
+                {isRoot && (
+                  <AddBenefitGoalDropdownButton
+                    buttonLabel="+"
+                    dropdownItems={CATEGORY_DROPDOWN_ITEMS}
+                    onTypeSelectedForCreation={handleCategorySelect} // USE NEW PROP HERE
+                    isPrimary={false}
+                    parentId={root.id} // Pass the parent ID dynamically
+                  />
+                )}
+              </Cell>
             </Row>
           );
         }}

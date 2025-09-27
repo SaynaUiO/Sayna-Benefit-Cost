@@ -43,8 +43,8 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
         <Header width={250}>Produkt Mål</Header>
         <Header width={400}>Beskrivelse</Header>
         <Header width={100}>Time</Header>
-        <Header width={400}>Kostnad</Header>
-        <Header width={200}>Handlinger</Header>
+        <Header width={530}>Kostnad</Header>
+        <Header width={120}>Handlinger</Header>
       </Headers>
 
       <Rows
@@ -76,11 +76,7 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
               <Cell>{isRoot ? "" : epic.costEstimate}</Cell>
               <Cell>
                 {isRoot && (
-                  <Button
-                    //onClick={handleAddClick}
-                    appearance="primary"
-                    onClick={handleAddClick}
-                  >
+                  <Button appearance="primary" onClick={handleAddClick}>
                     +
                   </Button>
                 )}

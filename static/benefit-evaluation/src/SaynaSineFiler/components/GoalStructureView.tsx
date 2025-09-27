@@ -9,11 +9,19 @@ import GoalDrawer2 from "../GoalDrawer2";
 export const GoalStructureView = () => {
   // Define state for the drawer's context
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [context, setContext] = useState({ parentId: "", goalType: "" });
+  const [context, setContext] = useState({
+    parentId: "",
+    goalType: "",
+    category: "",
+  });
   const [createGoalType, setCreateGoalType] = useState<string | null>(null);
 
-  const handleOpenDrawer = (parentId: string, goalType: string) => {
-    setContext({ parentId, goalType });
+  const handleOpenDrawer = (
+    parentId: string,
+    goalType: string,
+    category?: string
+  ) => {
+    setContext({ parentId, goalType, category: category || "" });
     setIsDrawerOpen(true);
   };
 
@@ -28,7 +36,7 @@ export const GoalStructureView = () => {
 
       {/* 2. Planlagte Nyttevirkninger (Benefits) */}
       <div style={{ marginBottom: "40px" }}>
-        <BenefitTableTree />
+        <BenefitTableTree onAddGoal={handleOpenDrawer} />
       </div>
 
       {/* 3. Produkt (Epics) */}
