@@ -1,10 +1,9 @@
 import { flushGoals } from "./GoalService";
 import { GCDA, GCHeadDA } from "../dataAccess/GoalCollectionDA";
 import { deleteIdFromHead, getAllIds, addIdToHead} from "../heads/GoalCollectionHead";
-import { GoalCollection, PortfolioItems, GoalTierTypeEnum } from "../models";
+import { GoalCollection, PortfolioItems, GoalTierTypeEnum, GC2 } from "../models";
 import { Result } from "@forge/api";
 import { getSelectedIssueType } from "./ProjectService";
-
 
 export const deleteGoalCollection = async (scopeId: string, id: string) => {
   console.log(`Delete Goal Collection: gc-${scopeId}-${id}`)
@@ -147,3 +146,40 @@ export const createGoalCollection = async (scopeId: string, goalCollection: Goal
   return GCDA.set(scopeId, goalCollection);
   // --- END OF CHANGES ---
 };
+
+//Nye metoder (Må legge til mandatory fields, da hele systemet fucker seg, så kan ct fikse det senere.): 
+
+// export const createGoal = async (scopeId: string, newGoal: GC2) => {
+    
+//   // We only save the fields we explicitly want, ensuring a clean structure.
+//   const cleanGoalToSave = {
+//     // === MANDATORY FIELDS ADDED TO SATISFY DAGoalCollection ===
+//     scopeId: scopeId, 
+//     status: "To Do", 
+
+//     id: newGoal.id,
+//     parentId: newGoal.parentId,
+//     name: newGoal.name,
+//     description: newGoal.description,
+//     goalType: newGoal.goalType,
+//     tier: newGoal.tier,
+
+//     ...(newGoal.timeEstimate !== undefined && { timeEstimate: newGoal.timeEstimate }),
+//     ...(newGoal.costEstimate !== undefined && { costEstimate: newGoal.costEstimate }),
+    
+//     title: newGoal.name, 
+//     subtask: [], 
+    
+    
+// };
+
+//   // 1. Add the ID to the head (This logic is usually for ranking, keep it if necessary)
+//   await addIdToHead(scopeId, newGoal.id); 
+
+//   // 2. Use raw Forge Storage to save the clean object
+//   // You must replace GCDA.set with storage.set(key, value)
+//   await GCDA.set(newGoal.id, cleanGoalToSave); 
+  
+//   // 3. Return the clean object
+//   return cleanGoalToSave;
+// };

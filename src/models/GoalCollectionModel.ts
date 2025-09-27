@@ -15,4 +15,5 @@ export type GCHead = {
 
 export type  DAGoalCollection = Omit<GoalCollection, 'type'>
 
+
 export interface GoalCollection extends GoalTier {}

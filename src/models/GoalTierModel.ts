@@ -22,4 +22,24 @@ export interface GoalTier {
   /* monetaryValue: boolean; */
 }
 
+//Ny
+export interface GC2 {
+  id: string; 
+  scopeId: string;
+  parentId?: string;
+  name: string; 
+  description: string;
+
+  //Categories: 
+  goalType: 'Objective' | 'Benefit' | 'Product'
+  tier: string //samfunnsmål, epic etc..
+
+  //Benefit fields:
+  weight?: number;
+
+  //Product fields: 
+  timeEstimate?: number; 
+  costEstimate?: number;
+}
+
 //Kanskje ikke bruke dette? 
