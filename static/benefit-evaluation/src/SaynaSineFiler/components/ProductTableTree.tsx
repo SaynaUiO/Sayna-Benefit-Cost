@@ -8,7 +8,7 @@ import TableTree, {
 } from "@atlaskit/table-tree";
 import { Epic } from "../types/Epic";
 import { PRODUCT_GOALS } from "../data/productMockData";
-import { Button } from "@forge/react"; // <-- Import Button
+import Button from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
 
 // 1. Define the Root Container Type
@@ -19,8 +19,8 @@ interface ProductRootItem {
 }
 
 interface ProductTableTreeProps {
-  // onAddGoal is a function that takes two strings and returns nothing.
-  onAddGoal: (parentId: string, goalType: string) => void;
+  // onAddGoal is a function that takes three strings and returns nothing.
+  onAddGoal: (parentId: string, goalType: string, category?: string) => void;
 }
 
 // 2. Define the Union Type for Items
@@ -36,6 +36,12 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
   onAddGoal,
 }) => {
   const items = [PRODUCT_ROOT_ITEM];
+
+  const handleAddEpic = (parentId: string) => {
+    // CRITICAL FIX: Ensure "Product" is passed as the goalType
+    // The category can be left as undefined or empty string, as the drawer defaults it to "Epic".
+    onAddGoal(parentId, "Product");
+  };
 
   return (
     <TableTree>
@@ -76,9 +82,12 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
               <Cell>{isRoot ? "" : epic.costEstimate}</Cell>
               <Cell>
                 {isRoot && (
-                  <Button appearance="primary" onClick={handleAddClick}>
-                    +
-                  </Button>
+                  <Button
+                    appearance="subtle"
+                    // Pass the icon component *as JSX*
+                    iconBefore={<AddIcon size="small" label="Add Epic" />}
+                    onClick={() => handleAddEpic(item.id)}
+                  />
                 )}
               </Cell>
             </Row>
