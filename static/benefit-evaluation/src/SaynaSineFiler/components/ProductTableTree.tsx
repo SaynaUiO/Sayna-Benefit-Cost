@@ -52,7 +52,7 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
       <Headers>
         <Header width={250}>Produkt Mål</Header>
         <Header width={400}>Beskrivelse</Header>
-        <Header width={100}>Time</Header>
+        <Header width={100}>Tid</Header>
         <Header width={530}>Kostnad</Header>
         <Header width={120}>Handlinger</Header>
       </Headers>

@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { Goals } from "../types/goal";
 
 import { v4 as uuidv4 } from "uuid";
+import { stringToBytes } from "uuid/dist/cjs/v35";
 
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
 
@@ -33,11 +34,11 @@ interface FormData {
   description: string;
   timeEstimate?: number;
   costEstimate?: number;
+  weight?: number;
 }
 
 // --- Component ---
 const GoalDrawer = ({
-  title,
   goalType,
   goalCategory,
   isOpen,
@@ -55,6 +56,7 @@ const GoalDrawer = ({
     description: "",
     timeEstimate: undefined,
     costEstimate: undefined,
+    weight: undefined,
   });
 
   // Reset form data when the drawer opens
@@ -66,6 +68,7 @@ const GoalDrawer = ({
           description: goalToEdit.description || "",
           timeEstimate: goalToEdit.timeEstimate ?? undefined,
           costEstimate: goalToEdit.costEstimate ?? undefined,
+          weight: goalToEdit.weight ?? undefined,
         });
       } else {
         //Create/Add
@@ -73,6 +76,7 @@ const GoalDrawer = ({
           description: "",
           timeEstimate: undefined,
           costEstimate: undefined,
+          weight: undefined,
         });
       }
     }
@@ -123,6 +127,7 @@ const GoalDrawer = ({
       costEstimate: formData.costEstimate,
 
       //Weight: Puttr det i senere.
+      weight: formData.weight,
     };
 
     console.log("GoalDrawer: Attempting to save with goalData:", goalData);
@@ -222,6 +227,26 @@ const GoalDrawer = ({
             style={{ minHeight: 80 }}
             isRequired
           />
+
+          {/* 3. Conditional Benefit Fields */}
+          {(goalType === "Benefit" || goalToEdit?.goalType === "Benefit") && (
+            <TextField
+              label="weight (%)"
+              type="number"
+              value={
+                formData.weight === undefined ? "" : String(formData.weight)
+              }
+              onChange={(e) =>
+                handleChange(
+                  "weight",
+                  Number((e.target as HTMLInputElement).value)
+                )
+              }
+              placeholder="0 til 100"
+              min={0}
+              max={100}
+            ></TextField>
+          )}
 
           {/* 3. Conditional Epic Fields */}
           {goalType === "Product" && renderEpicFields()}

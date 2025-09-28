@@ -114,7 +114,11 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
 
               <Cell>{isLiveGoal ? goal.description : ""}</Cell>
 
-              <Cell>{isLiveGoal ? `${goal.weight || 0}%` : ""}</Cell>
+              <Cell>
+                {isLiveGoal
+                  ? `${goal.weight || 0}%` // <-- NOW DISPLAYS LIVE DATA
+                  : ""}
+              </Cell>
               <Cell></Cell>
 
               <Cell>
