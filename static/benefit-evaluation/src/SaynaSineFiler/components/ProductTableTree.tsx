@@ -25,6 +25,7 @@ interface ProductRootItem {
 interface ProductTableTreeProps {
   data: GoalCollection2[];
   onAddGoal: (parentId: string, goalType: string, category?: string) => void;
+  onEditGoal: (goal: GoalCollection2) => void;
 }
 
 // 2. Define the Union Type for Items
@@ -32,6 +33,7 @@ type TableItem = ProductRootItem | GoalCollection2;
 
 export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
   onAddGoal,
+  onEditGoal,
   data,
 }) => {
   const PRODUCT_ROOT_ITEM: ProductRootItem = {
@@ -70,9 +72,9 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
               <Cell>{isLiveGoal ? formatGoalID(goal) : item.name}</Cell>
-              <Cell>{isLiveGoal ? "" : goal.description}</Cell>
-              <Cell>{isLiveGoal ? "" : goal.timeEstimate}</Cell>
-              <Cell>{isLiveGoal ? "" : goal.costEstimate}</Cell>
+              <Cell>{isLiveGoal ? goal.description : ""}</Cell>
+              <Cell>{isLiveGoal ? goal.timeEstimate : ""} </Cell>
+              <Cell>{isLiveGoal ? goal.costEstimate : ""}</Cell>
               <Cell>
                 {isRoot && (
                   <Button
@@ -88,10 +90,13 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
                   <Button
                     appearance="subtle"
                     iconBefore={<EditIcon size="small" label="Edit Goal" />}
+                    onClick={() => {
+                      onEditGoal(goal);
+                    }}
                   ></Button>
                 )}
 
-                {/* Edit Button  */}
+                {/* Delete Button  */}
                 {isLiveGoal && (
                   <Button
                     appearance="subtle"

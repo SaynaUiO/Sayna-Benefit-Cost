@@ -43,11 +43,13 @@ const CATEGORY_DROPDOWN_ITEMS = [
 interface BenefitTableTreeProps {
   data: GoalCollection2[];
   onAddGoal: (parentId: string, goalType: string, category: string) => void;
+  onEditGoal: (goal: GoalCollection2) => void;
 }
 
 // --- Main Component ---
 export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   onAddGoal,
+  onEditGoal,
   data,
 }) => {
   const liveCategories = CATEGORY_HEADERS.map((category) => ({
@@ -130,10 +132,13 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
                   <Button
                     appearance="subtle"
                     iconBefore={<EditIcon size="small" label="Edit Goal" />}
+                    onClick={() => {
+                      onEditGoal(goal);
+                    }}
                   ></Button>
                 )}
 
-                {/* Edit Button  */}
+                {/* Delete Button  */}
                 {isLiveGoal && (
                   <Button
                     appearance="subtle"

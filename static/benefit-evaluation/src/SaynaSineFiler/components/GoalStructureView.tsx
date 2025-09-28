@@ -30,6 +30,9 @@ export const GoalStructureView = () => {
   //State to hold live data:
   const [goalData, setGoalData] = useState<OrganizedGoalData>(initialData);
 
+  //State to edit data
+  const [goalToEdit, setGoalToEdit] = useState<GoalCollection2 | null>(null); // <-- NEW STATE
+
   // Define state for the drawer's context
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [context, setContext] = useState({
@@ -77,25 +80,41 @@ export const GoalStructureView = () => {
     fetchAndOrganizeGoals();
   }, [fetchAndOrganizeGoals]);
 
-  //Update Drawer
-  const onCloseDrawer = useCallback(
-    (shouldRefresh?: boolean) => {
-      setIsDrawerOpen(false);
-      if (shouldRefresh) {
-        fetchAndOrganizeGoals(); // Fetch data again if successful save occurred
-      }
-    },
-    [fetchAndOrganizeGoals]
-  );
-
+  //For creating a goal:
   const handleOpenDrawer = (
     parentId: string,
     goalType: string,
     category?: string
   ) => {
     setContext({ parentId, goalType, category: category || "" });
+    setGoalToEdit(null); // Clear any goal being edited
     setIsDrawerOpen(true);
   };
+
+  //For editing a Goal:
+  const handleEditGoal = (goal: GoalCollection2) => {
+    setGoalToEdit(goal);
+    setContext({
+      parentId: goal.parentId || "N/A", // Use existing parentId
+      goalType: goal.goalType,
+      category: goal.tier, // Use tier as the category for Benefits/Products
+    });
+    setIsDrawerOpen(true);
+  };
+
+  //For deleting a Goal
+
+  //Update Drawer
+  const onCloseDrawer = useCallback(
+    (shouldRefresh?: boolean) => {
+      setIsDrawerOpen(false);
+      setGoalToEdit(null); //Reset edit state
+      if (shouldRefresh) {
+        fetchAndOrganizeGoals(); // Fetch data again if successful save occurred
+      }
+    },
+    [fetchAndOrganizeGoals]
+  );
 
   return (
     <div style={{ padding: "16px" }}>
@@ -106,6 +125,7 @@ export const GoalStructureView = () => {
         <ObjectiveTableTree
           data={goalData.objectives}
           onAddGoal={handleOpenDrawer}
+          onEditGoal={handleEditGoal}
         />
       </div>
 
@@ -114,6 +134,7 @@ export const GoalStructureView = () => {
         <BenefitTableTree
           data={goalData.benefits}
           onAddGoal={handleOpenDrawer}
+          onEditGoal={handleEditGoal}
         />
       </div>
 
@@ -122,17 +143,19 @@ export const GoalStructureView = () => {
         <ProductTableTree
           data={goalData.products}
           onAddGoal={handleOpenDrawer}
+          onEditGoal={handleEditGoal}
         />
       </div>
 
       {/* The Goal Creation Drawer */}
       <GoalDrawer2
-        title="test"
+        title={context.category || context.goalType}
         isOpen={isDrawerOpen}
         onClose={onCloseDrawer}
         parentId={context.parentId}
         goalType={context.goalType}
         goalCategory={context.category}
+        goalToEdit={goalToEdit}
       />
     </div>
   );

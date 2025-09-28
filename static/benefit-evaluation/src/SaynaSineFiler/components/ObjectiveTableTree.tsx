@@ -6,8 +6,6 @@ import TableTree, {
   Header,
   Headers,
 } from "@atlaskit/table-tree";
-import { Objective } from "../types/objective";
-import { OBJECTIVE_GOALS } from "../data/objectiveMockData";
 import Button from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import { GoalCollection2 } from "../types/goal2";
@@ -25,6 +23,7 @@ interface ObjectiveRootItem {
 interface ObjectiveTableTreeProps {
   data: GoalCollection2[];
   onAddGoal: (parentId: string, goalType: string, category?: string) => void;
+  onEditGoal: (goal: GoalCollection2) => void;
 }
 
 //2. Define the Union Type for Items
@@ -32,6 +31,7 @@ type TableItem = ObjectiveRootItem | GoalCollection2;
 
 export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
   onAddGoal,
+  onEditGoal,
   data,
 }) => {
   const OBJECTIVE_ROOT_ITEM: ObjectiveRootItem = {
@@ -90,10 +90,13 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                   <Button
                     appearance="subtle"
                     iconBefore={<EditIcon size="small" label="Edit Goal" />}
+                    onClick={() => {
+                      onEditGoal(goal);
+                    }}
                   ></Button>
                 )}
 
-                {/* Edit Button  */}
+                {/* Delete Button  */}
                 {isLiveGoal && (
                   <Button
                     appearance="subtle"

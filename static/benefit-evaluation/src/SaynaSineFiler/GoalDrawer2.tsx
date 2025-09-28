@@ -28,6 +28,7 @@ type Props = {
   isOpen: boolean;
   parentId?: string;
   onClose: (shouldRefresh?: boolean) => void;
+  goalToEdit?: GoalCollection2 | null;
 };
 
 // Initial state for all possible fields
@@ -45,6 +46,7 @@ const GoalDrawer2 = ({
   isOpen,
   parentId,
   onClose,
+  goalToEdit,
 }: Props) => {
   console.log("GoalDrawer Props:", { goalType, goalCategory, parentId });
 
@@ -61,13 +63,23 @@ const GoalDrawer2 = ({
   // Reset form data when the drawer opens
   useEffect(() => {
     if (isOpen) {
-      setFormData({
-        description: "",
-        timeEstimate: undefined,
-        costEstimate: undefined,
-      });
+      if (goalToEdit) {
+        //Edit
+        setFormData({
+          description: goalToEdit.description || "",
+          timeEstimate: goalToEdit.timeEstimate ?? undefined,
+          costEstimate: goalToEdit.costEstimate ?? undefined,
+        });
+      } else {
+        //Create/Add
+        setFormData({
+          description: "",
+          timeEstimate: undefined,
+          costEstimate: undefined,
+        });
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, goalToEdit]);
 
   // Generic handler for all text/number fields
   const handleChange = (field: keyof FormData, value: string | number) => {
@@ -75,6 +87,9 @@ const GoalDrawer2 = ({
   };
 
   const handleSave = async () => {
+    //Determine if we are creating/adding or editing
+    const isEditing = !!goalToEdit; //Does it have data?
+
     // Basic Validation
     if (!formData.description) {
       alert("Title and Description are required.");
@@ -97,34 +112,39 @@ const GoalDrawer2 = ({
 
     //Prepare payload for API (GoalCollection)
     const goalData: GoalCollection2 = {
-      id: uuidv4(),
+      id: isEditing ? goalToEdit!.id : uuidv4(), //use existing ID if editing. if adding, create new id
       scopeId: scope.id,
-      parentId: parentId || undefined,
-      name: tierValue,
+      parentId: isEditing ? goalToEdit!.parentId : parentId || undefined, //use existing parentId if editing. if adding, create new
+      name: tierValue, // Note: You might want to use goalToEdit!.name if editing, but tierValue is fine for now as they are often the same
       description: formData.description,
 
       //Categories:
       goalType: goalType as "Objective" | "Benefit" | "Product",
       tier: tierValue,
 
-      //Product fields:
-      ...(goalType === "Product" && {
-        timeEstimate: formData.timeEstimate,
-        costEstimate: formData.costEstimate,
-      }),
+      timeEstimate: formData.timeEstimate,
+      costEstimate: formData.costEstimate,
 
       //Weight: Puttr det i senere.
     };
 
     console.log("GoalDrawer: Attempting to save with goalData:", goalData);
 
-    // NOTE: Uncomment and fix API call when ready:
+    // API call:
     try {
-      await api.goalAPI.create(scope.id, goalData);
-      console.log("Goal created:", goalData);
+      if (isEditing) {
+        //Call EDIT API endpoint
+        await api.goalAPI.update(scope.id, goalData);
+        console.log("Goal updated:", goalData);
+      } else {
+        //Call CREATE API endpoint
+        await api.goalAPI.create(scope.id, goalData);
+        console.log("Goal created:", goalData);
+      }
       onClose(true);
     } catch (err) {
       console.error("Failed to save goal:", err);
+      // NOTE: You should ideally show the user an error message, not just close
       onClose(false);
     }
   };
@@ -167,13 +187,19 @@ const GoalDrawer2 = ({
     </>
   );
 
+  //Update Title:
+  const drawerTitle = goalToEdit
+    ? `Endre ${goalToEdit.name}`
+    : `Opprett ny ${goalCategory || goalType}`;
+
+  //Update Button Text:
+  const buttonText = goalToEdit
+    ? "Lagre endringer"
+    : `Create ${goalCategory || goalType}`;
+
   // --- Main Render Function ---
   return (
-    <Drawer
-      isOpen={isOpen}
-      onClose={() => onClose(false)}
-      label={`Create ${goalType}`}
-    >
+    <Drawer isOpen={isOpen} onClose={() => onClose(false)} label={drawerTitle}>
       <DrawerSidebar>
         <DrawerCloseButton />
       </DrawerSidebar>
@@ -186,9 +212,7 @@ const GoalDrawer2 = ({
             padding: "1rem",
           }}
         >
-          <h2>{`Create New ${goalCategory || goalType} for ${
-            parentId || "Root"
-          }`}</h2>
+          <h2>{drawerTitle}</h2>
 
           {/* 2. DESCRIPTION FIELD */}
           <TextField
@@ -209,7 +233,7 @@ const GoalDrawer2 = ({
 
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button appearance="primary" onClick={handleSave}>
-              Create {goalCategory || goalType}
+              {buttonText} {/* <-- dynamic button */}
             </Button>
           </div>
         </div>
