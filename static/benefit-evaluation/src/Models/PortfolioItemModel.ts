@@ -10,4 +10,13 @@ export const PortfolioItems = (portfolioId: string): GoalTier => ({
   status: "",//Sayna har adda
   parentId: "", //Sayna har adda
   dueDate: "", //Sayna har adda
+
+  //Categories: 
+  goalType: "",
+
+  //Benefit fields:
+  weight: 0, 
+  //Product fields: 
+  timeEstimate: 0,  
+  costEstimate: 0,
 })

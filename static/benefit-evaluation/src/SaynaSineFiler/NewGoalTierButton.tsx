@@ -4,9 +4,6 @@ import DropdownMenu, {
   DropdownItemGroup,
 } from "@atlaskit/dropdown-menu";
 import AddIcon from "@atlaskit/icon/glyph/add";
-import React, { useState } from "react";
-import GoalDrawer from "./CreateGoalDrawer";
-import GoalTierTableTree from "./GoalTierTableTree";
 
 // This component Adds a new goal tier, both a new root one and a subtier
 

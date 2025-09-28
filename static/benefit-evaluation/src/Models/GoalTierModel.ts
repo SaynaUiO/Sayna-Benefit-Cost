@@ -7,18 +7,26 @@ export enum GoalTierTypeEnum {
   FORMAAL,
   NYTTEVIRKNING,
   PRODUKT,
-  EPIC
 }
 
 export interface GoalTier {
-  id: string;
+  id: string; 
   scopeId: string;
-  type: GoalTierTypeEnum;
-  name: string;
+  parentId?: string;
+  name: string; 
   description: string;
-  tier?: string //Sayna har adda
-  status: string //Sayna har adda
-  parentId?: string //Sayna har adda
-  dueDate?: string //Sayna har adda
-  /* monetaryValue: boolean; */
+  type: GoalTierTypeEnum;
+  status: string;
+  dueDate: string;
+
+  //Categories: 
+  goalType: ""
+  tier: string //samfunnsmål, epic etc..
+
+  //Benefit fields:
+  weight?: number;
+
+  //Product fields: 
+  timeEstimate?: number; 
+  costEstimate?: number;
 }

@@ -8,7 +8,6 @@ import PageHeader from "@atlaskit/page-header";
 import NewGoalTierButton from "../../SaynaSineFiler/NewGoalTierButton";
 import GoalTierTableTree from "../../SaynaSineFiler/GoalTierTableTree";
 import { GOAL_TYPE_DROPDOWN_ITEMS } from "../../SaynaSineFiler/goalDropdownItems";
-import GoalDrawer from "../../SaynaSineFiler/CreateGoalDrawer";
 
 export const GoalStructure = () => {
   const [scope] = useAppContext();
@@ -50,28 +49,9 @@ export const GoalStructure = () => {
 
   return (
     <>
-      <PageHeader>Målstruktur</PageHeader>
+      <PageHeader>Medfin</PageHeader>
 
       <div>
-        {/* Button to initiate creation of a new top-level goal */}
-        <NewGoalTierButton
-          buttonLabel="Nytt mål nivå"
-          dropdownItems={GOAL_TYPE_DROPDOWN_ITEMS}
-          onTypeSelectedForCreation={handleTopLevelGoalCreation} // Use the new prop
-          isPrimary={true}
-        />
-
-        {/* GoalDrawer for top-level creations (no goalId or parentId) */}
-        {isDrawerOpen && (
-          <GoalDrawer
-            title={`Create New ${createGoalType}`}
-            goalType={createGoalType || "Goal"}
-            isOpen={isDrawerOpen}
-            onClose={handleTopLevelDrawerClose}
-            // No goalId or parentId for top-level creation
-          />
-        )}
-
         {/* The TableTree component, which will now handle its own data fetching and rendering */}
         <GoalTierTableTree refreshTrigger={refreshTableTree} />
       </div>
