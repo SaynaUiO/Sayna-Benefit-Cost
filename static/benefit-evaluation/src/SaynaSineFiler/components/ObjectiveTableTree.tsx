@@ -51,7 +51,7 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
   return (
     <TableTree>
       <Headers>
-        <Header width={250}>Mål</Header>
+        <Header width={250}>Formål</Header>
         <Header width={400}>Beskrivelse</Header>
         <Header width={100}></Header>
         <Header width={530}></Header>
