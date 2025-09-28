@@ -24,6 +24,7 @@ interface ObjectiveTableTreeProps {
   data: GoalCollection2[];
   onAddGoal: (parentId: string, goalType: string, category?: string) => void;
   onEditGoal: (goal: GoalCollection2) => void;
+  onDeleteGoal: (goalId: string) => void;
 }
 
 //2. Define the Union Type for Items
@@ -32,6 +33,7 @@ type TableItem = ObjectiveRootItem | GoalCollection2;
 export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
   onAddGoal,
   onEditGoal,
+  onDeleteGoal,
   data,
 }) => {
   const OBJECTIVE_ROOT_ITEM: ObjectiveRootItem = {
@@ -101,6 +103,7 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                   <Button
                     appearance="subtle"
                     iconBefore={<TrashIcon size="small" label="Delete Goal" />}
+                    onClick={() => onDeleteGoal(goal.id)}
                   ></Button>
                 )}
               </Cell>

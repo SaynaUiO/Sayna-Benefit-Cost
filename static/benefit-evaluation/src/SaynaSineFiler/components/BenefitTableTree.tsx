@@ -44,12 +44,14 @@ interface BenefitTableTreeProps {
   data: GoalCollection2[];
   onAddGoal: (parentId: string, goalType: string, category: string) => void;
   onEditGoal: (goal: GoalCollection2) => void;
+  onDeleteGoal: (goalId: string) => void;
 }
 
 // --- Main Component ---
 export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   onAddGoal,
   onEditGoal,
+  onDeleteGoal,
   data,
 }) => {
   const liveCategories = CATEGORY_HEADERS.map((category) => ({
@@ -143,6 +145,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
                   <Button
                     appearance="subtle"
                     iconBefore={<TrashIcon size="small" label="Delete Goal" />}
+                    onClick={() => onDeleteGoal(goal.id)}
                   ></Button>
                 )}
               </Cell>

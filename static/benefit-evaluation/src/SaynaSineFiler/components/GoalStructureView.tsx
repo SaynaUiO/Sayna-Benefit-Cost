@@ -103,6 +103,25 @@ export const GoalStructureView = () => {
   };
 
   //For deleting a Goal
+  const handleDeleteGoal = useCallback(
+    async (goalId: string) => {
+      //Confirmation dialog
+      if (!window.confirm("Are you sure you want to delete this goal?")) {
+        return;
+      }
+      try {
+        //Call delete api:
+        await api.goalAPI.delete(scope.id, goalId);
+        console.log(`Goal deleted successfully:  ${goalId}`);
+        //Instant refresh of data/tree
+        fetchAndOrganizeGoals();
+      } catch (error) {
+        console.error("Failed to delete goal:", error);
+        alert("Failed to delete goal. Please try again.");
+      }
+    },
+    [scope.id, api.goalAPI, fetchAndOrganizeGoals]
+  );
 
   //Update Drawer
   const onCloseDrawer = useCallback(
@@ -126,6 +145,7 @@ export const GoalStructureView = () => {
           data={goalData.objectives}
           onAddGoal={handleOpenDrawer}
           onEditGoal={handleEditGoal}
+          onDeleteGoal={handleDeleteGoal}
         />
       </div>
 
@@ -135,6 +155,7 @@ export const GoalStructureView = () => {
           data={goalData.benefits}
           onAddGoal={handleOpenDrawer}
           onEditGoal={handleEditGoal}
+          onDeleteGoal={handleDeleteGoal}
         />
       </div>
 
@@ -144,6 +165,7 @@ export const GoalStructureView = () => {
           data={goalData.products}
           onAddGoal={handleOpenDrawer}
           onEditGoal={handleEditGoal}
+          onDeleteGoal={handleDeleteGoal}
         />
       </div>
 

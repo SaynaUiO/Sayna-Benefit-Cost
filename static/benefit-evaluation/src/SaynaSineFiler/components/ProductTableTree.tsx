@@ -26,6 +26,7 @@ interface ProductTableTreeProps {
   data: GoalCollection2[];
   onAddGoal: (parentId: string, goalType: string, category?: string) => void;
   onEditGoal: (goal: GoalCollection2) => void;
+  onDeleteGoal: (goalId: string) => void;
 }
 
 // 2. Define the Union Type for Items
@@ -34,6 +35,7 @@ type TableItem = ProductRootItem | GoalCollection2;
 export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
   onAddGoal,
   onEditGoal,
+  onDeleteGoal,
   data,
 }) => {
   const PRODUCT_ROOT_ITEM: ProductRootItem = {
@@ -101,6 +103,7 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
                   <Button
                     appearance="subtle"
                     iconBefore={<TrashIcon size="small" label="Delete Goal" />}
+                    onClick={() => onDeleteGoal(goal.id)}
                   ></Button>
                 )}
               </Cell>
