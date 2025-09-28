@@ -10,31 +10,36 @@ import { Epic } from "../types/Epic";
 import { PRODUCT_GOALS } from "../data/productMockData";
 import Button from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
+import { GoalCollection2 } from "../types/goal2";
+import { formatGoalID } from "../types/goalIdFormatter";
+import EditIcon from "@atlaskit/icon/glyph/edit";
+import TrashIcon from "@atlaskit/icon/glyph/trash";
 
 // 1. Define the Root Container Type
 interface ProductRootItem {
   id: string;
   name: string;
-  goals: Epic[];
+  goals: GoalCollection2[];
 }
 
 interface ProductTableTreeProps {
+  data: GoalCollection2[];
   onAddGoal: (parentId: string, goalType: string, category?: string) => void;
 }
 
 // 2. Define the Union Type for Items
-type TableItem = Epic | ProductRootItem;
-
-const PRODUCT_ROOT_ITEM: ProductRootItem = {
-  id: "Produkt",
-  name: "Produkt",
-  goals: PRODUCT_GOALS,
-};
+type TableItem = ProductRootItem | GoalCollection2;
 
 export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
   onAddGoal,
+  data,
 }) => {
-  const items = [PRODUCT_ROOT_ITEM];
+  const PRODUCT_ROOT_ITEM: ProductRootItem = {
+    id: "Produkt",
+    name: "Produkt",
+    goals: data,
+  };
+  const items: ProductRootItem[] = [PRODUCT_ROOT_ITEM];
 
   const handleAddEpic = (parentId: string) => {
     onAddGoal(parentId, "Product");
@@ -51,26 +56,23 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
       </Headers>
 
       <Rows
-        // 3. Cast the items array to the common type
         items={items as TableItem[]}
         render={(item: TableItem) => {
-          // Safely check if the item is the root container by checking for the 'goals' array
-          const isRoot = (item as ProductRootItem).goals !== undefined;
-          // Safely extract properties using type assertions
-          const epic = item as Epic;
           const root = item as ProductRootItem;
-          // Safely get children: if it's the root, use its 'goals'; otherwise, use an empty array.
-          const children = isRoot ? root.goals : [];
+          const isRoot = (item as ProductRootItem).goals !== undefined;
+          const isLiveGoal = !isRoot;
+
+          const rootContainer = item as ProductRootItem;
+          const goal = item as GoalCollection2;
+
+          const children = isRoot ? rootContainer.goals : [];
 
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
-              <Cell>{item.name}</Cell>
-
-              {/* The Root row shows empty cells for these columns */}
-              {/* Child Epic rows use the Epic properties */}
-              <Cell>{isRoot ? "" : epic.description}</Cell>
-              <Cell>{isRoot ? "" : epic.timeEstimate}</Cell>
-              <Cell>{isRoot ? "" : epic.costEstimate}</Cell>
+              <Cell>{isLiveGoal ? formatGoalID(goal) : item.name}</Cell>
+              <Cell>{isLiveGoal ? "" : goal.description}</Cell>
+              <Cell>{isLiveGoal ? "" : goal.timeEstimate}</Cell>
+              <Cell>{isLiveGoal ? "" : goal.costEstimate}</Cell>
               <Cell>
                 {isRoot && (
                   <Button
@@ -79,6 +81,22 @@ export const ProductTableTree: React.FC<ProductTableTreeProps> = ({
                     iconBefore={<AddIcon size="small" label="Add Epic" />}
                     onClick={() => handleAddEpic(item.id)}
                   />
+                )}
+
+                {/* Edit Button  */}
+                {isLiveGoal && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<EditIcon size="small" label="Edit Goal" />}
+                  ></Button>
+                )}
+
+                {/* Edit Button  */}
+                {isLiveGoal && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<TrashIcon size="small" label="Delete Goal" />}
+                  ></Button>
                 )}
               </Cell>
             </Row>

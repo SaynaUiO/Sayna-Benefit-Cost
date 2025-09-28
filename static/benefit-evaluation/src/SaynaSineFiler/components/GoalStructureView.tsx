@@ -120,7 +120,7 @@ export const GoalStructureView = () => {
       {/* 3. Produkt (Epics) */}
       <div style={{ marginBottom: "40px" }}>
         <ProductTableTree
-          // data={goalData.products}
+          data={goalData.products}
           onAddGoal={handleOpenDrawer}
         />
       </div>

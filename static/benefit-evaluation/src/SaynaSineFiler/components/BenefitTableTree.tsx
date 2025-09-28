@@ -6,24 +6,21 @@ import TableTree, {
   Header,
   Headers,
 } from "@atlaskit/table-tree";
-import { BenefitGoal, BenefitCategory } from "../types/benefit";
-import { BENEFIT_GOALS } from "../data/benefitMockData";
-import DropdownMenu, {
-  DropdownItemGroup,
-  DropdownItem,
-} from "@atlaskit/dropdown-menu";
+import { BenefitCategory } from "../types/benefit";
 import AddBenefitGoalDropdownButton from "../AddBenefitGoalDropdown";
+import { formatGoalID } from "../types/goalIdFormatter";
+import EditIcon from "@atlaskit/icon/glyph/edit";
+import TrashIcon from "@atlaskit/icon/glyph/trash";
+
 // Define the three category headers we need to insert into the table
 const CATEGORY_HEADERS: BenefitCategory[] = [
   "Samfunnsmål",
   "Organisasjonsmål",
   "Effektmål",
 ];
-import { GOAL_TYPE_DROPDOWN_ITEMS2 } from "../goalDropdownItems2";
-import { Button } from "@forge/react"; // <-- Import Button
 import { GoalCollection2 } from "../types/goal2";
+import Button from "@atlaskit/button";
 
-// 1. Define the Category Item structure (the new middle layer)
 interface CategoryItem {
   id: BenefitCategory; // e.g., "Samfunnsmål"
   name: BenefitCategory;
@@ -53,7 +50,6 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   onAddGoal,
   data,
 }) => {
-  // FIX 3: Update the implementation where you build the categories
   const liveCategories = CATEGORY_HEADERS.map((category) => ({
     id: category,
     name: category,
@@ -66,14 +62,11 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
     goals: liveCategories, // This now matches the new BenefitRootItem type
   };
 
-  // Use the combined data structure
   const items: BenefitRootItem[] = [BENEFIT_ROOT_ITEM];
-  // Define the Union Type for ALL possible items in the tree
   type TableItem = BenefitRootItem | CategoryItem | GoalCollection2;
 
   // Handler to bridge the dropdown component's output to the main GoalStructureView handler
   const handleCategorySelect = (category: string, parentId?: string) => {
-    // Goal type is fixed as "Benefit" here
     onAddGoal(parentId || "benefit-root", "Benefit", category);
   };
 
@@ -93,12 +86,9 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
           const isAbsoluteRoot = item.id === "benefit-root";
           const root = item as BenefitRootItem;
 
-          // Safely extract properties
-          // Safely check if the item is a container (Root or Category)
           const isContainer = (item as any).goals !== undefined;
           const isLiveGoal = !isContainer;
 
-          // Safely get the children array, defaulting to []
           const children = isContainer
             ? (item as BenefitRootItem | CategoryItem).goals
             : [];
@@ -116,7 +106,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
               items={childrenArray}
               hasChildren={hasChildren}
             >
-              <Cell>{isLiveGoal ? goal.id : item.name}</Cell>
+              <Cell>{isLiveGoal ? formatGoalID(goal) : item.name}</Cell>
 
               <Cell>{isLiveGoal ? goal.description : ""}</Cell>
 
@@ -124,6 +114,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
               <Cell></Cell>
 
               <Cell>
+                {/* Add button */}
                 {isAbsoluteRoot && (
                   <AddBenefitGoalDropdownButton
                     buttonLabel="+"
@@ -132,6 +123,22 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
                     isPrimary={false}
                     parentId={root.id} // Pass the parent ID dynamically
                   />
+                )}
+
+                {/* Edit Button  */}
+                {isLiveGoal && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<EditIcon size="small" label="Edit Goal" />}
+                  ></Button>
+                )}
+
+                {/* Edit Button  */}
+                {isLiveGoal && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<TrashIcon size="small" label="Delete Goal" />}
+                  ></Button>
                 )}
               </Cell>
             </Row>

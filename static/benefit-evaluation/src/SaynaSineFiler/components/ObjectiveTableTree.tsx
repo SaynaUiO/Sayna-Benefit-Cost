@@ -10,33 +10,37 @@ import { Objective } from "../types/objective";
 import { OBJECTIVE_GOALS } from "../data/objectiveMockData";
 import Button from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
+import { GoalCollection2 } from "../types/goal2";
+import { formatGoalID } from "../types/goalIdFormatter";
+import EditIcon from "@atlaskit/icon/glyph/edit";
+import TrashIcon from "@atlaskit/icon/glyph/trash";
 
 //1. Define the Root Container Type
 interface ObjectiveRootItem {
   id: string;
   name: string;
-  goals: Objective[];
+  goals: GoalCollection2[];
 }
 
 interface ObjectiveTableTreeProps {
-  data: Objective[];
+  data: GoalCollection2[];
   onAddGoal: (parentId: string, goalType: string, category?: string) => void;
 }
 
 //2. Define the Union Type for Items
-type TableItem = Objective | ObjectiveRootItem;
-
-const OBJECTIVE_ROOT_ITEM: ObjectiveRootItem = {
-  id: "Formål",
-  name: "Formål",
-  goals: OBJECTIVE_GOALS,
-};
+type TableItem = ObjectiveRootItem | GoalCollection2;
 
 export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
   onAddGoal,
+  data,
 }) => {
-  // The items array only contains the root container
-  const items = [OBJECTIVE_ROOT_ITEM];
+  const OBJECTIVE_ROOT_ITEM: ObjectiveRootItem = {
+    id: "objective-root",
+    name: "Formål",
+    goals: data,
+  };
+
+  const items: ObjectiveRootItem[] = [OBJECTIVE_ROOT_ITEM];
 
   const handleAddObjective = (parentId: string) => {
     onAddGoal(parentId, "Objective");
@@ -56,21 +60,20 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
         // Cast to object[] to avoid TypeScript issues with the generic component
         items={items as TableItem[]}
         render={(item: TableItem) => {
-          // Safely extract properties using type assertions
-          const objective = item as Objective;
           const root = item as ObjectiveRootItem;
 
           const isRoot = (item as ObjectiveRootItem).goals !== undefined;
-          // Determine if this is one of the actual goals (O1, O2, O3)
-          const isObjective = (item as Objective).description !== undefined;
+          const isLiveGoal = !isRoot;
 
-          // Safely get children: if it's the root, use its 'goals'; otherwise, use an empty array.
-          const children = isRoot ? root.goals : [];
+          const rootContainer = item as ObjectiveRootItem;
+          const goal = item as GoalCollection2;
+
+          const children = isRoot ? rootContainer.goals : [];
 
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
-              <Cell>{isRoot ? item.id : item.name}</Cell>
-              <Cell>{isRoot ? "" : objective.description}</Cell>
+              <Cell>{isLiveGoal ? formatGoalID(goal) : item.name}</Cell>
+              <Cell>{isLiveGoal ? goal.description : ""}</Cell>
               <Cell></Cell>
               <Cell></Cell>
               <Cell>
@@ -81,6 +84,21 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                     iconBefore={<AddIcon size="small" label="Add Epic" />}
                     onClick={() => handleAddObjective(item.id)}
                   />
+                )}
+                {/* Edit Button  */}
+                {isLiveGoal && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<EditIcon size="small" label="Edit Goal" />}
+                  ></Button>
+                )}
+
+                {/* Edit Button  */}
+                {isLiveGoal && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<TrashIcon size="small" label="Delete Goal" />}
+                  ></Button>
                 )}
               </Cell>
             </Row>
