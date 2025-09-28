@@ -1,6 +1,6 @@
 import { invoke } from "@forge/bridge"
 import { GoalCollection, Goal } from "../Models"
-import { GoalCollection2 } from "../SaynaSineFiler/types/goal2";
+import { Goals } from "../SaynaSineFiler/types/goal";
 
 export const goalCollectionApi = () => {
   return {
@@ -31,17 +31,17 @@ export const goalCollectionApi = () => {
 
 export const goalAPI = () => {
   return {
-    get: (scopeId: string, id: string): Promise<GoalCollection2> => {
+    get: (scopeId: string, id: string): Promise<Goals> => {
       return invoke("getGoalCollection", { scopeId: scopeId, id: id });
     },
     //Sayna har adda
-    getAll: (scopeId: string): Promise<GoalCollection2[]> => {
+    getAll: (scopeId: string): Promise<Goals[]> => {
       return invoke("getAllGoalCollections", { scopeId });
     },
-    create: (scopeId: string, goalCollection: GoalCollection2) => {
+    create: (scopeId: string, goalCollection: Goals) => {
       return invoke("createGoalCollection", { scopeId: scopeId, goalCollection: goalCollection });
     },
-    update: (scopeId: string, goalCollection: GoalCollection2) => {
+    update: (scopeId: string, goalCollection: Goals) => {
       return invoke("updateGoalCollection", { scopeId: scopeId, goalCollection: goalCollection });
     },
     delete: (scopeId: string, id: string) => {

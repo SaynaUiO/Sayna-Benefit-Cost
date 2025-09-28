@@ -6,18 +6,15 @@ import {
   DrawerCloseButton,
 } from "@atlaskit/drawer/compiled";
 import TextField from "@atlaskit/textfield";
-import { useAppContext } from "../Contexts/AppContext";
-import { useAPI } from "../Contexts/ApiContext";
+import { useAppContext } from "../../Contexts/AppContext";
+import { useAPI } from "../../Contexts/ApiContext";
 import Button from "@atlaskit/button";
 import { useEffect } from "react";
-import Select from "@atlaskit/select";
 
 //Ny interface jeg har laget:
-import { GoalCollection2 } from "./types/goal2";
-import { mapGoalTypeStringToEnum } from "./enums/goal";
+import { Goals } from "../types/goal";
 
 import { v4 as uuidv4 } from "uuid";
-import { DatePicker } from "@atlaskit/datetime-picker";
 
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
 
@@ -28,7 +25,7 @@ type Props = {
   isOpen: boolean;
   parentId?: string;
   onClose: (shouldRefresh?: boolean) => void;
-  goalToEdit?: GoalCollection2 | null;
+  goalToEdit?: Goals | null;
 };
 
 // Initial state for all possible fields
@@ -39,7 +36,7 @@ interface FormData {
 }
 
 // --- Component ---
-const GoalDrawer2 = ({
+const GoalDrawer = ({
   title,
   goalType,
   goalCategory,
@@ -111,7 +108,7 @@ const GoalDrawer2 = ({
     }
 
     //Prepare payload for API (GoalCollection)
-    const goalData: GoalCollection2 = {
+    const goalData: Goals = {
       id: isEditing ? goalToEdit!.id : uuidv4(), //use existing ID if editing. if adding, create new id
       scopeId: scope.id,
       parentId: isEditing ? goalToEdit!.parentId : parentId || undefined, //use existing parentId if editing. if adding, create new
@@ -242,4 +239,4 @@ const GoalDrawer2 = ({
   );
 };
 
-export default GoalDrawer2;
+export default GoalDrawer;

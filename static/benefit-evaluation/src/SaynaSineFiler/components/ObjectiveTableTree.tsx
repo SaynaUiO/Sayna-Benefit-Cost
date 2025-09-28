@@ -8,8 +8,8 @@ import TableTree, {
 } from "@atlaskit/table-tree";
 import Button from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
-import { GoalCollection2 } from "../types/goal2";
-import { formatGoalID } from "../types/goalIdFormatter";
+import { Goals } from "../types/goal";
+import { formatGoalID } from "../utils/goalIdFormatter";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 
@@ -17,18 +17,18 @@ import TrashIcon from "@atlaskit/icon/glyph/trash";
 interface ObjectiveRootItem {
   id: string;
   name: string;
-  goals: GoalCollection2[];
+  goals: Goals[];
 }
 
 interface ObjectiveTableTreeProps {
-  data: GoalCollection2[];
+  data: Goals[];
   onAddGoal: (parentId: string, goalType: string, category?: string) => void;
-  onEditGoal: (goal: GoalCollection2) => void;
+  onEditGoal: (goal: Goals) => void;
   onDeleteGoal: (goalId: string) => void;
 }
 
 //2. Define the Union Type for Items
-type TableItem = ObjectiveRootItem | GoalCollection2;
+type TableItem = ObjectiveRootItem | Goals;
 
 export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
   onAddGoal,
@@ -68,7 +68,7 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
           const isLiveGoal = !isRoot;
 
           const rootContainer = item as ObjectiveRootItem;
-          const goal = item as GoalCollection2;
+          const goal = item as Goals;
 
           const children = isRoot ? rootContainer.goals : [];
 

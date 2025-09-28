@@ -7,7 +7,7 @@
  */
 
 
-export interface GoalCollection {
+export interface Goals {
     id: string; 
     scopeId: string;
     parentId?: string;

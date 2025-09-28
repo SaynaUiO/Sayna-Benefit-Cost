@@ -7,8 +7,8 @@ import TableTree, {
   Headers,
 } from "@atlaskit/table-tree";
 import { BenefitCategory } from "../types/benefit";
-import AddBenefitGoalDropdownButton from "../AddBenefitGoalDropdown";
-import { formatGoalID } from "../types/goalIdFormatter";
+import AddBenefitGoalDropdownButton from "./AddBenefitGoalDropdown";
+import { formatGoalID } from "../utils/goalIdFormatter";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 
@@ -18,13 +18,13 @@ const CATEGORY_HEADERS: BenefitCategory[] = [
   "Organisasjonsmål",
   "Effektmål",
 ];
-import { GoalCollection2 } from "../types/goal2";
+import { Goals } from "../types/goal";
 import Button from "@atlaskit/button";
 
 interface CategoryItem {
   id: BenefitCategory; // e.g., "Samfunnsmål"
   name: BenefitCategory;
-  goals: GoalCollection2[]; // Children are the goals
+  goals: Goals[]; // Children are the goals
 }
 
 interface BenefitRootItem {
@@ -41,9 +41,9 @@ const CATEGORY_DROPDOWN_ITEMS = [
 
 // Define the component props
 interface BenefitTableTreeProps {
-  data: GoalCollection2[];
+  data: Goals[];
   onAddGoal: (parentId: string, goalType: string, category: string) => void;
-  onEditGoal: (goal: GoalCollection2) => void;
+  onEditGoal: (goal: Goals) => void;
   onDeleteGoal: (goalId: string) => void;
 }
 
@@ -67,7 +67,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   };
 
   const items: BenefitRootItem[] = [BENEFIT_ROOT_ITEM];
-  type TableItem = BenefitRootItem | CategoryItem | GoalCollection2;
+  type TableItem = BenefitRootItem | CategoryItem | Goals;
 
   // Handler to bridge the dropdown component's output to the main GoalStructureView handler
   const handleCategorySelect = (category: string, parentId?: string) => {
@@ -102,7 +102,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
 
           const hasChildren = childrenArray.length > 0;
 
-          const goal = item as GoalCollection2;
+          const goal = item as Goals;
 
           return (
             <Row

@@ -1,7 +1,7 @@
-import { GoalCollection2 } from "./goal2";
+import { Goals } from "../types/goal";
 
 
-export const formatGoalID = (goal: GoalCollection2): string => {
+export const formatGoalID = (goal: Goals): string => {
     const tier = goal.tier; 
     const shortId = goal.id.substring(0,4).toUpperCase();
     let prefix = ""; 

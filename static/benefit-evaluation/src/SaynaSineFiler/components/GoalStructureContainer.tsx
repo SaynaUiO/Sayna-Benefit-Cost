@@ -4,16 +4,16 @@ import { ObjectiveTableTree } from "./ObjectiveTableTree"; // Your Formål Table
 import { BenefitTableTree } from "./BenefitTableTree"; // Your Planlagte Nyttevirkninger Table
 import { ProductTableTree } from "./ProductTableTree"; // Your Produkt Table
 import { useState } from "react";
-import GoalDrawer2 from "../GoalDrawer2";
-import { GoalCollection2 } from "../types/goal2";
+import { Goals } from "../types/goal";
 import { useAppContext } from "../../Contexts/AppContext";
 import { useAPI } from "../../Contexts/ApiContext";
+import GoalDrawer from "./GoalDrawer";
 
 //Interface for organized data:
 interface OrganizedGoalData {
-  objectives: GoalCollection2[];
-  benefits: GoalCollection2[];
-  products: GoalCollection2[];
+  objectives: Goals[];
+  benefits: Goals[];
+  products: Goals[];
 }
 
 //Initial states:
@@ -23,7 +23,7 @@ const initialData: OrganizedGoalData = {
   products: [],
 };
 
-export const GoalStructureView = () => {
+export const GoalStructureContainer = () => {
   const [scope] = useAppContext();
   const api = useAPI();
 
@@ -31,7 +31,7 @@ export const GoalStructureView = () => {
   const [goalData, setGoalData] = useState<OrganizedGoalData>(initialData);
 
   //State to edit data
-  const [goalToEdit, setGoalToEdit] = useState<GoalCollection2 | null>(null); // <-- NEW STATE
+  const [goalToEdit, setGoalToEdit] = useState<Goals | null>(null); // <-- NEW STATE
 
   // Define state for the drawer's context
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -45,7 +45,7 @@ export const GoalStructureView = () => {
     if (!scope.id) return;
 
     try {
-      const allGoals: GoalCollection2[] = await api.goalAPI.getAll(scope.id);
+      const allGoals: Goals[] = await api.goalAPI.getAll(scope.id);
 
       const organizedData: OrganizedGoalData = allGoals.reduce(
         (acc, goal) => {
@@ -92,7 +92,7 @@ export const GoalStructureView = () => {
   };
 
   //For editing a Goal:
-  const handleEditGoal = (goal: GoalCollection2) => {
+  const handleEditGoal = (goal: Goals) => {
     setGoalToEdit(goal);
     setContext({
       parentId: goal.parentId || "N/A", // Use existing parentId
@@ -136,9 +136,7 @@ export const GoalStructureView = () => {
   );
 
   return (
-    <div style={{ padding: "16px" }}>
-      <h3>Medfin</h3>
-
+    <div style={{ padding: "2px" }}>
       {/* 1. Formål (Objectives) */}
       <div style={{ marginBottom: "40px" }}>
         <ObjectiveTableTree
@@ -170,7 +168,7 @@ export const GoalStructureView = () => {
       </div>
 
       {/* The Goal Creation Drawer */}
-      <GoalDrawer2
+      <GoalDrawer
         title={context.category || context.goalType}
         isOpen={isDrawerOpen}
         onClose={onCloseDrawer}
