@@ -167,6 +167,10 @@ export const GoalStructureContainer = () => {
         />
       </div>
 
+      <pre className="text-xs mt-4 bg-gray-100 p-2">
+        {JSON.stringify(goalData, null, 3)}
+      </pre>
+
       {/* The Goal Creation Drawer */}
       <GoalDrawer
         title={context.category || context.goalType}
