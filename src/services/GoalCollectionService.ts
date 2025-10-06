@@ -1,7 +1,7 @@
 import { flushGoals } from "./GoalService";
 import { GCDA, GCHeadDA } from "../dataAccess/GoalCollectionDA";
 import { deleteIdFromHead, getAllIds, addIdToHead} from "../heads/GoalCollectionHead";
-import { GoalCollection, PortfolioItems, GoalTierTypeEnum, GC2 } from "../models";
+import { GoalCollection, PortfolioItems, GoalTierTypeEnum } from "../models";
 import { Result } from "@forge/api";
 import { getSelectedIssueType } from "./ProjectService";
 
@@ -131,20 +131,12 @@ export const getSubGoalCollection = async (scopeId: string, goalCollectionId: st
   }
 }
 
+
 // --- Keep ONLY this (the second/bottom-most) one, with the changes below: ---
 export const createGoalCollection = async (scopeId: string, goalCollection: GoalCollection) => {
   console.log(`Create New Goal Collection: gc-${scopeId}-`);
-
-  // --- START OF CHANGES ---
-  // No longer use getNextId or overwrite the ID
-  // The goalCollection.id already contains the UUID from the frontend.
-
-  // Add the client-generated UUID to the head
   await addIdToHead(scopeId, goalCollection.id); // <--- NEW LINE
-
-  // Store the goal with the UUID
   return GCDA.set(scopeId, goalCollection);
-  // --- END OF CHANGES ---
 };
 
 //Nye metoder (Må legge til mandatory fields, da hele systemet fucker seg, så kan ct fikse det senere.): 

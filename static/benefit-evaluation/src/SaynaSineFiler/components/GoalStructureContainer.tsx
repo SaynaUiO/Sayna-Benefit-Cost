@@ -46,6 +46,7 @@ export const GoalStructureContainer = () => {
 
     try {
       const allGoals: Goals[] = await api.goalAPI.getAll(scope.id);
+      console.log("Hva kommer ut her: ", allGoals);
 
       const organizedData: OrganizedGoalData = allGoals.reduce(
         (acc, goal) => {

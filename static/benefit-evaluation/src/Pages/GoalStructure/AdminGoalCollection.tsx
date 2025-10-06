@@ -84,17 +84,9 @@ export const AdminGoalCollection = (props: AdminGoalCollectionProps) => {
     const goalCollection: GoalCollection = {
       id: `0`,
       scopeId: scope.id,
-      parentId: "", // Sayna har adda
+      type: GoalTierTypeEnum.GOAL_COLLECTION,
       name: data.name,
       description: data.description,
-      goalType: "",
-      type: GoalTierTypeEnum.GOAL_COLLECTION, // Sayna har adda
-      status: "",
-      dueDate: "",
-      tier: "", // Sayna har adda
-      weight: 0, // Sayna har adda
-      timeEstimate: 0,
-      costEstimate: 0,
     };
     if (scope) {
       api.goalCollection

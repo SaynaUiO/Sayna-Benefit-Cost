@@ -5,7 +5,5 @@ export const PortfolioItems = (portfolioId: string): GoalTier => ({
   scopeId: portfolioId,
   type: GoalTierTypeEnum.PORTFOLIO_ITEM,
   name: "Portfolio Items",
-  description: "",
-  tier: "",
-  status: "",
+  description: ""
 })
