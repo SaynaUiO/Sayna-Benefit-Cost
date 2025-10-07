@@ -53,79 +53,40 @@ export const SelectGoalCollections = ({
   };
 
   const fetch = async (): Promise<GoalTierOption[]> => {
-    return await api.goalTier
-      .getAll(scope.id, scope.type)
+    return await api.goalCollection
+      .getAll(scope.id)
       .then((goalTiers) => {
-        //Denne funker, den henter alle de tilgjengelge goalTiersene
-        // ------------------------------------------------------------------
-        // NY LINJE: Denne logger rådataene hentet fra API-et
         console.log("Rådata fra getAll:", goalTiers);
-        // --
 
-        //Ny logikk:
-        const findGoal = (name: string, tier: string, type: number) => {
-          const goal = goalTiers.find(
-            (g) => g.name === name && g.type === type //Fjernet && g.tier === tier
-          );
-          if (goal!) {
-            console.warn(
-              `Kunne ikke finne GoalTier for Navn: ${name}, Tier: ${tier}, Type: ${type}`
-            );
-          }
-          return goal;
-        };
+        //Sorter i riktig girarkisk rekkefølge:
+        const HIERARCHY_ORDER = ["Formål", "Effektmål", "Epic"];
 
-        const estimationOptions: GoalTierOption[] = [];
+        // 3. Sorter validGoalTiers: Formål (0) -> Effektmål (1) -> Epic (2)
+        goalTiers.sort((a, b) => {
+          const aIndex = HIERARCHY_ORDER.indexOf(a.name);
+          const bIndex = HIERARCHY_ORDER.indexOf(b.name);
+          return aIndex - bIndex;
+        });
 
-        // ------------------------------------------------------------------
-        // 1. Definer relasjonene basert på den ønskede strukturen
-        // ------------------------------------------------------------------
+        const estimationOptions: GoalTierOption[] = []; //Lager en tom liste
+        for (let index = 0; index < goalTiers.length - 1; index++) {
+          //Itererer gjennom GoalTiers
+          const lowerGoalTier = goalTiers[index + 1]; // Epic (nederst)
+          const upperGoalTier = goalTiers[index]; // Effektmål (over)
 
-        // RELASJON 1: Benefit.Organisasjonsmål -> Benefit.Samfunnsmål
-        const orgGoal = findGoal("Organisasjonsmål", "Organisasjonsmål", 0);
-        const samfunnGoal = findGoal("Samfunnsmål", "Samfunnsmål", 0);
-
-        if (orgGoal && samfunnGoal) {
+          // Sørg for at ingen navn er tomme (den defensive fiksingen fra sist)
+          const lowerGoalTierName = lowerGoalTier.name || lowerGoalTier.id;
+          const upperGoalTierName = upperGoalTier.name || upperGoalTier.id;
           estimationOptions.push({
-            label: orgGoal.name + " - " + samfunnGoal.name,
-            value: { goalTier: orgGoal, upperGoalTier: samfunnGoal },
+            label: `${lowerGoalTierName} - ${upperGoalTierName}`, // Epic - Effektmål
+            value: {
+              goalTier: lowerGoalTier, // Dette er "nedre nivå"
+              upperGoalTier: upperGoalTier, // Dette er "øvre nivå"
+            },
           });
         }
-
-        // RELASJON 2: Benefit.Effektmål -> Benefit.Organisasjonsmål
-        // Merk: Vi må velge en unik Effektmål (Her velges den første vi finner med tier "Effektmål" og type 0)
-        const effektGoal = goalTiers.find(
-          (g) => g.name === "Effektmål" && g.type === 0
-        );
-
-        if (effektGoal && orgGoal) {
-          // Bruker den samme orgGoal som i relasjon 1
-          estimationOptions.push({
-            label: effektGoal.name + " - " + orgGoal.name,
-            value: { goalTier: effektGoal, upperGoalTier: orgGoal },
-          });
-        }
-
-        // RELASJON 3: Product.Epic -> Benefit.Effektmål
-        // Merk: Vi må velge en unik Product.Epic (Her velges den første vi finner med tier "Epic" og type 0)
-        const productEpicGoal = goalTiers.find(
-          (g) => g.name === "Epic" && g.type === 0
-        );
-
-        if (productEpicGoal && effektGoal) {
-          // Bruker den samme effektGoal som i relasjon 2
-          estimationOptions.push({
-            label: productEpicGoal.name + " - " + effektGoal.name,
-            value: { goalTier: productEpicGoal, upperGoalTier: effektGoal },
-          });
-        }
-
-        // ------------------------------------------------------------------
-        // Merk: Vi dropper den originale .reverse() for å se om rekkefølgen
-        // stemmer med ønsket hierarki i select-boksen
-        // ------------------------------------------------------------------
-
-        console.debug("Filtrerte estimationOptions:", estimationOptions);
+        //estimationOptions.reverse(); //Reserveres for at høyere nivå skal vises flrst
+        console.debug(estimationOptions);
         return estimationOptions;
       })
       .catch((error) => {
@@ -133,29 +94,6 @@ export const SelectGoalCollections = ({
         return [];
       });
   };
-
-  //       const estimationOptions: GoalTierOption[] = []; //Lager en tom liste
-  //       for (let index = 0; index < goalTiers.length - 1; index++) {
-  //         //Itererer gjennom GoalTiers
-  //         const goalTier = goalTiers[index];
-  //         const upperGoalTier = goalTiers[index + 1]; //Lager en upper goal tier
-  //         estimationOptions.push({
-  //           label: goalTier.name + " - " + upperGoalTier.name,
-  //           value: {
-  //             goalTier: goalTier,
-  //             upperGoalTier: upperGoalTier,
-  //           },
-  //         });
-  //       }
-  //       estimationOptions.reverse(); //Reserveres for at høyere nivå skal vises flrst
-  //       console.debug(estimationOptions);
-  //       return estimationOptions;
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //       return [];
-  //     });
-  // };
 
   //Denne hooken kjøres en gnag for å hente datene med fetch
   useEffect(() => {
