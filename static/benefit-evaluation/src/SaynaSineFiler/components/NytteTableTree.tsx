@@ -11,6 +11,7 @@ import TrashIcon from "@atlaskit/icon/glyph/trash";
 import Button from "@atlaskit/button";
 import { Goal } from "../../Models";
 import AddIcon from "@atlaskit/icon/glyph/add";
+import Lozenge from "@atlaskit/lozenge";
 
 // --- NY/OPPDATERT DEFINISJON ---
 // Bruk string for ID/Name for å matche Goal.goalCollectionId
@@ -22,12 +23,7 @@ const ORGANISASJONSMAAL_ID: GoalCollectionID = "root-organisasjonsmaal"; // Anta
 const SAMFUNNSMAAL_ID: GoalCollectionID = "root-samfunnsmaal"; // Antatt ID
 
 // Definer de Kategori-IDene som skal vises i denne tabellen
-const CATEGORY_IDS_TO_DISPLAY: GoalCollectionID[] = [
-  // Merk: Bruk de faktiske IDene fra DB
-  EFFEKTMAAL_ID,
-  // ORGANISASJONSMAAL_ID, // Fjernet som i din kode
-  // SAMFUNNSMAAL_ID,     // Fjernet som i din kode
-];
+const CATEGORY_IDS_TO_DISPLAY: GoalCollectionID[] = [EFFEKTMAAL_ID];
 
 interface CategoryItem {
   id: GoalCollectionID;
@@ -69,8 +65,6 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   // 1. Lag Kategori-objektene (Effektmål, Org.mål, etc.)
   const liveCategories: CategoryItem[] = CATEGORY_IDS_TO_DISPLAY.map(
     (collectionId) => {
-      // Finner navnet: Du må kanskje slå opp navnet fra et annet sted hvis du kun har ID
-      // Bruker 'id' som fallback for navnet
       const name = collectionId.split("-")[1] || collectionId;
 
       return {
@@ -89,15 +83,6 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   };
 
   const items: BenefitRootItem[] = [BENEFIT_ROOT_ITEM];
-
-  // Handler for å koble dropdown til action
-  // const handleCategorySelect = (
-  //   collectionId: GoalCollectionID,
-  //   parentId?: string
-  // ) => {
-  //   // Sende "benefit-root" som parentId når det lages ny kategori-node
-  //   onAddGoal(parentId || BENEFIT_ROOT_ITEM.id, "Benefit", collectionId);
-  // };
 
   return (
     <TableTree>
@@ -146,19 +131,13 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
               <Cell></Cell>
               <Cell></Cell>
 
-              <Cell>{!isRoot && itemGoal.balancedPoints?.value}</Cell>
+              <Cell>
+                <Lozenge appearance="new" isBold>
+                  {!isRoot && itemGoal.balancedPoints?.value}
+                </Lozenge>
+              </Cell>
 
               <Cell>
-                {/* Legg til-knapp vises KUN på Root-nivå */}
-                {/* {isRoot && (
-                  <AddBenefitGoalDropdownButton
-                    buttonLabel="+"
-                    dropdownItems={CATEGORY_DROPDOWN_ITEMS}
-                    onTypeSelectedForCreation={handleCategorySelect}
-                    isPrimary={false}
-                  />
-                )} */}
-
                 {/* Legg til-knapp kan også vises på Kategori-nivå om ønskelig: */}
                 {isCategory && (
                   <Button

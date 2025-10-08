@@ -12,6 +12,7 @@ import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import { Goal } from "../../Models";
 import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
+import Lozenge from "@atlaskit/lozenge";
 
 //Definer root-element (Produkt):
 interface ProductRootItem {
@@ -80,9 +81,24 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                 <strong>{isRoot ? item.id : goal.key}</strong>
               </Cell>
               <Cell>{!isRoot && goal.description}</Cell>
-              <Cell> {!isRoot && goal.issueCost?.time}</Cell>
-              <Cell> {!isRoot && goal.issueCost?.cost}</Cell>
-              <Cell> {!isRoot && goal.balancedPoints?.value}</Cell>
+              <Cell>
+                {" "}
+                <Lozenge appearance="moved" isBold>
+                  {!isRoot && goal.issueCost?.time}
+                </Lozenge>
+              </Cell>
+              <Cell>
+                {" "}
+                <Lozenge appearance="success" isBold>
+                  {!isRoot && goal.issueCost?.cost}
+                </Lozenge>
+              </Cell>
+              <Cell>
+                {" "}
+                <Lozenge appearance="new" isBold>
+                  {!isRoot && goal.balancedPoints?.value}{" "}
+                </Lozenge>
+              </Cell>
 
               <Cell>
                 {isRoot && (
