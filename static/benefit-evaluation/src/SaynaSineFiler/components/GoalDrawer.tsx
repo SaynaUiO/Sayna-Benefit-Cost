@@ -12,12 +12,11 @@ import Button from "@atlaskit/button";
 import { useEffect } from "react";
 import { CostTime, Goal, GoalTypeEnum } from "../../Models";
 import { v4 as uuidv4 } from "uuid";
+import { useGoalForm } from "../hooks/useGoalDrawer";
 
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
 
-const FORMAAL_ID = "root-formaal";
-const EFFEKTMAAL_ID = "root-effektmaal"; // Brukes for "Benefit" goals
-const EPIC_ID = "root-epic";
+const EFFEKTMAAL_ID = "root-effektmaal";
 const ORGANISASJONSMAAL_ID = "root-organisasjonsmaal";
 const SAMFUNNSMAAL_ID = "root-samfunnsmaal";
 
@@ -30,7 +29,6 @@ const getGoalCategoryDisplayName = (categoryId: string): string => {
     case SAMFUNNSMAAL_ID:
       return "Samfunnsmål";
     default:
-      // Bruk ID som fallback, men fjern 'root-' prefikset og formater
       return categoryId
         .replace("root-", "")
         .split("-")
@@ -39,203 +37,46 @@ const getGoalCategoryDisplayName = (categoryId: string): string => {
   }
 };
 
+// --- Props (Beholdt) ---
+
 type Props = {
   title: string;
   goalType: "Objective" | "Benefit" | "Product" | string;
-  goalCategory?: string; //samfunnsmål...
+  goalCategory?: string;
   isOpen: boolean;
-  parentId?: string;
   onClose: (shouldRefresh?: boolean) => void;
   goalToEdit?: Goal | null;
 };
 
-// Initial state for all possible fields
-interface FormData {
-  description: string;
-  timeEstimate?: number;
-  costEstimate?: number;
-  weight?: number;
-}
-
 // --- Component ---
-const GoalDrawer = ({
-  goalType,
-  goalCategory,
-  isOpen,
-  parentId,
-  onClose,
-  goalToEdit,
-}: Props) => {
-  console.log("GoalDrawer Props:", { goalType, goalCategory, parentId });
+const GoalDrawer = (props: Props) => {
+  const { goalType, goalCategory, isOpen, onClose, goalToEdit } = props;
 
-  const [scope] = useAppContext();
-  const api = useAPI();
+  // 1. Bruker den nye hooken for all logikk og state!
+  const { formData, isSubmitting, handleChange, handleSave } =
+    useGoalForm(props);
 
-  // Initialize all fields in a single state object
-  const [formData, setFormData] = useState<FormData>({
-    description: "",
-    timeEstimate: undefined,
-    costEstimate: undefined,
-    weight: undefined,
-  });
-
-  // Reset form data when the drawer opens
-  useEffect(() => {
-    if (isOpen) {
-      if (goalToEdit) {
-        // Edit
-        setFormData({
-          description: goalToEdit.description || "",
-          timeEstimate: goalToEdit.issueCost?.time ?? undefined,
-          costEstimate: goalToEdit.issueCost?.time ?? undefined,
-          weight: goalToEdit.issueCost?.balanced_points ?? undefined,
-        });
-      } else {
-        //Create/Add
-        setFormData({
-          description: "",
-          timeEstimate: undefined,
-          costEstimate: undefined,
-          weight: undefined,
-        });
-      }
-    }
-  }, [isOpen, goalToEdit]);
-
-  const handleChange = (field: keyof FormData, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSave = async () => {
-    const isEditing = !!goalToEdit;
-    if (!formData.description) {
-      alert("Title and Description are required.");
-      return;
-    }
-
-    let tierValue: string;
-    switch (goalType) {
-      case "Benefit":
-        if (!goalCategory) {
-          alert("Benefit goal is missing category ID.");
-          return;
-        }
-        tierValue = goalCategory;
-        break;
-      case "Product":
-        tierValue = EPIC_ID;
-        break;
-      case "Objective":
-        tierValue = FORMAAL_ID;
-        break;
-      default:
-        alert("Invalid goal type.");
-        return;
-    }
-
-    try {
-      if (isEditing) {
-        // --- LOGIKK FOR REDIGERING ---
-
-        const updatedIssueCost: CostTime = {
-          ...(goalToEdit!.issueCost || {}),
-          time: formData.timeEstimate ?? 0, // Setter til 0 hvis tomt, eller håndter undefined
-          cost: formData.costEstimate ?? 0, // Setter til 0 hvis tomt, eller håndter undefined
-          balanced_points: goalToEdit!.issueCost?.balanced_points ?? 0,
-        };
-
-        const goalDataToUpdate: Goal = {
-          ...goalToEdit!,
-          description: formData.description,
-          issueCost: updatedIssueCost, // Sender inn det oppdaterte nestede objektet
-          // weight: formData.weight, // Hvis weight er direkte på Goal (for Benefits)
-        };
-
-        await api.goal.update(
-          scope.id,
-          goalDataToUpdate.goalCollectionId,
-          goalDataToUpdate
-        );
-        console.log("Goal updated:", goalDataToUpdate);
-      } else {
-        await api.goal.create(
-          scope.id,
-          tierValue, // Bruker korrekt GoalCollection ID
-          formData.description
-        );
-        console.log(
-          `Goal created in ${tierValue} with description: ${formData.description}`
-        );
-      }
-
-      onClose(true);
-    } catch (err) {
-      console.error("Error saving goal:", err);
-      // Bruk alert for å gi feedback
-      alert("There was an error saving the goal. Please try again.");
-    }
-  };
-
-  // --- Conditional Field Renderer ---
-  const renderEpicFields = () => (
-    <>
-      <TextField
-        label="Time"
-        type="number"
-        value={
-          formData.timeEstimate === undefined
-            ? ""
-            : String(formData.timeEstimate)
-        }
-        onChange={(e) =>
-          handleChange(
-            "timeEstimate",
-            Number((e.target as HTMLInputElement).value)
-          )
-        }
-        placeholder="Estimated time in hours"
-      />
-      <TextField
-        label="Cost"
-        type="number"
-        value={
-          formData.costEstimate === undefined
-            ? ""
-            : String(formData.costEstimate)
-        }
-        onChange={(e) =>
-          handleChange(
-            "costEstimate",
-            Number((e.target as HTMLInputElement).value)
-          )
-        }
-        placeholder="Estimated cost in currency"
-      />
-    </>
-  );
+  // --- UI Tekst Logikk (Beholdt for ren visning) ---
 
   const categoryDisplayName = goalCategory
-    ? getGoalCategoryDisplayName(goalCategory) // F.eks. "Effektmål"
+    ? getGoalCategoryDisplayName(goalCategory)
     : goalType === "Benefit"
     ? "Nyttevirkning"
-    : goalType; // Fikser visningen om category er null.
+    : goalType;
 
-  // Konverterer "Product" -> "Epic", "Objective" -> "Formål" for bedre UI-navn
   const finalDisplayName = categoryDisplayName
     .replace("Product", "Epic")
     .replace("Objective", "Formål");
 
-  // Dynamic Drawer Title
   const drawerTitle = goalToEdit
     ? `Endre ${goalToEdit.id}`
-    : `Opprett nytt ${finalDisplayName}`; // Bruk det pene navnet her!
+    : `Opprett nytt ${finalDisplayName}`;
 
-  //Update Button Text:
   const buttonText = goalToEdit
     ? "Lagre endringer"
     : `Create ${goalCategory || goalType}`;
 
-  // --- Main Render Function ---
+  // --- Hoved Render Funksjon ---
   return (
     <Drawer isOpen={isOpen} onClose={() => onClose(false)} label={drawerTitle}>
       <DrawerSidebar>
@@ -264,34 +105,13 @@ const GoalDrawer = ({
             isRequired
           />
 
-          {/* 3. Conditional Benefit Fields */}
-          {(goalType === "Benefit" || goalToEdit?.id === "Benefit") && (
-            <TextField
-              label="weight (%)"
-              type="number"
-              value={
-                formData.weight === undefined ? "" : String(formData.weight)
-              }
-              onChange={(e) =>
-                handleChange(
-                  "weight",
-                  Number((e.target as HTMLInputElement).value)
-                )
-              }
-              placeholder="0 til 100"
-              min={0}
-              max={100}
-            ></TextField>
-          )}
-
-          {/* 3. Conditional Epic Fields */}
-          {goalType === "Product" && renderEpicFields()}
-
-          {/* 4. Placeholder for Status (using Select) and Date (DatePicker) - Removed for now, but ready to be added back */}
-
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button appearance="primary" onClick={handleSave}>
-              {buttonText} {/* <-- dynamic button */}
+            <Button
+              appearance="primary"
+              onClick={handleSave}
+              isDisabled={isSubmitting} // Bruk state fra hooken
+            >
+              {buttonText}
             </Button>
           </div>
         </div>
