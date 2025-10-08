@@ -10,14 +10,34 @@ import { useAppContext } from "../../Contexts/AppContext";
 import { useAPI } from "../../Contexts/ApiContext";
 import Button from "@atlaskit/button";
 import { useEffect } from "react";
-
-//Ny interface jeg har laget:
-import { Goals } from "../types/goal";
-
+import { CostTime, Goal, GoalTypeEnum } from "../../Models";
 import { v4 as uuidv4 } from "uuid";
-import { stringToBytes } from "uuid/dist/cjs/v35";
 
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
+
+const FORMAAL_ID = "root-formaal";
+const EFFEKTMAAL_ID = "root-effektmaal"; // Brukes for "Benefit" goals
+const EPIC_ID = "root-epic";
+const ORGANISASJONSMAAL_ID = "root-organisasjonsmaal";
+const SAMFUNNSMAAL_ID = "root-samfunnsmaal";
+
+const getGoalCategoryDisplayName = (categoryId: string): string => {
+  switch (categoryId) {
+    case EFFEKTMAAL_ID:
+      return "Effektmål";
+    case ORGANISASJONSMAAL_ID:
+      return "Organisasjonsmål";
+    case SAMFUNNSMAAL_ID:
+      return "Samfunnsmål";
+    default:
+      // Bruk ID som fallback, men fjern 'root-' prefikset og formater
+      return categoryId
+        .replace("root-", "")
+        .split("-")
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
+  }
+};
 
 type Props = {
   title: string;
@@ -26,7 +46,7 @@ type Props = {
   isOpen: boolean;
   parentId?: string;
   onClose: (shouldRefresh?: boolean) => void;
-  goalToEdit?: Goals | null;
+  goalToEdit?: Goal | null;
 };
 
 // Initial state for all possible fields
@@ -63,12 +83,12 @@ const GoalDrawer = ({
   useEffect(() => {
     if (isOpen) {
       if (goalToEdit) {
-        //Edit
+        // Edit
         setFormData({
           description: goalToEdit.description || "",
-          timeEstimate: goalToEdit.timeEstimate ?? undefined,
-          costEstimate: goalToEdit.costEstimate ?? undefined,
-          weight: goalToEdit.weight ?? undefined,
+          timeEstimate: goalToEdit.issueCost?.time ?? undefined,
+          costEstimate: goalToEdit.issueCost?.time ?? undefined,
+          weight: goalToEdit.issueCost?.balanced_points ?? undefined,
         });
       } else {
         //Create/Add
@@ -82,72 +102,77 @@ const GoalDrawer = ({
     }
   }, [isOpen, goalToEdit]);
 
-  // Generic handler for all text/number fields
   const handleChange = (field: keyof FormData, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async () => {
-    //Determine if we are creating/adding or editing
-    const isEditing = !!goalToEdit; //Does it have data?
-
-    // Basic Validation
+    const isEditing = !!goalToEdit;
     if (!formData.description) {
       alert("Title and Description are required.");
       return;
     }
 
-    //Determine correct tier based on goalType and goalCathegory
     let tierValue: string;
-
-    if (goalType === "Benefit" && goalCategory) {
-      tierValue = goalCategory; // e.g., "Samfunnsmål"
-    } else if (goalType === "Product") {
-      tierValue = "Epic"; // Default for Product
-    } else if (goalType === "Objective") {
-      tierValue = "Objective"; // Default for Objective
-    } else {
-      alert("Invalid goal type or missing category.");
-      return;
+    switch (goalType) {
+      case "Benefit":
+        if (!goalCategory) {
+          alert("Benefit goal is missing category ID.");
+          return;
+        }
+        tierValue = goalCategory;
+        break;
+      case "Product":
+        tierValue = EPIC_ID;
+        break;
+      case "Objective":
+        tierValue = FORMAAL_ID;
+        break;
+      default:
+        alert("Invalid goal type.");
+        return;
     }
 
-    //Prepare payload for API (GoalCollection)
-    const goalData: Goals = {
-      id: isEditing ? goalToEdit!.id : uuidv4(), //use existing ID if editing. if adding, create new id
-      scopeId: scope.id,
-      parentId: isEditing ? goalToEdit!.parentId : parentId || undefined, //use existing parentId if editing. if adding, create new
-      name: tierValue, // Note: You might want to use goalToEdit!.name if editing, but tierValue is fine for now as they are often the same
-      description: formData.description,
-
-      //Categories:
-      goalType: goalType as "Objective" | "Benefit" | "Product",
-      tier: tierValue,
-
-      timeEstimate: formData.timeEstimate,
-      costEstimate: formData.costEstimate,
-
-      //Weight: Puttr det i senere.
-      weight: formData.weight,
-    };
-
-    console.log("GoalDrawer: Attempting to save with goalData:", goalData);
-
-    // API call:
     try {
       if (isEditing) {
-        //Call EDIT API endpoint
-        await api.goalAPI.update(scope.id, goalData);
-        console.log("Goal updated:", goalData);
+        // --- LOGIKK FOR REDIGERING ---
+
+        const updatedIssueCost: CostTime = {
+          ...(goalToEdit!.issueCost || {}),
+          time: formData.timeEstimate ?? 0, // Setter til 0 hvis tomt, eller håndter undefined
+          cost: formData.costEstimate ?? 0, // Setter til 0 hvis tomt, eller håndter undefined
+          balanced_points: goalToEdit!.issueCost?.balanced_points ?? 0,
+        };
+
+        const goalDataToUpdate: Goal = {
+          ...goalToEdit!,
+          description: formData.description,
+          issueCost: updatedIssueCost, // Sender inn det oppdaterte nestede objektet
+          // weight: formData.weight, // Hvis weight er direkte på Goal (for Benefits)
+        };
+
+        await api.goal.update(
+          scope.id,
+          goalDataToUpdate.goalCollectionId,
+          goalDataToUpdate
+        );
+        console.log("Goal updated:", goalDataToUpdate);
       } else {
-        //Call CREATE API endpoint
-        await api.goalAPI.create(scope.id, goalData);
-        console.log("Goal created:", goalData);
+        await api.goal.create(
+          scope.id,
+          tierValue, // Bruker korrekt GoalCollection ID
+          formData.description
+        );
+        console.log(
+          `Goal created in ${tierValue} with description: ${formData.description}`
+        );
       }
+
       onClose(true);
     } catch (err) {
-      console.error("Failed to save goal:", err);
-      // NOTE: You should ideally show the user an error message, not just close
-      onClose(false);
+      console.error("Error saving goal:", err);
+      // Bruk alert for å gi feedback
+      alert("There was an error saving the goal. Please try again.");
     }
   };
 
@@ -189,10 +214,21 @@ const GoalDrawer = ({
     </>
   );
 
-  //Update Title:
+  const categoryDisplayName = goalCategory
+    ? getGoalCategoryDisplayName(goalCategory) // F.eks. "Effektmål"
+    : goalType === "Benefit"
+    ? "Nyttevirkning"
+    : goalType; // Fikser visningen om category er null.
+
+  // Konverterer "Product" -> "Epic", "Objective" -> "Formål" for bedre UI-navn
+  const finalDisplayName = categoryDisplayName
+    .replace("Product", "Epic")
+    .replace("Objective", "Formål");
+
+  // Dynamic Drawer Title
   const drawerTitle = goalToEdit
-    ? `Endre ${goalToEdit.name}`
-    : `Opprett ny ${goalCategory || goalType}`;
+    ? `Endre ${goalToEdit.id}`
+    : `Opprett nytt ${finalDisplayName}`; // Bruk det pene navnet her!
 
   //Update Button Text:
   const buttonText = goalToEdit
@@ -229,7 +265,7 @@ const GoalDrawer = ({
           />
 
           {/* 3. Conditional Benefit Fields */}
-          {(goalType === "Benefit" || goalToEdit?.goalType === "Benefit") && (
+          {(goalType === "Benefit" || goalToEdit?.id === "Benefit") && (
             <TextField
               label="weight (%)"
               type="number"
