@@ -25,7 +25,7 @@ type TableItem = ProductRootItem | Goal;
 
 interface EpicTableTreeProps {
   data: Goal[]; //Henter ut alle epicsene
-  onAddGoal: (parentId: string, goalCollectionId: string) => void; //legger til en epic
+  onAddGoal: (goalCollectionId: string) => void; //legger til en epic
   onEditGoal: (goal: Goal) => void; //redigerer en epic
   onDeleteGoal: (goalId: string) => void; //sletter en epic
 }
@@ -49,20 +49,15 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
   // Datakilden for Rows er nå et array med kun Root-elementet
   const items: ProductRootItem[] = [PRODUCT_ROOT_ITEM];
 
-  const handleAddEpic = () => {
-    // Når brukeren trykker "Add Goal" på toppen, legges den til under root-epic
-    // Vi sender "" som parentId siden det er et toppnivå mål i denne samlingen.
-    onAddGoal(PRODUCT_ROOT_ITEM.id, EPIC_COLLECTION_ID);
-  };
-
   return (
     <TableTree>
       <Headers>
         <Header width={250}>Produkt Mål</Header>
-        <Header width={400}>Beskrivelse</Header>
+        <Header width={700}>Beskrivelse</Header>
+        <Header width={160}>Benefit Points</Header>
         <Header width={100}>Tid</Header>
-        <Header width={530}>Kostnad</Header>
-        <Header width={120}>Handlinger</Header>
+        <Header width={200}>Kostnad</Header>
+        <Header width={130}>Handlinger</Header>
       </Headers>
 
       <Rows
@@ -77,10 +72,13 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
           const isLiveGoal = !isRoot;
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
-              <Cell>{isRoot ? item.id : goal.key}</Cell>
+              <Cell>
+                <strong>{isRoot ? item.id : goal.key}</strong>
+              </Cell>
               <Cell>{!isRoot && goal.description}</Cell>
-              <Cell> </Cell>
-              <Cell> </Cell>
+              <Cell> BenefitPoint </Cell>
+              <Cell> tid </Cell>
+              <Cell> KOstnad</Cell>
 
               <Cell>
                 {isRoot && (
@@ -88,6 +86,7 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                     appearance="subtle"
                     // Pass the icon component *as JSX*
                     iconBefore={<AddIcon size="small" label="Add Epic" />}
+                    onClick={() => onAddGoal(EPIC_COLLECTION_ID)}
                   />
                 )}
                 {/* Edit Button  */}

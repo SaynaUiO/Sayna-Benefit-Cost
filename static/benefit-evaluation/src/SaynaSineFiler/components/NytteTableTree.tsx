@@ -12,10 +12,8 @@ import { formatGoalID } from "../utils/goalIdFormatter";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import Button from "@atlaskit/button";
-
-// Importer din AddBenefitGoalDropdownButton
-// import { AddBenefitGoalDropdownButton } from './AddBenefitGoalDropdownButton';
 import { Goal } from "../../Models";
+import AddIcon from "@atlaskit/icon/glyph/add";
 
 // --- NY/OPPDATERT DEFINISJON ---
 // Bruk string for ID/Name for å matche Goal.goalCollectionId
@@ -59,11 +57,7 @@ const CATEGORY_DROPDOWN_ITEMS = [
 // Define the component props
 interface BenefitTableTreeProps {
   data: Goal[]; // Alle Effektmål, Org.mål, Samf.mål
-  onAddGoal: (
-    parentId: string,
-    goalType: string,
-    goalCollectionId: GoalCollectionID
-  ) => void; // Bruk GoalCollectionID
+  onAddGoal: (goalCollectionId: string) => void;
   onEditGoal: (goal: Goal) => void;
   onDeleteGoal: (goalId: string) => void;
 }
@@ -100,13 +94,13 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   const items: BenefitRootItem[] = [BENEFIT_ROOT_ITEM];
 
   // Handler for å koble dropdown til action
-  const handleCategorySelect = (
-    collectionId: GoalCollectionID,
-    parentId?: string
-  ) => {
-    // Sende "benefit-root" som parentId når det lages ny kategori-node
-    onAddGoal(parentId || BENEFIT_ROOT_ITEM.id, "Benefit", collectionId);
-  };
+  // const handleCategorySelect = (
+  //   collectionId: GoalCollectionID,
+  //   parentId?: string
+  // ) => {
+  //   // Sende "benefit-root" som parentId når det lages ny kategori-node
+  //   onAddGoal(parentId || BENEFIT_ROOT_ITEM.id, "Benefit", collectionId);
+  // };
 
   return (
     <TableTree>
@@ -146,7 +140,9 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
           return (
             <Row itemId={item.id} items={children} hasChildren={hasChildren}>
               {/* KOLONNE 1: Nyttevirkninger/Kategori */}
-              <Cell>{!isRoot ? primaryLabel : "Nyttevirkning"}</Cell>
+              <Cell>
+                <strong>{!isRoot ? primaryLabel : "Nyttevirkning"}</strong>
+              </Cell>
 
               {/* KOLONNE 2: Beskrivelse */}
               <Cell>{isLiveGoal ? itemGoal.description : ""}</Cell>
@@ -158,26 +154,22 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
               {/* KOLONNE 5: Handlinger */}
               <Cell>
                 {/* Legg til-knapp vises KUN på Root-nivå */}
-                {isRoot && (
+                {/* {isRoot && (
                   <AddBenefitGoalDropdownButton
                     buttonLabel="+"
                     dropdownItems={CATEGORY_DROPDOWN_ITEMS}
                     onTypeSelectedForCreation={handleCategorySelect}
                     isPrimary={false}
-                    parentId={item.id}
                   />
-                )}
+                )} */}
 
                 {/* Legg til-knapp kan også vises på Kategori-nivå om ønskelig: */}
                 {isCategory && (
                   <Button
                     appearance="subtle"
-                    // Legg til en enkelt Add-knapp her for å legge til et mål direkte under denne kategorien
-                    // onClick={() => handleCategorySelect(item.id, (item as CategoryItem).id)}
-                  >
-                    {" "}
-                    {/* ... */}{" "}
-                  </Button>
+                    iconBefore={<AddIcon size="small" label="Legg til " />}
+                    onClick={() => onAddGoal(EFFEKTMAAL_ID)}
+                  />
                 )}
 
                 {/* Rediger/Slett-knapper vises KUN på Mål-nivå */}

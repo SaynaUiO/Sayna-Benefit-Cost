@@ -87,7 +87,9 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
               {/* KOLONNE 1: Formål Navn / Nøkkel */}
-              <Cell>{primaryLabel}</Cell>
+              <Cell>
+                <strong>{primaryLabel}</strong>
+              </Cell>
 
               {/* KOLONNE 2: Beskrivelse */}
               <Cell>{isLiveGoal && goal.description}</Cell>

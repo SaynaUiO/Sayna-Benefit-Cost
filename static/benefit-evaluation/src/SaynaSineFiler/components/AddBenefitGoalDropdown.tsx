@@ -10,7 +10,7 @@ type Props = {
   dropdownItems: { label: string; value: string }[];
   onTypeSelectedForCreation: (selectedType: string, parentId?: string) => void;
   isPrimary?: boolean;
-  parentId?: string;
+  goalCollectionId?: string;
 };
 
 const AddBenefitGoalDropdownButton = ({
@@ -18,7 +18,7 @@ const AddBenefitGoalDropdownButton = ({
   dropdownItems,
   onTypeSelectedForCreation,
   isPrimary = true,
-  parentId,
+  goalCollectionId,
 }: Props) => {
   return (
     <>
@@ -42,7 +42,7 @@ const AddBenefitGoalDropdownButton = ({
             <DropdownItem
               key={item.value}
               onClick={() => {
-                onTypeSelectedForCreation(item.value, parentId);
+                onTypeSelectedForCreation(item.value, goalCollectionId);
               }}
             >
               {item.label}

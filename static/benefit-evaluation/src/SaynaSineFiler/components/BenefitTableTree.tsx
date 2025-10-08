@@ -123,7 +123,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
 
               <Cell>
                 {/* Add button */}
-                {isAbsoluteRoot && (
+                {/* {isAbsoluteRoot && (
                   <AddBenefitGoalDropdownButton
                     buttonLabel="+"
                     dropdownItems={CATEGORY_DROPDOWN_ITEMS}
@@ -131,7 +131,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
                     isPrimary={false}
                     parentId={root.id} // Pass the parent ID dynamically
                   />
-                )}
+                )} */}
 
                 {/* Edit Button  */}
                 {isLiveGoal && (
