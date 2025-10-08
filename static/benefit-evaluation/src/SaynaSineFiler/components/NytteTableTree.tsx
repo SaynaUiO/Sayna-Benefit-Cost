@@ -6,9 +6,6 @@ import TableTree, {
   Header,
   Headers,
 } from "@atlaskit/table-tree";
-import { BenefitCategory } from "../types/benefit";
-import AddBenefitGoalDropdownButton from "./AddBenefitGoalDropdown";
-import { formatGoalID } from "../utils/goalIdFormatter";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import Button from "@atlaskit/button";

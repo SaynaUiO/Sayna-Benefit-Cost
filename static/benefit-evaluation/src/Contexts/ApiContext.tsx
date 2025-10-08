@@ -12,9 +12,6 @@ import { appApi } from "../Api/AppApi";
 import { portfolioItemApi } from "../Api/PortfolioItemApi";
 import { onboardingApi } from "../Api/OnboardingApi";
 
-//sayna add:
-import { goalAPI } from "../Api/GoalCollectionApi";
-
 type ApiContextProps = {
   children: ReactNode;
 };
@@ -26,8 +23,6 @@ const fromAPI = () => {
     app: appApi(),
     estimation: estimationApi(),
     goalCollection: goalCollectionApi(),
-    //sayna add:
-    goalAPI: goalAPI(),
     goalTier: goalTierApi(),
     goal: goalApi(),
     issue: issueApi(),

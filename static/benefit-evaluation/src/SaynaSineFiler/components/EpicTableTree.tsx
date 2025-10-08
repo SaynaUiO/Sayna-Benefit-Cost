@@ -8,7 +8,6 @@ import TableTree, {
 } from "@atlaskit/table-tree";
 import Button from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
-import { formatGoalID } from "../utils/goalIdFormatter";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import { Goal } from "../../Models";

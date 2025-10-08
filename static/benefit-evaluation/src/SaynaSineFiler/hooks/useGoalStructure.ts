@@ -4,8 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useAPI } from "../../Contexts/ApiContext";
 import { useAppContext } from "../../Contexts/AppContext";
 import { Goal, GoalTableItem, GoalTableItemTypeEnum } from "../../Models";
-import { useGoalInitializer } from "../MockData/goalsMockData";
 import { useGoalStructureInitializer } from "./useGoalStructureInitializer";
+import { useGoalInitializer } from "../MockData/goalsMockData";
 
 
 type GoalType = "Objective" | "Benefit" | "Product";
