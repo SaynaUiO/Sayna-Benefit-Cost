@@ -7,54 +7,57 @@ import { Goal } from "../../Models";
 import { useAppContext } from "../../Contexts/AppContext";
 import { useAPI } from "../../Contexts/ApiContext";
 import { useGoalCleaner } from "../MockData/DeleteGoal";
+import { EpicTableTree } from "./EpicTableTree";
+import { ObjectiveTableTree } from "./FormaalTableTree";
+import { BenefitTableTree } from "./NytteTableTree";
 
 // Importer useGoalCleaner hvis du bruker knappen, ellers fjern den
 // import { useGoalCleaner } from '../hooks/useGoalCleaner';
 
-// Definerer en enkel type for å holde all den hentede dataen
+// Definerer data-typene for klarhet (som i den minimalistiske versjonen)
 interface GoalData {
-  collections: any[] | null;
-  effektmål: any[] | null;
-  epics: any[] | null;
+  goals: Goal[] | null;
 }
+
+// Hardkode GoalCollection ID-ene for filtrering
+const EPIC_COLLECTION_ID = "root-epic";
+const FORMAAL_COLLECTION_ID = "root-formaal";
+const EFFEKT_COLLECTION_ID = "root-effektmaal";
 
 export const GoalStructureContainer2 = () => {
   const [scope] = useAppContext();
   const api = useAPI();
 
-  // Henter kun initialiseringsstatus
+  // Henter initialiseringsstatus og slette-funksjoner
   const { initialized: collectionsInitialized } = useGoalStructureInitializer();
   const { initialized: goalsInitialized } = useGoalInitializer();
-  // const { clearTestGoals, isDeleting } = useGoalCleaner(); // Fjern hvis du ikke trenger knappen
+  const { clearTestGoals, isDeleting } = useGoalCleaner();
 
   const fullyInitialized = collectionsInitialized && goalsInitialized;
 
-  // NY STATE: Lagrer all data som skal vises i JSON-format
-  const [fetchedData, setFetchedData] = useState<GoalData>({
-    collections: null,
-    effektmål: null,
-    epics: null,
-  });
+  // State for alle Goals
+  const [fetchedData, setFetchedData] = useState<GoalData>({ goals: null });
 
   useEffect(() => {
     const fetchDataAndSetState = async () => {
-      // 1. KUN KJØR HVIS ALT ER INITIALISERT
       if (!fullyInitialized || !scope.id) return;
 
       try {
-        // Hent alle Promise-ene parallelt (raskere enn å vente på hver enkelt)
-        const [allCollections, allEffektmål, allEpic] = await Promise.all([
-          api.goalCollection.getAll(scope.id),
-          api.goal.getAll(scope.id, "root-effektmaal"),
-          api.goal.getAll(scope.id, "root-epic"),
-        ]);
+        // Henter alle GoalCollections først (for å vite hvilke samlinger som finnes)
+        const allCollections = await api.goalCollection.getAll(scope.id);
 
-        // 2. Oppdater state med resultatene
-        setFetchedData({
-          collections: allCollections,
-          effektmål: allEffektmål,
-          epics: allEpic,
-        });
+        let allGoals: Goal[] = [];
+
+        // Looper gjennom alle samlinger for å hente alle mål
+        for (const collection of allCollections) {
+          const goalsInCollection = await api.goal.getAll(
+            scope.id,
+            collection.id
+          );
+          allGoals = allGoals.concat(goalsInCollection);
+        }
+
+        setFetchedData({ goals: allGoals });
       } catch (error) {
         console.error("Feil under henting av data:", error);
       }
@@ -63,36 +66,65 @@ export const GoalStructureContainer2 = () => {
     fetchDataAndSetState();
   }, [fullyInitialized, scope.id, api]);
 
+  // --- Datafiltrering før Rendering ---
+
+  // 1. Filtrer ut KUN Epic Goals
+  const epicGoals =
+    fetchedData.goals?.filter(
+      (goal) => goal.goalCollectionId === EPIC_COLLECTION_ID
+    ) || [];
+
+  //Filterer kun Formaal goals
+  const formaalGoals =
+    fetchedData.goals?.filter(
+      (goal) => goal.goalCollectionId === FORMAAL_COLLECTION_ID
+    ) || [];
+
+  //Filterer kun effekt (nytte) goals
+  const effektGoals =
+    fetchedData.goals?.filter(
+      (goal) => goal.goalCollectionId === EFFEKT_COLLECTION_ID
+    ) || [];
+
   // --- RENDERING ---
 
-  // Viser "Laster..." hvis data ikke er hentet ennå
-  if (!fullyInitialized || !fetchedData.collections) {
-    return <div>Laster struktur og mål...</div>;
+  if (!fullyInitialized || !fetchedData.goals) {
+    return <div>Laster målstruktur...</div>;
   }
 
   return (
-    <div>
-      <h3>Datautskrift</h3>
+    <div style={{ padding: "2px" }}>
+      <ObjectiveTableTree
+        data={formaalGoals}
+        onAddGoal={() => {}} // Bruk mock funksjoner
+        onEditGoal={() => {}}
+        onDeleteGoal={() => {}}
+      />
 
-      {/* Seksjon: Alle Goals (Effektmål og Epics) */}
-      <h4>Goals (Effektmål & Epics)</h4>
-      <pre className="text-xs mt-4 bg-gray-100 p-2">
-        {/* Bruker '?' for å sikre at det ikke krasjer hvis data er null */}
-        {JSON.stringify(
-          [...(fetchedData.effektmål || []), ...(fetchedData.epics || [])],
-          null,
-          3
-        )}
+      <BenefitTableTree
+        data={effektGoals}
+        onAddGoal={() => {}} // Bruk mock funksjoner
+        onEditGoal={() => {}}
+        onDeleteGoal={() => {}}
+      />
+
+      {/* Produkt (Epic) */}
+      <div style={{ marginBottom: "40px" }}>
+        <EpicTableTree
+          data={epicGoals}
+          onAddGoal={() => {}} // Bruk mock funksjoner
+          onEditGoal={() => {}}
+          onDeleteGoal={() => {}}
+        />
+      </div>
+
+      {/* Her kan du legge til Effektmål-tabellen senere */}
+
+      {/* 3. Viser alle mål som JSON for debug */}
+      <h2 style={{ marginTop: "30px" }}>Alle Hentede Goals (DEBUG)</h2>
+      <pre style={{ backgroundColor: "#f4f4f4", padding: "10px" }}>
+        {JSON.stringify(fetchedData.goals, null, 2)}
       </pre>
-
-      {/* Seksjon: GoalCollections */}
-      <h4>GoalCollections</h4>
-      <pre className="text-xs mt-4 bg-gray-100 p-2">
-        {JSON.stringify(fetchedData.collections, null, 3)}
-      </pre>
-
-      {/* Legg til knappen her om nødvendig: */}
-      {/* <button onClick={clearTestGoals} disabled={isDeleting}>...</button> */}
     </div>
   );
 };
