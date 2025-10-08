@@ -10,7 +10,7 @@ import { useAppContext } from "../../Contexts/AppContext";
 import { useAPI } from "../../Contexts/ApiContext";
 import Button from "@atlaskit/button";
 import { useEffect } from "react";
-import { Goal, GoalTypeEnum } from "../../Models";
+import { CostTime, Goal, GoalTypeEnum } from "../../Models";
 import { v4 as uuidv4 } from "uuid";
 
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
@@ -86,11 +86,9 @@ const GoalDrawer = ({
         // Edit
         setFormData({
           description: goalToEdit.description || "",
-          // MERK: Disse feltene MÅ være definert i din Goal-modell for å unngå 'as any'
-          // Gjeninnfør disse linjene når `Goal` modellen er oppdatert:
-          // timeEstimate: (goalToEdit as any).timeEstimate ?? undefined,
-          // costEstimate: (goalToEdit as any).costEstimate ?? undefined,
-          // weight: (goalToEdit as any).weight ?? undefined,
+          timeEstimate: goalToEdit.issueCost?.time ?? undefined,
+          costEstimate: goalToEdit.issueCost?.time ?? undefined,
+          weight: goalToEdit.issueCost?.balanced_points ?? undefined,
         });
       } else {
         //Create/Add
@@ -138,13 +136,19 @@ const GoalDrawer = ({
     try {
       if (isEditing) {
         // --- LOGIKK FOR REDIGERING ---
-        // Veldig viktig: GoalData for UPDATE må inkludere alle feltene API-et forventer.
-        // Hvis API-et forventer kun de redigerte feltene, er dette forenklet.
+
+        const updatedIssueCost: CostTime = {
+          ...(goalToEdit!.issueCost || {}),
+          time: formData.timeEstimate ?? 0, // Setter til 0 hvis tomt, eller håndter undefined
+          cost: formData.costEstimate ?? 0, // Setter til 0 hvis tomt, eller håndter undefined
+          balanced_points: goalToEdit!.issueCost?.balanced_points ?? 0,
+        };
 
         const goalDataToUpdate: Goal = {
-          ...goalToEdit!, // Beholder eksisterende id, key, goalCollectionId
+          ...goalToEdit!,
           description: formData.description,
-          // Gjeninnfør estimat-feltene herfra når de er i Goal-modellen
+          issueCost: updatedIssueCost, // Sender inn det oppdaterte nestede objektet
+          // weight: formData.weight, // Hvis weight er direkte på Goal (for Benefits)
         };
 
         await api.goal.update(

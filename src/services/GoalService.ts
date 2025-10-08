@@ -85,6 +85,18 @@ export const setBPToAllGoals = async (goals: Goal[]) => {
   }
 };
 
+// NY FUNKSJON FOR Å SETTE KOSTNADER TIL ALLE MÅL
+export const setCostToAllGoals = async (goals: Goal[]) => {
+  if (goals.length === 0) return; // Add a check to ensure there are goals
+  console.log(goals)
+
+  const setCostPromises = goals.map((goal) =>
+    updateGoal(goal.scopeId, goal.goalCollectionId, goal)
+  );
+
+  return Promise.all(setCostPromises);
+}
+
 
 export const createGoal = async (scopeId: string, goalCollectionId: string, description: string) => {
   console.log(`Create Goal: go-${scopeId}-${goalCollectionId}-`)
@@ -127,8 +139,12 @@ export const updateGoal = async (scopeId: string, goalCollectionId: string, goal
         ...originalGoal,
         description: goal.description,
         balancedPoints: goal.balancedPoints,
-        distributedPoints: goal.distributedPoints
+        distributedPoints: goal.distributedPoints,
+        // NY Fiks: Legg til det nye feltet fra det innkommende 'goal'-objektet
+        issueCost: goal.issueCost // <-- Må inkluderes!
       }
+       // Valgfritt: Legg til logging her for å bekrefte at issueCost er med før GDA.set
+      console.log(`[updateGoal] Final issueCost before save:`, updatedGoal.issueCost); 
       return GDA.set(scopeId, goalCollectionId, updatedGoal);
     } else {
       return Promise.reject('Goal not found');

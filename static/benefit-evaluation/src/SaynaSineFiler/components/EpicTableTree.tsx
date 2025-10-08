@@ -12,6 +12,7 @@ import { formatGoalID } from "../utils/goalIdFormatter";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import { Goal } from "../../Models";
+import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
 
 //Definer root-element (Produkt):
 interface ProductRootItem {
@@ -28,6 +29,7 @@ interface EpicTableTreeProps {
   onAddGoal: (goalCollectionId: string) => void; //legger til en epic
   onEditGoal: (goal: Goal) => void; //redigerer en epic
   onDeleteGoal: (goalId: string) => void; //sletter en epic
+  onSetCostTime: (goals: Goal[]) => void; // Ny prop
 }
 
 export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
@@ -35,7 +37,10 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
   onEditGoal,
   onDeleteGoal,
   data: epicGoals, // Omdøpt for klarhet
+  onSetCostTime,
 }) => {
+  const isDataEmpty = epicGoals.length === 0;
+
   // Hardkoder GoalCollectionId for Epics, basert på tidligere debugging
   const EPIC_COLLECTION_ID = "root-epic";
 
@@ -76,9 +81,9 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                 <strong>{isRoot ? item.id : goal.key}</strong>
               </Cell>
               <Cell>{!isRoot && goal.description}</Cell>
-              <Cell> BenefitPoint </Cell>
-              <Cell> tid </Cell>
-              <Cell> KOstnad</Cell>
+              <Cell> {!isRoot && goal.balancedPoints?.value}</Cell>
+              <Cell> {!isRoot && goal.issueCost?.time}</Cell>
+              <Cell> {!isRoot && goal.issueCost?.cost}</Cell>
 
               <Cell>
                 {isRoot && (
@@ -89,8 +94,18 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                     onClick={() => onAddGoal(EPIC_COLLECTION_ID)}
                   />
                 )}
-                {/* Edit Button  */}
 
+                {/* Cost/Time Button  */}
+                {isRoot && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<BitbucketCompareIcon size="small" label="" />}
+                    isDisabled={isDataEmpty} // Deaktiver knappen hvis det ikke er noen Epics
+                    onClick={() => onSetCostTime(epicGoals)} // Sender alle Epics
+                  ></Button>
+                )}
+
+                {/* Edit Button  */}
                 {isLiveGoal && (
                   <Button
                     appearance="subtle"

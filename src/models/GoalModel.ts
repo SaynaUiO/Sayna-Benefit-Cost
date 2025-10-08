@@ -1,3 +1,4 @@
+import { CostTime } from "./CostTimeModel";
 import { balancedPoints, distributedPoints } from "./EstimationModel";
 
 export const GHeadKey = (scopeId: string, goalCollectionId: string): string => {
@@ -29,4 +30,5 @@ export interface Goal {
   description: string;
   balancedPoints?: balancedPoints;
   distributedPoints?: distributedPoints;
+  issueCost?: CostTime;
 }

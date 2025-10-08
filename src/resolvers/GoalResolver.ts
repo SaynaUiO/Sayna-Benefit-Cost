@@ -1,5 +1,5 @@
 import Resolver from "@forge/resolver";
-import { createGoal, deleteGoal, getAllGoals, getGoal, resetAllGoalPoints, setBPToAllGoals, updateGoal } from "../services/GoalService";
+import { createGoal, deleteGoal, getAllGoals, getGoal, resetAllGoalPoints, setBPToAllGoals, setCostToAllGoals, updateGoal } from "../services/GoalService";
 import { Goal } from "../models/GoalModel";
 
 export const goalApi = (resolver: Resolver) => {
@@ -27,6 +27,11 @@ export const goalApi = (resolver: Resolver) => {
   resolver.define('setBPToAllGoals', async ({ payload: { goals } }) => {
     return setBPToAllGoals(goals);
   });
+  // SetAllCosts (NY DEFINISJON FOR Å FIKSE FEILEN)
+resolver.define('setCostToAllGoals', async ({ payload: { goals } }) => {
+    // Denne funksjonen må implementeres i din service-lag (den faktiske logikken)
+    return await setCostToAllGoals(goals); 
+});
   //ResetAllPoints
   resolver.define('resetAllGoalPoints', async ({ payload: { scopeId, goalCollectionId } }) => {
     return resetAllGoalPoints(scopeId, goalCollectionId);

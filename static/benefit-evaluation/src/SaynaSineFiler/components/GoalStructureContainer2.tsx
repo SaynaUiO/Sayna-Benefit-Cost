@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useGoalStructureInitializer } from "../hooks/useGoalStructureInitializer";
 import { useGoalInitializer } from "../MockData/goalsMockData";
-import { Goal, GoalTypeEnum } from "../../Models";
+import {
+  Goal,
+  GoalTableItem,
+  GoalTableItemTypeEnum,
+  GoalTypeEnum,
+} from "../../Models";
 import { useAppContext } from "../../Contexts/AppContext";
 import { useAPI } from "../../Contexts/ApiContext";
 import { useGoalCleaner } from "../MockData/DeleteGoal";
@@ -11,6 +16,7 @@ import { EpicTableTree } from "./EpicTableTree";
 import { ObjectiveTableTree } from "./FormaalTableTree";
 import { BenefitTableTree } from "./NytteTableTree";
 import GoalDrawer from "./GoalDrawer2";
+import { SetEpicCostTime } from "../../Pages/GoalTiers/SetEpicCostTime";
 
 // Importer useGoalCleaner hvis du bruker knappen, ellers fjern den
 // import { useGoalCleaner } from '../hooks/useGoalCleaner';
@@ -34,6 +40,13 @@ interface GoalData {
 const EPIC_COLLECTION_ID = "root-epic";
 const FORMAAL_COLLECTION_ID = "root-formaal";
 const EFFEKT_COLLECTION_ID = "root-effektmaal";
+
+interface CostTimeModalState {
+  isOpen: boolean;
+  goals: GoalTableItem[]; // Bruker den forventede GoalTableItem[]
+  upperIsMonetary: boolean;
+  postfix: string;
+}
 
 export const GoalStructureContainer2 = () => {
   const [scope] = useAppContext();
@@ -173,6 +186,42 @@ export const GoalStructureContainer2 = () => {
     [scope.id, api.goal, fetchAndOrganizeGoals, fetchedData.goals]
   );
 
+  //Handle cost og tid:
+  // NY STATE:
+  const [costTimeModal, setCostTimeModal] = useState<CostTimeModalState | null>(
+    null
+  );
+
+  // Handler for å åpne modalen
+  const handleSetCostTime = (epicGoals: Goal[]) => {
+    // VIKTIG: Mappingen fra Goal.type til GoalTableItem.type
+    const mappedGoals: GoalTableItem[] = epicGoals.map((goal) => ({
+      ...goal,
+      // Vi caster direkte, da vi antar verdiene er like
+      type: goal.type as unknown as GoalTableItemTypeEnum,
+      // Du kan også legge til andre påkrevde felter for GoalTableItem her
+    }));
+
+    // Disse verdiene må bestemmes av din applikasjonslogikk (basert på Goals over Epics)
+    const isMonetary = false;
+    const currencyPostfix = "pts";
+
+    setCostTimeModal({
+      isOpen: true,
+      goals: mappedGoals,
+      upperIsMonetary: isMonetary,
+      postfix: currencyPostfix,
+    });
+  };
+
+  // Handler for å lukke modalen (lik GoalDrawer)
+  const handleCostTimeModalClose = (shouldRefresh = false) => {
+    setCostTimeModal(null);
+    if (shouldRefresh) {
+      fetchAndOrganizeGoals();
+    }
+  };
+
   //Metoder for Drawer:
 
   //Update Drawer
@@ -246,6 +295,7 @@ export const GoalStructureContainer2 = () => {
           }
           onEditGoal={handleEditGoal}
           onDeleteGoal={handleDeleteGoal}
+          onSetCostTime={handleSetCostTime} // KOBLET TIL NY HANDLER
         />
       </div>
 
@@ -263,6 +313,21 @@ export const GoalStructureContainer2 = () => {
           isOpen={isDrawerOpen}
           onClose={onCloseDrawer}
           goalToEdit={drawerContext.goalToEdit}
+        />
+      )}
+
+      {/* NYTT: Modal for Cost/Time (Som i GoalTable.tsx) */}
+      {costTimeModal && costTimeModal.isOpen && (
+        <SetEpicCostTime
+          items={costTimeModal.goals}
+          scopeId={scope.id}
+          // GoalTypeEnum.EPIC er mest sannsynlig en enum (nummer).
+          // Vi må caste for å matche SetEpicCostTimeProps: scopeType: number;
+          scopeType={GoalTypeEnum.GOAL as unknown as number}
+          upperIsMonetary={costTimeModal.upperIsMonetary}
+          postfix={costTimeModal.postfix}
+          close={() => handleCostTimeModalClose(false)}
+          refresh={() => handleCostTimeModalClose(true)}
         />
       )}
 
