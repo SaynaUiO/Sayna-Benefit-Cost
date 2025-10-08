@@ -59,9 +59,9 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
       <Headers>
         <Header width={250}>Produkt Mål</Header>
         <Header width={700}>Beskrivelse</Header>
-        <Header width={160}>Benefit Points</Header>
         <Header width={100}>Tid</Header>
-        <Header width={200}>Kostnad</Header>
+        <Header width={120}>Kostnad</Header>
+        <Header width={100}>Benefit Points</Header>
         <Header width={130}>Handlinger</Header>
       </Headers>
 
@@ -81,9 +81,9 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                 <strong>{isRoot ? item.id : goal.key}</strong>
               </Cell>
               <Cell>{!isRoot && goal.description}</Cell>
-              <Cell> {!isRoot && goal.balancedPoints?.value}</Cell>
               <Cell> {!isRoot && goal.issueCost?.time}</Cell>
               <Cell> {!isRoot && goal.issueCost?.cost}</Cell>
+              <Cell> {!isRoot && goal.balancedPoints?.value}</Cell>
 
               <Cell>
                 {isRoot && (

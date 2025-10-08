@@ -106,10 +106,11 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
     <TableTree>
       <Headers>
         <Header width={250}>Nyttevirkninger</Header>
-        <Header width={400}>Beskrivelse</Header>
+        <Header width={700}>Beskrivelse</Header>
+        <Header width={100}></Header>
+        <Header width={120}></Header>
         <Header width={100}>Weight</Header>
-        <Header width={530}></Header>
-        <Header width={120}>Handlinger</Header>
+        <Header width={130}>Handlinger</Header>
       </Headers>
 
       <Rows
@@ -139,19 +140,17 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
 
           return (
             <Row itemId={item.id} items={children} hasChildren={hasChildren}>
-              {/* KOLONNE 1: Nyttevirkninger/Kategori */}
               <Cell>
                 <strong>{!isRoot ? primaryLabel : "Nyttevirkning"}</strong>
               </Cell>
 
-              {/* KOLONNE 2: Beskrivelse */}
               <Cell>{isLiveGoal ? itemGoal.description : ""}</Cell>
 
-              {/* KOLONNE 3 & 4: Vekt % og Tom */}
               <Cell></Cell>
               <Cell></Cell>
 
-              {/* KOLONNE 5: Handlinger */}
+              <Cell>{!isRoot && itemGoal.balancedPoints?.value}</Cell>
+
               <Cell>
                 {/* Legg til-knapp vises KUN på Root-nivå */}
                 {/* {isRoot && (
