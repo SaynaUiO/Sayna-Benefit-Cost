@@ -11,6 +11,10 @@ import AddIcon from "@atlaskit/icon/glyph/add";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import { Goal } from "../../Models";
+import TextArea from "@atlaskit/textarea";
+import Textfield from "@atlaskit/textfield";
+import { Box } from "@atlaskit/primitives";
+import { InlineEditableTextfield } from "@atlaskit/inline-edit";
 
 // Definerer root-element (Bruker en konstant ID for sikkerhet)
 const OBJECTIVE_ROOT_ID = "Formål";
@@ -91,7 +95,22 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
               </Cell>
 
               {/* KOLONNE 2: Beskrivelse */}
-              <Cell>{isLiveGoal && goal.description}</Cell>
+              <Cell>
+                {isRoot && (
+                  <InlineEditableTextfield
+                    testId="editable-text-field"
+                    defaultValue={""}
+                    onConfirm={(newValue) =>
+                      console.log("Oppdatert rot-beskrivelse:", newValue)
+                    }
+                    placeholder={
+                      goal.description || "Legg til en beskrivelse her"
+                    }
+                    hideActionButtons
+                  />
+                )}
+                {isLiveGoal && goal.description}
+              </Cell>
 
               <Cell></Cell>
               <Cell></Cell>
