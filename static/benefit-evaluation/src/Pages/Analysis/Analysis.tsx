@@ -12,6 +12,10 @@ import {
 } from "./periodizationCalculations";
 
 import { PeriodizationChart } from "./Charts";
+import Tooltip from "@atlaskit/tooltip";
+import Button from "@atlaskit/button";
+import HipchatChevronDoubleUpIcon from "@atlaskit/icon/glyph/hipchat/chevron-double-up";
+import HipchatChevronDoubleDownIcon from "@atlaskit/icon/glyph/hipchat/chevron-double-down";
 
 //Definerer select
 // Definerer typen for Select Options
@@ -60,9 +64,6 @@ const costProfiles: ProfileOption[] = [
   },
 ];
 
-// Hardkodet tidsramme (skal senere hentes fra brukerinput)
-const NUMBER_OF_PERIODS = 16;
-
 // Legg til denne typen for å lagre profilvalgene per Epic ID
 interface EpicProfileSelections {
   [epicId: string]: {
@@ -95,6 +96,59 @@ export const Analysis = () => {
   const [periodizationResults, setPeriodizationResults] = useState<
     PeriodizationPeriodResult[]
   >([]);
+  // Ny state: Lagrer valgt antall ÅR (starter med 1)
+  const [numberOfPeriods, setNumberOfPeriods] = useState<number>(10);
+
+  // State for å håndtere input-feilmeldinger
+  const [inputError, setInputError] = useState<string | null>(null);
+
+  const MIN_YEARS = 10; // Ny minste tillatte verdi
+  const MAX_YEARS = 20; // Maksimal tillatte verdi
+
+  // NY FUNKSJON: Øker antall år med 1 (opp til MAX_YEARS)
+  const incrementYears = () => {
+    setInputError(null); // Rens feilmeldingen
+    setNumberOfPeriods((prevYears) => {
+      const newYears = prevYears + 1;
+      if (newYears > MAX_YEARS) {
+        // Returner maksverdien og sett en feilmelding (valgfritt)
+        // setInputError(`Maksimal analyseperiode er ${MAX_YEARS} år.`);
+        return MAX_YEARS;
+      }
+      return newYears;
+    });
+  };
+
+  // NY FUNKSJON: Reduserer antall år med 1 (ned til MIN_YEARS)
+  const decrementYears = () => {
+    setInputError(null);
+    setNumberOfPeriods((prevYears) => {
+      const newYears = prevYears - 1;
+      if (newYears < MIN_YEARS) {
+        // setInputError(`Minimum analyseperiode er ${MIN_YEARS} år.`);
+        return MIN_YEARS;
+      }
+      return newYears;
+    });
+  };
+
+  useEffect(() => {
+    if (
+      epicGoals &&
+      epicGoals.length > 0 &&
+      Object.keys(profileSelections).length > 0
+    ) {
+      // Sikrer at beregningen ikke kjører hvis input er ugyldig (selv om state burde fange det)
+      if (numberOfPeriods < 1) return;
+
+      const results = calculateTotalPeriodization(
+        epicGoals,
+        profileSelections,
+        numberOfPeriods // Nå er dette antall ÅR
+      );
+      setPeriodizationResults(results);
+    }
+  }, [epicGoals, profileSelections, numberOfPeriods]);
 
   //1. Fetch epic data fra goal funksjonen
   const fetchEpicGoals = useCallback(async () => {
@@ -149,13 +203,13 @@ export const Analysis = () => {
       const results = calculateTotalPeriodization(
         epicGoals,
         profileSelections,
-        NUMBER_OF_PERIODS
+        numberOfPeriods
       );
 
       // Lagrer det endelige resultatet
       setPeriodizationResults(results);
     }
-  }, [epicGoals, profileSelections]); // Avhenger av Epic-data og profilvalg
+  }, [epicGoals, profileSelections, numberOfPeriods]); // Avhenger av Epic-data og profilvalg
 
   // Legg til en default verdi hvis profilen ikke er valgt
   useEffect(() => {
@@ -236,7 +290,7 @@ export const Analysis = () => {
   // Definisjon av head for totaltabellen
   const totalTableHead = {
     cells: [
-      { key: "period", content: "Periode" },
+      { key: "period", content: "År" },
       { key: "totalBP", content: "Total BP" },
       { key: "totalSP", content: "Total SP" },
       { key: "netPoints", content: "Netto Poeng" },
@@ -250,7 +304,7 @@ export const Analysis = () => {
   const totalTableRows = periodizationResults.map((result) => ({
     key: `p-${result.period}`,
     cells: [
-      { key: "period", content: `Q${result.period}` },
+      { key: "period", content: `${result.period}` },
       { key: "totalBP", content: String(result.totalBP) },
       { key: "totalSP", content: String(result.totalSP) },
       { key: "netPoints", content: String(result.netPoints) },
@@ -266,7 +320,7 @@ export const Analysis = () => {
     // Hver periode er ett dataobjekt
     return periodizationResults.map((result) => ({
       // xAccessor
-      xAxis: `Q${result.period}`,
+      xAxis: `År ${result.period}`,
       // yAccessor (Netto Poeng)
       value: result.netPoints,
       // Ekstra data for farge/tooltip (Bruker farge for å skille positiv/negativ)
@@ -287,7 +341,7 @@ export const Analysis = () => {
   const chartDataJs = useMemo(() => {
     if (periodizationResults.length === 0) return { labels: [], datasets: [] };
 
-    const labels = periodizationResults.map((r) => `Q${r.period}`);
+    const labels = periodizationResults.map((r) => `År ${r.period}`);
     const netPointsData = periodizationResults.map((r) => r.netPoints);
     const accumulatedNPVData = periodizationResults.map(
       (r) => r.accumulatedNPV
@@ -335,6 +389,7 @@ export const Analysis = () => {
         over tid. Velg profiler for hver Epic under for å se den finansielle
         planen.
       </p>
+
       <div>
         <DynamicTable
           caption="Liste over epics"
@@ -346,8 +401,38 @@ export const Analysis = () => {
       {/* 2. TOTAL BEREGNINGSTABELL */}
       {periodizationResults.length > 0 && (
         <div>
+          {/* KONTROLL FOR TIDSRAMME (KNAPPER) */}
+          <div
+            style={{
+              marginBottom: "20px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <h3 style={{ marginRight: "10px" }}>
+              Finansiell plan over {numberOfPeriods} år
+            </h3>
+
+            {/* Knapp for å redusere år */}
+            <Tooltip content={"Reduser antall år"}>
+              <Button
+                onClick={decrementYears}
+                isDisabled={numberOfPeriods <= MIN_YEARS}
+                iconBefore={<HipchatChevronDoubleDownIcon label="Reduser år" />}
+              />
+            </Tooltip>
+
+            {/* Knapp for å øke år */}
+            <Tooltip content={"Øk antall år"}>
+              <Button
+                onClick={incrementYears}
+                isDisabled={numberOfPeriods >= MAX_YEARS}
+                iconBefore={<HipchatChevronDoubleUpIcon label="Øk år" />}
+              />
+            </Tooltip>
+          </div>
           <DynamicTable
-            caption={`Finansiell plan over ${NUMBER_OF_PERIODS} kvartaler`}
+            // caption={`Finansiell plan over ${numberOfPeriods} år`}
             head={totalTableHead}
             rows={totalTableRows}
             rowsPerPage={4}

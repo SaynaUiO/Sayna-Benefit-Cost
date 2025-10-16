@@ -1,7 +1,7 @@
 // src/analysis/periodizationCalculations.ts
 
 import { Goal } from "../../Models";
-import { Distribution, BP_DISTRIBUTIONS, SP_DISTRIBUTIONS, DISCOUNT_RATE_PER_QUARTER} from "./PeriodizationProfiles";
+import { Distribution, BP_DISTRIBUTIONS, SP_DISTRIBUTIONS, DISCOUNT_RATE_PER_YEAR} from "./PeriodizationProfiles";
 // Antar at Goal er importert fra et annet sted
 // import { Goal } from '...'; 
 
@@ -120,7 +120,7 @@ export const calculateTotalPeriodization = (
     
     // 3. Beregn Discount Factor og NPV
     // For Q1 (n=1), Q2 (n=2), etc.
-    const discountFactor = 1 / Math.pow(1 + DISCOUNT_RATE_PER_QUARTER, periodNumber);
+    const discountFactor = 1 / Math.pow(1 + DISCOUNT_RATE_PER_YEAR, periodNumber);
     
     const netDiscountedPoints = netPoints * discountFactor;
     

@@ -1,14 +1,14 @@
 
 //Typer: 
 
-//Array av variable lengde N (Kvartaler)
+//Array av variable lengde N (År)
 export type Distribution = number[]; 
 
 //Funksjon som genererer en Distribution basert på antall perioder
 export type ProfileFunction = (periods: number) => Distribution;
 
 // Nødvendig for NPV-beregning (Skla denne endres?)
-export const DISCOUNT_RATE_PER_QUARTER = 0.01; 
+export const DISCOUNT_RATE_PER_YEAR = 0.10; 
 
 //---Benefit Profiles---
 

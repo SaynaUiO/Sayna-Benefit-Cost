@@ -88,7 +88,7 @@ export const PeriodizationChart: React.FC<PeriodizationChartProps> = ({
       x: {
         title: {
           display: true,
-          text: "Periode (Kvartal)",
+          text: "Periode (År)",
         },
       },
     },
