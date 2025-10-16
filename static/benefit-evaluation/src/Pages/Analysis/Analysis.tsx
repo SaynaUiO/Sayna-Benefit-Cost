@@ -1,523 +1,374 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import PageHeader from "@atlaskit/page-header";
-import { useLocation } from "react-router-dom";
-import { useAPI } from "../../Contexts/ApiContext";
+import { Goal } from "../../Models";
 import { useAppContext } from "../../Contexts/AppContext";
+import { useAPI } from "../../Contexts/ApiContext";
+import DynamicTable from "@atlaskit/dynamic-table";
+import Lozenge from "@atlaskit/lozenge";
+import Select from "@atlaskit/select";
 import {
-  GoalTier,
-  GoalTierTypeEnum,
-  GoalTableItem,
-  GoalTableItemTypeEnum,
-  Goal,
-  balancedPointsEnum,
-} from "../../Models";
-import { EpicTable } from "../../Components/Analysis/Table/EpicTable";
-import { Loading } from "../../Components/Common/Loading";
-import Select, { OptionType, StylesConfig } from "@atlaskit/select";
-import { Label } from "@atlaskit/form";
-import Toggle from "@atlaskit/toggle";
-import Textfield from "@atlaskit/textfield";
-import { LoadingButton } from "@atlaskit/button";
-import Timeline from "../../Components/Analysis/Charts/Timeline";
-import { ScatterChart } from "../../Components/Analysis/Charts/ScatterChart";
-import { PieChartBenefit } from "../../Components/Analysis/Charts/PieChartBenefit";
-import RemainingBenefit from "../../Components/Analysis/Charts/RemainingBenefit";
-import RealizedBenefit from "../../Components/Analysis/Charts/RealizedBenefit";
-import CumulativePoints from "../../Components/Analysis/Charts/CumulativePoints";
-import { BudgetDetails } from "../../Models/BudgetModel";
-import Tooltip, { TooltipPrimitive } from "@atlaskit/tooltip";
-import QuestionCircleIcon from "@atlaskit/icon/glyph/question-circle";
-import { Box } from "@atlaskit/primitives";
-import { token } from "@atlaskit/tokens";
-import styled from "@emotion/styled";
+  calculateTotalPeriodization,
+  PeriodizationPeriodResult,
+} from "./periodizationCalculations";
 
-type option = {
-  label: string;
-  value: GoalTier;
+import { PeriodizationChart } from "./Charts";
+
+//Definerer select
+// Definerer typen for Select Options
+interface ProfileOption {
+  label: string; // Visningsnavnet i dropdown-menyen
+  value: string; // En unik nøkkel for profilen (brukes i beregningen)
+}
+
+// 6 BENEFIT-PROFILER (BP)
+const benefitProfiles: ProfileOption[] = [
+  { label: "Uniform with delay", value: "BP_DELAY_UNIFORM" },
+  { label: "Delay with plateau", value: "BP_DELAY_PLATEAU" },
+  { label: "Delay with peak and deterioration", value: "BP_DELAY_PEAK_DET" },
+  {
+    label: "Immediate effect with linear increase and plateau",
+    value: "BP_IMM_INCREASE",
+  },
+  {
+    label: "Beginners enthusiasm and deterioration",
+    value: "BP_BEGINNERS_DET",
+  },
+  { label: "Uniform", value: "BP_UNIFORM" },
+];
+
+// 5 COST-PROFILER (SP)
+const costProfiles: ProfileOption[] = [
+  {
+    label: "Development (1 period) with uniform post deployment",
+    value: "SP_DEV1_UNIFORM",
+  },
+  {
+    label: "Development (1 period) with decreasing post deployment",
+    value: "SP_DEV1_DECREASING",
+  },
+  {
+    label: "High development (1 period) with low decreasing post deployment",
+    value: "SP_HIGH_DEV_LOW_DEC",
+  },
+  {
+    label: "Low development (1 period) with increasing post deployment",
+    value: "SP_LOW_DEV_INCREASING",
+  },
+  {
+    label: "High development (1 period) with decreasing post deployment",
+    value: "SP_HIGH_DEV_DECREASING",
+  },
+];
+
+// Hardkodet tidsramme (skal senere hentes fra brukerinput)
+const NUMBER_OF_PERIODS = 16;
+
+// Legg til denne typen for å lagre profilvalgene per Epic ID
+interface EpicProfileSelections {
+  [epicId: string]: {
+    bpProfile: ProfileOption | null;
+    spProfile: ProfileOption | null;
+  };
+}
+
+//---Feridg med select definering---
+
+// Definerer head for DynamicTable
+const head = {
+  cells: [
+    { key: "epic", content: "Epic", width: 5 },
+    { key: "bp", content: "Total BP", width: 5 },
+    { key: "sp", content: "Total SP", width: 5 },
+    { key: "bpProfile", content: "Velg BP profil", width: 5 },
+    { key: "spProfile", content: "Velg SP profil", width: 5 },
+  ],
 };
-
-const customSelectStyle: StylesConfig = {
-  container: (styles: any) => ({ ...styles, width: "16rem" }),
-};
-
-const InlineDialog = styled(TooltipPrimitive)`
-  background: white;
-  border-radius: ${token("border.radius", "4px")};
-  box-shadow: ${token("elevation.shadow.overlay")};
-  box-sizing: content-box;
-  color: black;
-  max-height: 300px;
-  max-width: 300px;
-  padding: ${token("space.100", "8px")} ${token("space.150", "12px")};
-`;
 
 export const Analysis = () => {
-  const [isLoading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>();
-  const [goalCollection, setSelectedOption] = useState<option | undefined>();
-  const [items, setItems] = useState<GoalTableItem[]>([]);
-  const [sortBy, setSortBy] = useState<{ label: string; value: string }>({
-    label: "Benefit/Cost",
-    value: "benefitcost",
-  });
-  const [sortedItems, setSortedItems] = useState<GoalTableItem[]>([]);
-
-  const [upperGoals, setUpperGoals] = useState<Goal[]>([]);
-  const [upperIsMonetary, setUpperIsMonetary] = useState<boolean>(false);
-  const [isMonetary, setIsMonetary] = useState<boolean>(false);
-  const [postfix, setPostfix] = useState<string>("$");
-  const [expectedBenefit, setExpectedBenefit] = useState<number>(0);
-  const [expectedCosts, setExpectedCosts] = useState<number>(0);
-  const [budgetSavingLoading, setBudgetSavingLoading] =
-    useState<boolean>(false);
-
-  const postfixRef = useRef<HTMLInputElement | null>(null);
-  const expectedBenefitRef = useRef<HTMLInputElement | null>(null);
-  const expectedCostRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    const copy = [...items];
-
-    let costValue = !upperIsMonetary ? expectedCosts / 100 : 0;
-    let pointValue = upperIsMonetary
-      ? upperGoals.reduce(
-          (acc, curr) => acc + curr!!.balancedPoints!!.value,
-          0
-        ) / 100
-      : expectedBenefit / 100;
-
-    copy.sort((a, b) => {
-      const aValue = isMonetary
-        ? a.balancedPoints!!.value * pointValue
-        : a.balancedPoints?.value!!;
-      const bValue = isMonetary
-        ? b.balancedPoints!!.value * pointValue
-        : b.balancedPoints?.value!!;
-
-      const aCost = isMonetary
-        ? upperIsMonetary
-          ? a.issueCost!!.cost
-          : costValue * (a.issueCost!!.balanced_points || 0) * 100
-        : (a.issueCost!!.balanced_points || 1 / items.length) * 100;
-      const bCost = isMonetary
-        ? upperIsMonetary
-          ? b.issueCost!!.cost
-          : costValue * (b.issueCost!!.balanced_points || 0) * 100
-        : (b.issueCost!!.balanced_points || 1 / items.length) * 100;
-
-      if (sortBy.value === "benefit") {
-        const compare = bValue - aValue;
-
-        if (compare === 0) return a.issueCost!!.time - b.issueCost!!.time;
-        return compare;
-      } else if (sortBy.value === "benefitcost") {
-        const compare = bValue / bCost - aValue / aCost;
-
-        if (compare === 0) return a.issueCost!!.time - b.issueCost!!.time;
-        return compare;
-      } else if (sortBy.value === "benefitcosttime") {
-        const compare =
-          bValue / bCost / b.issueCost!!.time -
-          aValue / aCost / a.issueCost!!.time;
-        return compare;
-      } else {
-        const sortedBalanceTime =
-          bValue / (b.issueCost?.time || 1) - aValue / (a.issueCost?.time || 1);
-        if (sortedBalanceTime === 0) return bValue / bCost - aValue / aCost;
-
-        return sortedBalanceTime;
-      }
-    });
-    setSortedItems(copy);
-  }, [
-    items,
-    sortBy,
-    upperIsMonetary,
-    isMonetary,
-    expectedBenefit,
-    expectedCosts,
-  ]);
-
   const [scope] = useAppContext();
   const api = useAPI();
-  const location = useLocation();
-  const refresh = location.state?.refresh;
 
-  const fetchGoalCollection = async () => {
-    return api.goalTier
-      .getAll(scope.id, scope.type)
-      .then(async (goalTiers) => {
-        const goalTiersMapped = goalTiers.map(
-          (goalTier: GoalTier, index): option => {
-            return {
-              label: `Tier ${index + 1} – ${goalTier.name}`,
-              value: goalTier,
-            };
-          }
+  //Stats:
+  const [epicGoals, setEpicGoals] = useState<Goal[] | null>(null);
+  const [profileSelections, setProfileSelections] =
+    useState<EpicProfileSelections>({});
+  const [periodizationResults, setPeriodizationResults] = useState<
+    PeriodizationPeriodResult[]
+  >([]);
+
+  //1. Fetch epic data fra goal funksjonen
+  const fetchEpicGoals = useCallback(async () => {
+    try {
+      const allCollections = await api.goalCollection.getAll(scope.id);
+      let allEpics: Goal[] = [];
+
+      for (const collection of allCollections) {
+        const epics = await api.goal.getAll(scope.id, collection.id);
+        const epicGoals = epics.filter(
+          (goal) => goal.goalCollectionId === "root-epic"
         );
-
-        if (goalTiersMapped.length >= 2) {
-          const upGoals: Goal[] = await api.goal.getAll(
-            goalTiersMapped[goalTiersMapped.length - 1].value.scopeId,
-            goalTiersMapped[goalTiersMapped.length - 1].value.id
-          );
-
-          const upIsMonetary = upGoals.some(
-            (goal) => goal.balancedPoints?.type === balancedPointsEnum.MONETARY
-          );
-          if (upIsMonetary)
-            setPostfix(upGoals[0].balancedPoints?.postFix || "$");
-          else getBudget();
-
-          setUpperIsMonetary(upIsMonetary);
-          setUpperGoals(upGoals);
-        } else {
-          getBudget();
-        }
-
-        return goalTiersMapped.filter(
-          (option) => option.value.type === GoalTierTypeEnum.ISSUE_TYPE
-        );
-      })
-      .catch((error) => {
-        console.error(error);
-        return [];
-      });
-  };
-
-  const fetchItems = async () => {
-    return await api.issue
-      .getAll()
-      .then(async (issues) => {
-        const mappedIssues = issues.map((issue) => {
-          return {
-            ...issue,
-            type: GoalTableItemTypeEnum.ISSUE,
-          } as GoalTableItem;
-        });
-
-        for (const i of mappedIssues)
-          if (i.balancedPoints === undefined)
-            i.balancedPoints = { postFix: "$", type: 1, value: 0 };
-
-        return mappedIssues;
-      })
-      .catch((error) => {
-        console.error(error);
-        return [];
-      });
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    fetchGoalCollection()
-      .then((options) => {
-        setLoading(false);
-        if (options.length === 0) setError("No issue types found");
-        setSelectedOption(options[0]);
-        setError("");
-      })
-      .catch((error) => {
-        setError(error);
-        setLoading(false);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!goalCollection) return;
-
-    let isMounted = true;
-    setLoading(true);
-    fetchItems().then((items) => {
-      if (isMounted) {
-        let totalCosts = 0;
-        items.forEach((item) => {
-          if (item.issueCost === undefined)
-            item.issueCost = {
-              cost: 1,
-              time: 1,
-              balanced_points: 0,
-            };
-          if (item.issueCost.cost === 0) item.issueCost.cost = 1;
-          if (item.issueCost.time === 0) item.issueCost.time = 1;
-          totalCosts += item.issueCost.cost;
-        });
-        // * Make sure the balanced_points for costs is fixed
-        items.forEach((item) => {
-          item.issueCost!!.balanced_points = item.issueCost!!.cost / totalCosts;
-        });
-        setItems(items);
-        setLoading(false);
+        allEpics = allEpics.concat(epicGoals);
       }
-    });
-    return () => {
-      isMounted = false;
-    };
-  }, [goalCollection, refresh]);
+      setEpicGoals(allEpics);
+    } catch (error) {
+      console.error("Error fetching epic goals:", error);
+    }
+  }, [scope.id, api]);
 
-  if (isLoading)
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-        }}
-      >
-        <Loading />
-      </div>
+  useEffect(() => {
+    fetchEpicGoals();
+  }, [fetchEpicGoals]);
+
+  //2. Håndterer profil dropdown:
+  const handleProfileChange = useCallback(
+    (
+      epicId: string,
+      type: "bp" | "sp",
+      selectedOption: ProfileOption | null
+    ) => {
+      setProfileSelections((prevSelections) => ({
+        ...prevSelections,
+        [epicId]: {
+          ...prevSelections[epicId],
+          // Oppdaterer enten bpProfile eller spProfile
+          [`${type}Profile`]: selectedOption,
+        },
+      }));
+    },
+    []
+  );
+
+  useEffect(() => {
+    // Sjekker om vi har data å jobbe med
+    if (
+      epicGoals &&
+      epicGoals.length > 0 &&
+      Object.keys(profileSelections).length > 0
+    ) {
+      // Utfør total beregning basert på alle Epics og valgte profiler
+      const results = calculateTotalPeriodization(
+        epicGoals,
+        profileSelections,
+        NUMBER_OF_PERIODS
+      );
+
+      // Lagrer det endelige resultatet
+      setPeriodizationResults(results);
+    }
+  }, [epicGoals, profileSelections]); // Avhenger av Epic-data og profilvalg
+
+  // Legg til en default verdi hvis profilen ikke er valgt
+  useEffect(() => {
+    if (epicGoals && Object.keys(profileSelections).length === 0) {
+      const defaultSelections: EpicProfileSelections = {};
+      epicGoals.forEach((epic) => {
+        defaultSelections[epic.id] = {
+          // Setter en default profil, f.eks. den første i listen
+          bpProfile: benefitProfiles[0],
+          spProfile: costProfiles[0],
+        };
+      });
+      setProfileSelections(defaultSelections);
+    }
+  }, [epicGoals, profileSelections]);
+
+  //3. Rader for tabellen
+  const rows = epicGoals?.map((epic) => {
+    const epicId = epic.id;
+    const currentSelections = profileSelections[epicId] || {
+      bpProfile: null,
+      spProfile: null,
+    };
+
+    return {
+      key: epicId,
+      cells: [
+        { key: "epic", content: epic.key },
+        {
+          key: "bp",
+          content: (
+            <Lozenge appearance="new" isBold>
+              {String(epic.balancedPoints?.value || "")}
+            </Lozenge>
+          ),
+        },
+        {
+          key: "sp",
+          content: (
+            <Lozenge appearance="success" isBold>
+              {String(epic.issueCost?.cost || "")}
+            </Lozenge>
+          ),
+        },
+        {
+          key: "bpProfile",
+          content: (
+            <Select
+              options={benefitProfiles}
+              value={currentSelections.bpProfile}
+              onChange={(option) =>
+                handleProfileChange(epicId, "bp", option as ProfileOption)
+              }
+              placeholder="Velg BP-profil..."
+              spacing="compact"
+            />
+          ),
+          // Sørger for at Select-komponenten får plass i cellen
+        },
+        {
+          key: "spProfile",
+          content: (
+            <Select
+              options={costProfiles}
+              value={currentSelections.spProfile}
+              onChange={(option) =>
+                handleProfileChange(epicId, "sp", option as ProfileOption)
+              }
+              placeholder="Velg SP-profil..."
+              spacing="compact"
+            />
+          ),
+        },
+      ],
+    };
+  });
+
+  // Definisjon av head for totaltabellen
+  const totalTableHead = {
+    cells: [
+      { key: "period", content: "Periode" },
+      { key: "totalBP", content: "Total BP" },
+      { key: "totalSP", content: "Total SP" },
+      { key: "netPoints", content: "Netto Poeng" },
+      { key: "discount", content: "Discount Factor " },
+      { key: "netNPV", content: "Netto Nåverdi" },
+      { key: "accumulatedNPV", content: "Akkumulert NPV" },
+    ],
+  };
+
+  // Lager rader for totaltabellen basert på periodizationResults
+  const totalTableRows = periodizationResults.map((result) => ({
+    key: `p-${result.period}`,
+    cells: [
+      { key: "period", content: `Q${result.period}` },
+      { key: "totalBP", content: String(result.totalBP) },
+      { key: "totalSP", content: String(result.totalSP) },
+      { key: "netPoints", content: String(result.netPoints) },
+      { key: "discount", content: String(result.discountFactor) },
+      { key: "netNPV", content: String(result.netDiscountedPoints) },
+      { key: "accumulatedNPV", content: String(result.accumulatedNPV) },
+    ],
+  }));
+
+  const chartData = useMemo(() => {
+    if (periodizationResults.length === 0) return [];
+
+    // Hver periode er ett dataobjekt
+    return periodizationResults.map((result) => ({
+      // xAccessor
+      xAxis: `Q${result.period}`,
+      // yAccessor (Netto Poeng)
+      value: result.netPoints,
+      // Ekstra data for farge/tooltip (Bruker farge for å skille positiv/negativ)
+      financialState: result.netPoints >= 0 ? "Netto Gevinst" : "Netto Kostnad",
+      // Akkumulert NPV for tooltip
+      accumulatedNPV: result.accumulatedNPV,
+    }));
+  }, [periodizationResults]);
+
+  // Definerer Series for Bar Chart. Vi trenger kun én serie for Netto Poeng.
+  const netPointsSeries = [
+    {
+      key: "Netto Poeng",
+      data: chartData,
+    },
+  ];
+
+  const chartDataJs = useMemo(() => {
+    if (periodizationResults.length === 0) return { labels: [], datasets: [] };
+
+    const labels = periodizationResults.map((r) => `Q${r.period}`);
+    const netPointsData = periodizationResults.map((r) => r.netPoints);
+    const accumulatedNPVData = periodizationResults.map(
+      (r) => r.accumulatedNPV
     );
 
-  const handleExpectedBenefitValueChange = (
-    event: React.FormEvent<HTMLInputElement>
-  ) => {
-    if (expectedBenefitRef.current) {
-      let value = expectedBenefitRef.current.value;
-      if (!value || value === "") {
-        setExpectedBenefit(0);
-      } else if (isNaN(+value)) {
-      } else if (+value > 9999999) {
-        setExpectedBenefit(9999999);
-      } else {
-        setExpectedBenefit(+value);
-      }
-    }
-  };
-
-  const handleExpectedCostValueChange = (
-    event: React.FormEvent<HTMLInputElement>
-  ) => {
-    if (expectedCostRef.current) {
-      let value = expectedCostRef.current.value;
-      if (!value || value === "") {
-        setExpectedCosts(0);
-      } else if (isNaN(+value)) {
-      } else if (+value > 9999999) {
-        setExpectedCosts(999999);
-      } else {
-        setExpectedCosts(+value);
-      }
-    }
-  };
-
-  const handlePostfixChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (postfixRef.current) {
-      let value = postfixRef.current.value;
-      setPostfix(value);
-    }
-  };
-
-  const saveBudget = () => {
-    setBudgetSavingLoading(true);
-    api.project
-      .setBudgetDetails(expectedBenefit, expectedCosts, postfix)
-      .then(() => {
-        setBudgetSavingLoading(false);
-      });
-  };
-
-  const getBudget = () => {
-    if (!upperIsMonetary)
-      api.project.getBudgetDetails().then((details: BudgetDetails) => {
-        setExpectedBenefit(details.expectedBenefit);
-        setPostfix(details.postfix);
-        setExpectedCosts(details.expectedCosts);
-      });
-  };
+    return {
+      labels: labels,
+      datasets: [
+        {
+          // DATASET 1: STOLPER (Netto Poeng)
+          type: "bar" as const,
+          label: "Netto Poeng (Kvartalsvis)",
+          // Custom fargefunksjon: Grønn for positiv, Rød for negativ
+          backgroundColor: (context: any) => {
+            const value = context.raw;
+            return value >= 0
+              ? "rgba(75, 192, 192, 0.8)"
+              : "rgba(255, 99, 132, 0.8)";
+          },
+          borderColor: "rgba(255, 255, 255, 0.5)",
+          borderWidth: 1,
+          data: netPointsData,
+          yAxisID: "yNetPoints", // Koblet til venstre akse
+        },
+        {
+          // DATASET 2: LINJE (Akkumulert NPV)
+          type: "line" as const,
+          label: "Akkumulert NPV",
+          borderColor: "rgb(53, 162, 235)",
+          backgroundColor: "rgba(53, 162, 235, 0.2)",
+          data: accumulatedNPVData,
+          yAxisID: "yAccumulatedNPV", // Koblet til høyre akse
+          tension: 0.4,
+          pointRadius: 5,
+        },
+      ],
+    };
+  }, [periodizationResults]);
 
   return (
     <>
-      <PageHeader>Analysis</PageHeader>
+      <PageHeader>Periodisering</PageHeader>
       <p>
-        Unless the monetary value is shown both the benefit and costs are
-        normalized to a total of 100 points each.
+        På denne siden får du en oversikt over estimeringen av benefit of cost
+        over tid. Velg profiler for hver Epic under for å se den finansielle
+        planen.
       </p>
-      {error !== "" || goalCollection?.value === undefined ? (
-        <p>{error} ERROR</p>
-      ) : (
-        <>
-          {
-            <>
-              <Label htmlFor="toggle-monetary">Show In Monetary Value</Label>
-              <Toggle
-                id="toggle-monetary"
-                isChecked={isMonetary}
-                onChange={() => setIsMonetary((prev: boolean) => !prev)}
-              />
-              <br />
-              {!upperIsMonetary && isMonetary && (
-                <div style={{ marginBottom: "1rem" }}>
-                  <div
-                    style={{
-                      width: "10rem",
-                      display: "inline-block",
-                      marginRight: "0.5rem",
-                    }}
-                  >
-                    <Label htmlFor="expected-project-benefit">
-                      Expected Project Benefit
-                    </Label>
-                    <Textfield
-                      id="expected-project-benefit"
-                      placeholder="Expected Project Benefit"
-                      onChange={handleExpectedBenefitValueChange}
-                      value={expectedBenefit.toString()}
-                      ref={expectedBenefitRef}
-                      maxLength={7}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      width: "10rem",
-                      display: "inline-block",
-                      marginRight: "0.5rem",
-                    }}
-                  >
-                    <Label htmlFor="expected-project-costs">
-                      Expected Project Costs
-                    </Label>
-                    <Textfield
-                      id="expected-project-costs"
-                      placeholder="Expected Project Costs"
-                      onChange={handleExpectedCostValueChange}
-                      value={expectedCosts.toString()}
-                      ref={expectedCostRef}
-                      maxLength={7}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      width: "5rem",
-                      display: "inline-block",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    <Label htmlFor="postfix">Postfix</Label>
-                    <Textfield
-                      id="postfix"
-                      placeholder="Postfix"
-                      ref={postfixRef}
-                      value={postfix}
-                      maxLength={4}
-                      onChange={handlePostfixChange}
-                    />
-                  </div>
-                  <br />
-                  <LoadingButton
-                    appearance="primary"
-                    onClick={saveBudget}
-                    isLoading={budgetSavingLoading}
-                  >
-                    Save
-                  </LoadingButton>
-                </div>
-              )}
-            </>
-          }
+      <div>
+        <DynamicTable
+          caption="Liste over epics"
+          head={head}
+          rows={rows}
+        ></DynamicTable>
+      </div>
 
-          <EpicTable
-            goalTier={goalCollection?.value}
-            items={items}
-            loading={isLoading}
-            showMonetary={isMonetary}
-            pointValue={
-              upperIsMonetary
-                ? upperGoals.reduce(
-                    (acc, curr) => acc + curr!!.balancedPoints!!.value,
-                    0
-                  ) / 100
-                : expectedBenefit / 100
-            }
-            upperIsMonetary={upperIsMonetary}
-            costValue={!upperIsMonetary ? expectedCosts / 100 : 0}
-            postfix={postfix}
-          />
+      {/* 2. TOTAL BEREGNINGSTABELL */}
+      {periodizationResults.length > 0 && (
+        <div>
+          <DynamicTable
+            caption={`Finansiell plan over ${NUMBER_OF_PERIODS} kvartaler`}
+            head={totalTableHead}
+            rows={totalTableRows}
+            rowsPerPage={4}
+            defaultPage={1}
+          ></DynamicTable>
+        </div>
+      )}
 
-          <div style={{ position: "relative", width: "20rem" }}>
-            <Label htmlFor="select-sorting">Sort By</Label>
-            <Select<OptionType>
-              inputId="select-sorting"
-              value={sortBy}
-              options={[
-                { label: "Benefit/Cost", value: "benefitcost" },
-                { label: "Benefit", value: "benefit" },
-                { label: "Benefit/Time", value: "benefittime" },
-                {
-                  label: "(Benefit/Cost)/Time",
-                  value: "benefitcosttime",
-                },
-              ]}
-              onChange={(e: any) => {
-                setSortBy(e);
-              }}
-              placeholder="Sort by"
-              styles={customSelectStyle}
-            />
-            <Tooltip content="View the graphs and timeline sorted based on the selected value.">
-              <Box
-                style={{
-                  cursor: "pointer",
-                  position: "absolute",
-                  top: "1.75rem",
-                  right: "1rem",
-                }}
-              >
-                <QuestionCircleIcon label="" />
-              </Box>
-            </Tooltip>
-          </div>
+      {/* 3. VISUALISERING AV FINANSIELL PLAN */}
+      {chartDataJs.labels.length > 0 && (
+        <div style={{ marginTop: "40px" }}>
+          <h3>3. Netto Nåverdi (NPV) Over Tid </h3>
+          <p>
+            Diagrammet kombinerer Netto Poeng (stolper) og den kritiske
+            Akkumulerte NPV (linjen). Nullpunktet (Breakeven) er der den
+            Akkumulerte NPV-linjen krysser null-linjen.
+          </p>
 
-          <div className="grid-container" style={{ marginTop: 20 }}>
-            <div className="grid-item-full">
-              <Timeline items={sortedItems} />
-            </div>
-            <div className="grid-item">
-              <RemainingBenefit
-                items={sortedItems}
-                isMonetary={isMonetary}
-                upperIsMonetary={upperIsMonetary}
-                costValue={!upperIsMonetary ? expectedCosts / 100 : 0}
-                pointValue={
-                  upperIsMonetary
-                    ? upperGoals.reduce(
-                        (acc, curr) => acc + curr!!.balancedPoints!!.value,
-                        0
-                      ) / 100
-                    : expectedBenefit / 100
-                }
-              />
-            </div>
-            <div className="grid-item">
-              <RealizedBenefit
-                items={sortedItems}
-                isMonetary={isMonetary}
-                upperIsMonetary={upperIsMonetary}
-                costValue={!upperIsMonetary ? expectedCosts / 100 : 0}
-                pointValue={
-                  upperIsMonetary
-                    ? upperGoals.reduce(
-                        (acc, curr) => acc + curr!!.balancedPoints!!.value,
-                        0
-                      ) / 100
-                    : expectedBenefit / 100
-                }
-              />
-            </div>
-            <div className="grid-item">
-              <ScatterChart items={items} />
-            </div>
-            <div className="grid-item">
-              <CumulativePoints items={sortedItems} />
-            </div>
-            <div className="grid-item">
-              <PieChartBenefit items={sortedItems} benefit={true} />
-            </div>
-            <div className="grid-item">
-              <PieChartBenefit items={sortedItems} benefit={false} />
-            </div>
-          </div>
-        </>
+          {/* Kaller den nye komponenten med de korrekt formaterte dataene */}
+          <PeriodizationChart chartData={chartDataJs} />
+        </div>
       )}
     </>
   );

@@ -7,6 +7,7 @@
   "dependencies": {
     "@forge/api": "^5.2.0",
     "@forge/events": "^1.0.1",
+    "@forge/react": "^11.5.0",
     "@forge/resolver": "^1.5.19",
     "typescript": "^5.2.2"
   },
