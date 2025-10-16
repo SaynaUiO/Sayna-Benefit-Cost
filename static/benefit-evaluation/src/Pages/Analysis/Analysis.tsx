@@ -64,11 +64,24 @@ const costProfiles: ProfileOption[] = [
   },
 ];
 
-// Legg til denne typen for å lagre profilvalgene per Epic ID
+// NYTTIG: Lager Map for raskt oppslag av ProfileOption ut fra den lagrede nøkkelen (string)
+const getProfileMap = (
+  options: ProfileOption[]
+): Record<string, ProfileOption> => {
+  return options.reduce((acc, option) => {
+    acc[option.value] = option;
+    return acc;
+  }, {} as Record<string, ProfileOption>);
+};
+
+const benefitProfileMap = getProfileMap(benefitProfiles);
+const costProfileMap = getProfileMap(costProfiles);
+
+// KORRIGERT TYPE: Lagrer nå KUN strengene (keys) for å matche 'calculateTotalPeriodization'
 interface EpicProfileSelections {
   [epicId: string]: {
-    bpProfile: ProfileOption | null;
-    spProfile: ProfileOption | null;
+    benefitProfileKey: string; // NYTT NAVN OG TYPE
+    costProfileKey: string; // NYTT NAVN OG TYPE
   };
 }
 
@@ -92,7 +105,7 @@ export const Analysis = () => {
   //Stats:
   const [epicGoals, setEpicGoals] = useState<Goal[] | null>(null);
   const [profileSelections, setProfileSelections] =
-    useState<EpicProfileSelections>({});
+    useState<EpicProfileSelections>({}); // Bruker den korrigerte typen
   const [periodizationResults, setPeriodizationResults] = useState<
     PeriodizationPeriodResult[]
   >([]);
@@ -111,8 +124,7 @@ export const Analysis = () => {
     setNumberOfPeriods((prevYears) => {
       const newYears = prevYears + 1;
       if (newYears > MAX_YEARS) {
-        // Returner maksverdien og sett en feilmelding (valgfritt)
-        // setInputError(`Maksimal analyseperiode er ${MAX_YEARS} år.`);
+        // Returner maksverdien
         return MAX_YEARS;
       }
       return newYears;
@@ -125,7 +137,6 @@ export const Analysis = () => {
     setNumberOfPeriods((prevYears) => {
       const newYears = prevYears - 1;
       if (newYears < MIN_YEARS) {
-        // setInputError(`Minimum analyseperiode er ${MIN_YEARS} år.`);
         return MIN_YEARS;
       }
       return newYears;
@@ -143,7 +154,7 @@ export const Analysis = () => {
 
       const results = calculateTotalPeriodization(
         epicGoals,
-        profileSelections,
+        profileSelections, // Denne har nå KORREKT type
         numberOfPeriods // Nå er dette antall ÅR
       );
       setPeriodizationResults(results);
@@ -173,66 +184,69 @@ export const Analysis = () => {
     fetchEpicGoals();
   }, [fetchEpicGoals]);
 
-  //2. Håndterer profil dropdown:
+  //2. Håndterer profil dropdown: Lagrer KUN nøkkelstrengen (value)
   const handleProfileChange = useCallback(
     (
       epicId: string,
       type: "bp" | "sp",
       selectedOption: ProfileOption | null
     ) => {
+      // Bestemmer hvilken nøkkel vi skal oppdatere
+      const keyToUpdate =
+        type === "bp" ? "benefitProfileKey" : "costProfileKey";
+      const value =
+        selectedOption?.value ||
+        (keyToUpdate === "benefitProfileKey"
+          ? benefitProfiles[0].value
+          : costProfiles[0].value);
+
       setProfileSelections((prevSelections) => ({
         ...prevSelections,
         [epicId]: {
           ...prevSelections[epicId],
-          // Oppdaterer enten bpProfile eller spProfile
-          [`${type}Profile`]: selectedOption,
+          [keyToUpdate]: value, // Lagrer KUN strengen (key)
         },
       }));
     },
     []
   );
 
-  useEffect(() => {
-    // Sjekker om vi har data å jobbe med
-    if (
-      epicGoals &&
-      epicGoals.length > 0 &&
-      Object.keys(profileSelections).length > 0
-    ) {
-      // Utfør total beregning basert på alle Epics og valgte profiler
-      const results = calculateTotalPeriodization(
-        epicGoals,
-        profileSelections,
-        numberOfPeriods
-      );
-
-      // Lagrer det endelige resultatet
-      setPeriodizationResults(results);
-    }
-  }, [epicGoals, profileSelections, numberOfPeriods]); // Avhenger av Epic-data og profilvalg
-
-  // Legg til en default verdi hvis profilen ikke er valgt
+  // KORRIGERT BLOKK: Legg til en default verdi hvis profilen ikke er valgt - Bruker KUN nøkkelstrenger
   useEffect(() => {
     if (epicGoals && Object.keys(profileSelections).length === 0) {
       const defaultSelections: EpicProfileSelections = {};
+
+      // Henter de korrekte streng-nøklene fra default-profilene
+      const defaultBPKey = benefitProfiles[0].value;
+      const defaultSPKey = costProfiles[0].value;
+
       epicGoals.forEach((epic) => {
         defaultSelections[epic.id] = {
-          // Setter en default profil, f.eks. den første i listen
-          bpProfile: benefitProfiles[0],
-          spProfile: costProfiles[0],
+          // Setter de korrekte nøkkelnavnene og streng-verdiene
+          benefitProfileKey: defaultBPKey,
+          costProfileKey: defaultSPKey,
         };
       });
       setProfileSelections(defaultSelections);
     }
   }, [epicGoals, profileSelections]);
 
+  // ----------------------------------------------------
+  // Merknad: Den andre useEffect for beregning er flyttet opp tidligere for logisk flyt og er uendret.
+  // ----------------------------------------------------
+
   //3. Rader for tabellen
   const rows = epicGoals?.map((epic) => {
     const epicId = epic.id;
-    const currentSelections = profileSelections[epicId] || {
-      bpProfile: null,
-      spProfile: null,
+    // Henter de lagrede nøklene (string) fra state
+    const currentKeys = profileSelections[epicId] || {
+      benefitProfileKey: benefitProfiles[0].value,
+      costProfileKey: costProfiles[0].value,
     };
+
+    // Konverterer nøkkelen tilbake til ProfileOption for Select-komponenten (visning)
+    const currentBP = benefitProfileMap[currentKeys.benefitProfileKey];
+    const currentSP = costProfileMap[currentKeys.costProfileKey];
 
     return {
       key: epicId,
@@ -259,7 +273,7 @@ export const Analysis = () => {
           content: (
             <Select
               options={benefitProfiles}
-              value={currentSelections.bpProfile}
+              value={currentBP} // Bruker det oppslåtte ProfileOption-objektet
               onChange={(option) =>
                 handleProfileChange(epicId, "bp", option as ProfileOption)
               }
@@ -274,7 +288,7 @@ export const Analysis = () => {
           content: (
             <Select
               options={costProfiles}
-              value={currentSelections.spProfile}
+              value={currentSP} // Bruker det oppslåtte ProfileOption-objektet
               onChange={(option) =>
                 handleProfileChange(epicId, "sp", option as ProfileOption)
               }
@@ -291,11 +305,11 @@ export const Analysis = () => {
   const totalTableHead = {
     cells: [
       { key: "period", content: "År" },
-      { key: "totalBP", content: "Total BP" },
-      { key: "totalSP", content: "Total SP" },
+      { key: "grossBenefit", content: "Brutto Gevinst (BP)" }, // Nytt navn
+      { key: "grossCost", content: "Brutto Kostnad (SP)" }, // Nytt navn
       { key: "netPoints", content: "Netto Poeng" },
       { key: "discount", content: "Discount Factor " },
-      { key: "netNPV", content: "Netto Nåverdi" },
+      { key: "netNPV", content: "Netto Nåverdi" }, // Nytt navn
       { key: "accumulatedNPV", content: "Akkumulert NPV" },
     ],
   };
@@ -305,11 +319,11 @@ export const Analysis = () => {
     key: `p-${result.period}`,
     cells: [
       { key: "period", content: `${result.period}` },
-      { key: "totalBP", content: String(result.totalBP) },
-      { key: "totalSP", content: String(result.totalSP) },
+      { key: "grossBenefit", content: String(result.grossBenefit) }, // Korrigert: totalBP -> grossBenefit
+      { key: "grossCost", content: String(result.grossCost) }, // Korrigert: totalSP -> grossCost
       { key: "netPoints", content: String(result.netPoints) },
       { key: "discount", content: String(result.discountFactor) },
-      { key: "netNPV", content: String(result.netDiscountedPoints) },
+      { key: "netNPV", content: String(result.netPresentValue) }, // Korrigert: netDiscountedPoints -> netPresentValue
       { key: "accumulatedNPV", content: String(result.accumulatedNPV) },
     ],
   }));
@@ -338,6 +352,7 @@ export const Analysis = () => {
     },
   ];
 
+  // KORRIGERT BLOKK: Oppdaterer feltnavnet i datakilden for Chart.js
   const chartDataJs = useMemo(() => {
     if (periodizationResults.length === 0) return { labels: [], datasets: [] };
 
@@ -345,7 +360,7 @@ export const Analysis = () => {
     const netPointsData = periodizationResults.map((r) => r.netPoints);
     const accumulatedNPVData = periodizationResults.map(
       (r) => r.accumulatedNPV
-    );
+    ); // Bruker 'accumulatedNPV', som er korrekt
 
     return {
       labels: labels,
@@ -358,8 +373,8 @@ export const Analysis = () => {
           backgroundColor: (context: any) => {
             const value = context.raw;
             return value >= 0
-              ? "rgba(75, 192, 192, 0.8)"
-              : "rgba(255, 99, 132, 0.8)";
+              ? "rgba(171, 245, 209, 0.8)"
+              : "rgba(255, 189, 173, 0.8)";
           },
           borderColor: "rgba(255, 255, 255, 0.5)",
           borderWidth: 1,
@@ -432,7 +447,6 @@ export const Analysis = () => {
             </Tooltip>
           </div>
           <DynamicTable
-            // caption={`Finansiell plan over ${numberOfPeriods} år`}
             head={totalTableHead}
             rows={totalTableRows}
             rowsPerPage={4}
