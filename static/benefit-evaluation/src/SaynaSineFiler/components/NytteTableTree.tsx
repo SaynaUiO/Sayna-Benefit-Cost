@@ -13,39 +13,16 @@ import { Goal } from "../../Models";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import Lozenge from "@atlaskit/lozenge";
 
-// --- NY/OPPDATERT DEFINISJON ---
-// Bruk string for ID/Name for å matche Goal.goalCollectionId
-type GoalCollectionID = string;
-
-// GoalCollection IDene du har i DB:
-const EFFEKTMAAL_ID: GoalCollectionID = "root-effektmaal";
-const ORGANISASJONSMAAL_ID: GoalCollectionID = "root-organisasjonsmaal"; // Antatt ID
-const SAMFUNNSMAAL_ID: GoalCollectionID = "root-samfunnsmaal"; // Antatt ID
-
-// Definer de Kategori-IDene som skal vises i denne tabellen
-const CATEGORY_IDS_TO_DISPLAY: GoalCollectionID[] = [EFFEKTMAAL_ID];
-
-interface CategoryItem {
-  id: GoalCollectionID;
-  name: string; // Navnet (f.eks. "Effektmål")
-  goals: Goal[]; // Barna er målene i denne samlingen
-}
+const BENEFIT_COLLECTION_ID = "benefit-root";
 
 interface BenefitRootItem {
-  id: "benefit-root"; // Hardkodet ID
-  name: "Planlagte Nyttevirkninger";
-  categories: CategoryItem[]; // Omdøpt fra 'goals' til 'categories' for klarhet
+  id: typeof BENEFIT_COLLECTION_ID; // Hardkodet ID
+  // name: "Planlagte Nyttevirkninger";
+  name: string;
+  goals: Goal[]; // Omdøpt fra 'goals' til 'categories' for klarhet
 }
 
-// Union Type for TableTree rendering
-type TableItem = BenefitRootItem | CategoryItem | Goal;
-
-// Dropdown-items (bruk ID som value for enklere handling)
-const CATEGORY_DROPDOWN_ITEMS = [
-  { label: "Legg til Samfunnsmål", value: SAMFUNNSMAAL_ID },
-  { label: "Legg til Organisasjonsmål", value: ORGANISASJONSMAAL_ID },
-  { label: "Legg til Effektmål", value: EFFEKTMAAL_ID },
-];
+type TableItem = BenefitRootItem | Goal;
 
 // Define the component props
 interface BenefitTableTreeProps {
@@ -60,29 +37,19 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   onAddGoal,
   onEditGoal,
   onDeleteGoal,
-  data, // Alle mål
+  data: benefitgoals, // Alle mål
 }) => {
-  // 1. Lag Kategori-objektene (Effektmål, Org.mål, etc.)
-  const liveCategories: CategoryItem[] = CATEGORY_IDS_TO_DISPLAY.map(
-    (collectionId) => {
-      const name = collectionId.split("-")[1] || collectionId;
+  const isDataEmpty = benefitgoals.length === 0;
 
-      return {
-        id: collectionId,
-        name: name.charAt(0).toUpperCase() + name.slice(1), // Formatterer navnet (f.eks. 'effektmaal' -> 'Effektmål')
-        goals: data.filter((goal) => goal.goalCollectionId === collectionId),
-      };
-    }
-  );
-
-  // 2. Lag Rot-objektet
   const BENEFIT_ROOT_ITEM: BenefitRootItem = {
-    id: "benefit-root",
+    id: BENEFIT_COLLECTION_ID,
     name: "Planlagte Nyttevirkninger",
-    categories: liveCategories,
+    goals: benefitgoals,
   };
 
   const items: BenefitRootItem[] = [BENEFIT_ROOT_ITEM];
+
+  // const items: BenefitRootItem[] = [BENEFIT_ROOT_ITEM];
 
   return (
     <TableTree>
@@ -99,51 +66,43 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
         items={items as TableItem[]}
         render={(item: TableItem) => {
           // Bruk type guards for renere logikk
-          const isRoot = item.id === "benefit-root";
-          const isCategory =
-            !isRoot && (item as CategoryItem).goals !== undefined;
-          const isLiveGoal = !isRoot && !isCategory;
+          const isRoot = item.id === BENEFIT_COLLECTION_ID;
+          const goal = item as Goal; // Kun gyldig hvis !isRoot
 
-          const children = isRoot
-            ? (item as BenefitRootItem).categories
-            : isCategory
-            ? (item as CategoryItem).goals
-            : [];
+          // Fjerner unødvendig 'unknown as' casting
+          const children = isRoot ? (item as BenefitRootItem).goals : [];
 
-          const hasChildren = children.length > 0;
+          const isLiveGoal = !isRoot;
 
-          const itemGoal = item as Goal; // Kun gyldig hvis isLiveGoal
-
-          // Hent label for Cell 1 (Root/Kategori/Mål ID)
-          let primaryLabel = "";
-          if (isRoot) primaryLabel = item.id;
-          else if (isCategory) primaryLabel = (item as CategoryItem).name;
-          else if (isLiveGoal) primaryLabel = itemGoal.key || itemGoal.id;
+          // Definer label for første celle
+          const primaryLabel = isRoot
+            ? "Planlagt Nyttevirkning"
+            : goal.key || goal.id;
 
           return (
-            <Row itemId={item.id} items={children} hasChildren={hasChildren}>
+            <Row itemId={item.id} items={children} hasChildren={isRoot}>
               <Cell>
-                <strong>{!isRoot ? primaryLabel : "Nyttevirkning"}</strong>
+                <strong>{primaryLabel}</strong>
               </Cell>
 
-              <Cell>{isLiveGoal ? itemGoal.description : ""}</Cell>
+              <Cell>{isLiveGoal ? goal.description : ""}</Cell>
 
               <Cell></Cell>
               <Cell></Cell>
 
               <Cell>
                 <Lozenge appearance="new" isBold>
-                  {!isRoot && itemGoal.balancedPoints?.value}
+                  {!isRoot && goal.balancedPoints?.value}
                 </Lozenge>
               </Cell>
 
               <Cell>
                 {/* Legg til-knapp kan også vises på Kategori-nivå om ønskelig: */}
-                {isCategory && (
+                {isRoot && (
                   <Button
                     appearance="subtle"
                     iconBefore={<AddIcon size="small" label="Legg til " />}
-                    onClick={() => onAddGoal(EFFEKTMAAL_ID)}
+                    onClick={() => onAddGoal(BENEFIT_COLLECTION_ID)}
                   />
                 )}
 
@@ -153,12 +112,12 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
                     <Button
                       appearance="subtle"
                       iconBefore={<EditIcon size="small" label="Rediger Mål" />}
-                      onClick={() => onEditGoal(itemGoal)}
+                      onClick={() => onEditGoal(goal)}
                     />
                     <Button
                       appearance="subtle"
                       iconBefore={<TrashIcon size="small" label="Slett Mål" />}
-                      onClick={() => onDeleteGoal(itemGoal.id)}
+                      onClick={() => onDeleteGoal(goal.id)}
                     />
                   </>
                 )}
