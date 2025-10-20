@@ -7,7 +7,7 @@ import { GoalStructureContainer } from "../../SaynaSineFiler/components/GoalStru
 
 export const GoalStructure = () => (
   <>
-    <PageHeader>Medfin</PageHeader>
+    <PageHeader>Målstruktur</PageHeader>
     <GoalStructureContainer />
   </>
 );
