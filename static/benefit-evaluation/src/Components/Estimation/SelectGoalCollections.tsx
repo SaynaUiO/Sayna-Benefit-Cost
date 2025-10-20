@@ -182,7 +182,7 @@ export const SelectGoalCollections = ({
         })}
         alignInline="center"
       >
-        <Label htmlFor="">Select which goal tiers you want to evaluate</Label>
+        <Label htmlFor="">Velg hvilke målnivåer du vil evaluere</Label>
         <Grid
           xcss={xcss({ width: "100%" })}
           templateColumns="32px 1fr 32px"
@@ -240,16 +240,15 @@ export const SelectGoalCollections = ({
         </Grid>
         {selectedOption && (
           <p>
-            Assign benefit points to the{" "}
+            Fordel nyttepoeng mellom{" "}
             {Number(goal_tier_type) === GoalTierTypeEnum.ISSUE_TYPE
               ? `epics`
-              : `${selectedOption?.value.goalTier.name} goals`}{" "}
-            indicating how much each{" "}
+              : `${selectedOption?.value.goalTier.name} målene,`}{" "}
+            for å vise hvor mye hvert mål bidrar til de overordnede{" "}
             {Number(goal_tier_type) === GoalTierTypeEnum.ISSUE_TYPE
               ? "epic"
-              : "goal"}{" "}
-            contributes to the "{selectedOption?.value.upperGoalTier.name}"
-            goals on the tier above.
+              : ""}{" "}
+            {selectedOption?.value.upperGoalTier.name}ene .
           </p>
         )}
       </Stack>
