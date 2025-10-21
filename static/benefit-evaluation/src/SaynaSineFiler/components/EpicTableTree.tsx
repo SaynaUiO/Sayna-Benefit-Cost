@@ -13,49 +13,43 @@ import TrashIcon from "@atlaskit/icon/glyph/trash";
 import { Goal } from "../../Models";
 import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
 import Lozenge from "@atlaskit/lozenge";
+import { EPIC_COLLECTION_ID } from "../constants/goalConstants";
 
-//Definer root-element (Produkt):
 interface ProductRootItem {
-  id: "Produkt";
+  id: typeof EPIC_COLLECTION_ID;
   name: string;
   goals: Goal[];
 }
 
-// 2. Define the Union Type for Items
 type TableItem = ProductRootItem | Goal;
 
 interface EpicTableTreeProps {
-  data: Goal[]; //Henter ut alle epicsene
+  data: Goal[];
   onAddGoal: (
-    parentId: string, // Item ID som klikkes (Root ID)
-    goalCollectionId: string, // Den faktiske collection ID'en vi skal opprette i
+    parentId: string,
+    goalCollectionId: string,
     category?: string
   ) => void;
-  onEditGoal: (goal: Goal) => void; //redigerer en epic
-  onDeleteGoal: (goalId: string) => void; //sletter en epic
-  onSetCostTime: (goals: Goal[]) => void; // Ny prop
+  onEditGoal: (goal: Goal) => void;
+  onDeleteGoal: (goalId: string) => void;
+  onSetCostTime: (goals: Goal[]) => void;
 }
 
 export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
   onAddGoal,
   onEditGoal,
   onDeleteGoal,
-  data: epicGoals, // Omdøpt for klarhet
+  data: epicGoals,
   onSetCostTime,
 }) => {
   const isDataEmpty = epicGoals.length === 0;
 
-  // Hardkoder GoalCollectionId for Epics, basert på tidligere debugging
-  const EPIC_COLLECTION_ID = "root-epic";
-
-  // Lag den hardkodede Root-noden
   const PRODUCT_ROOT_ITEM: ProductRootItem = {
-    id: "Produkt",
+    id: EPIC_COLLECTION_ID,
     name: "Produkt",
-    goals: epicGoals, // Alle Epics er barn av denne roten
+    goals: epicGoals,
   };
 
-  // Datakilden for Rows er nå et array med kun Root-elementet
   const items: ProductRootItem[] = [PRODUCT_ROOT_ITEM];
 
   return (
@@ -72,17 +66,16 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
       <Rows
         items={items as TableItem[]}
         render={(item: TableItem) => {
-          // Bestemmer om elementet er Root eller et Live Goal (Epic)
-          const isRoot = item.id === "Produkt";
-          const goal = item as Goal; // Er kun gyldig hvis !isRoot
-
-          // Definerer barna (Epics) hvis det er Root
-          const children = isRoot ? (item as ProductRootItem).goals : [];
+          const isRoot = item.id === EPIC_COLLECTION_ID;
+          const goal = item as unknown as Goal;
+          const rootItem = item as unknown as ProductRootItem;
+          const children = isRoot ? rootItem.goals : [];
           const isLiveGoal = !isRoot;
+
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
               <Cell>
-                <strong>{isRoot ? item.id : goal.key}</strong>
+                <strong>{isRoot ? PRODUCT_ROOT_ITEM.name : goal.key}</strong>
               </Cell>
               <Cell>{!isRoot && goal.description}</Cell>
               <Cell>
@@ -108,11 +101,9 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                 {isRoot && (
                   <Button
                     appearance="subtle"
-                    // Pass the icon component *as JSX*
                     iconBefore={<AddIcon size="small" label="Add Epic" />}
                     onClick={() =>
-                      // OPPDATERT: Sender parent ID (Root ID) og Collection ID
-                      onAddGoal(PRODUCT_ROOT_ITEM.id, "root-epic")
+                      onAddGoal(PRODUCT_ROOT_ITEM.id, EPIC_COLLECTION_ID)
                     }
                   />
                 )}
@@ -139,7 +130,6 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                 )}
 
                 {/* Delete Button  */}
-
                 {isLiveGoal && (
                   <Button
                     appearance="subtle"

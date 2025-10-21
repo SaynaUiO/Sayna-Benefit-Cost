@@ -11,14 +11,11 @@ import AddIcon from "@atlaskit/icon/glyph/add";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import { Goal } from "../../Models";
-import TextArea from "@atlaskit/textarea";
-import Textfield from "@atlaskit/textfield";
-import { Box } from "@atlaskit/primitives";
 import { InlineEditableTextfield } from "@atlaskit/inline-edit";
-import { FORMAAL_COLLECTION_ID } from "../constants/goalConstants"; // <-- IMPORTERER
+import { FORMAAL_COLLECTION_ID } from "../constants/goalConstants";
 
 interface ObjectiveRootItem {
-  id: typeof FORMAAL_COLLECTION_ID; // Bruker Collection ID som Root ID for konsistens
+  id: typeof FORMAAL_COLLECTION_ID;
   name: string;
   goals: Goal[];
 }
