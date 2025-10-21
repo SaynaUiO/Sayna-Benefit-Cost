@@ -2,9 +2,9 @@
 
 import { GoalTypeEnum } from "../../Models";
 
-import { EpicTableTree } from "./EpicTableTree";
-import { ObjectiveTableTree } from "./FormaalTableTree";
-import { BenefitTableTree } from "./NytteTableTree";
+import { EpicTableTree } from "./ProductTableTree";
+import { ObjectiveTableTree } from "./ObjectiveTableTree";
+import { BenefitTableTree } from "./BenefitTableTree";
 import GoalDrawer from "./GoalDrawer";
 import { SetEpicCostTime } from "../../Pages/GoalTiers/SetEpicCostTime";
 import { useGoalStructure } from "../hooks/useGoalStructure";
