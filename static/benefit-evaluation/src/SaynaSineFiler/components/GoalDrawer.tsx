@@ -63,7 +63,7 @@ const GoalDrawer = (props: Props) => {
 
   const drawerTitle = goalToEdit
     ? `Endre ${goalToEdit.key || goalToEdit.id}`
-    : `Opprett nytt ${finalDisplayName}`;
+    : `Opprett ${finalDisplayName}`;
 
   const buttonText = goalToEdit ? "Lagre endringer" : `Opprett `;
 

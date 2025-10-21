@@ -4,7 +4,7 @@ import { useAPI } from "../../Contexts/ApiContext";
 import { useAppContext } from "../../Contexts/AppContext";
 import { Goal, GoalTableItem, GoalTableItemTypeEnum } from "../../Models";
 import { useGoalStructureInitializer } from "./useGoalStructureInitializer";
-import { useGoalInitializer } from "../MockData/goalsMockData";
+import { useGoalInitializer } from "./useGoalDataInitializer";
 import { EPIC_COLLECTION_ID, NYTTE_COLLECTION_ID, FORMAAL_COLLECTION_ID } from "../constants/goalConstants";
 
 type GoalType = "Objective" | "Benefit" | "Product";
