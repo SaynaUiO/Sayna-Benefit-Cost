@@ -15,22 +15,17 @@ import TextArea from "@atlaskit/textarea";
 import Textfield from "@atlaskit/textfield";
 import { Box } from "@atlaskit/primitives";
 import { InlineEditableTextfield } from "@atlaskit/inline-edit";
-
-// Definerer root-element (Bruker en konstant ID for sikkerhet)
-const OBJECTIVE_ROOT_ID = "Formål";
+import { FORMAAL_COLLECTION_ID } from "../constants/goalConstants"; // <-- IMPORTERER
 
 interface ObjectiveRootItem {
-  id: typeof OBJECTIVE_ROOT_ID; // Bruk konstanten som type
+  id: typeof FORMAAL_COLLECTION_ID; // Bruker Collection ID som Root ID for konsistens
   name: string;
   goals: Goal[];
 }
-
-// 2. Define the Union Type for Items
 type TableItem = ObjectiveRootItem | Goal;
 
 interface ObjectiveTableTreeProps {
   data: Goal[];
-  // Endret goalType til GoalCollectionId for bedre konsistens
   onAddGoal: (
     parentId: string,
     goalCollectionId: string,
@@ -48,19 +43,13 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
 }) => {
   const FORMAAL_COLLECTION_ID = "root-formaal";
 
-  // Lag rot-objektet
   const OBJECTIVE_ROOT_ITEM: ObjectiveRootItem = {
-    id: OBJECTIVE_ROOT_ID,
+    id: FORMAAL_COLLECTION_ID,
     name: "Formål",
     goals: formaalGoals,
   };
 
   const items: ObjectiveRootItem[] = [OBJECTIVE_ROOT_ITEM];
-
-  const handleAddObjective = () => {
-    // Legger til nytt Formål under rot-elementet
-    onAddGoal(OBJECTIVE_ROOT_ITEM.id, FORMAAL_COLLECTION_ID);
-  };
 
   return (
     <TableTree>
@@ -75,17 +64,11 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
       <Rows
         items={items as TableItem[]}
         render={(item: TableItem) => {
-          // --- KORRIGERT LOGIKK ---
-          const isRoot = item.id === OBJECTIVE_ROOT_ID; // Bruker konstant/korrekt ID
+          const isRoot = item.id === FORMAAL_COLLECTION_ID; // Bruker konstant/korrekt ID
           const goal = item as Goal;
-
-          // Fjerner unødvendig 'unknown as' casting
           const children = isRoot ? (item as ObjectiveRootItem).goals : [];
-
           const isLiveGoal = !isRoot;
-
-          // Definer label for første celle
-          const primaryLabel = isRoot ? item.id : goal.key || goal.id;
+          const primaryLabel = isRoot ? "Formål" : goal.key || goal.id;
 
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
@@ -117,18 +100,18 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
 
               {/* KOLONNE 5: Handlinger */}
               <Cell>
-                {/* Legg til-knapp vises KUN på Root-nivå */}
                 {isRoot && (
                   <Button
                     appearance="subtle"
                     iconBefore={
                       <AddIcon size="small" label="Legg til Formål" />
                     }
-                    onClick={handleAddObjective}
+                    onClick={() =>
+                      onAddGoal(OBJECTIVE_ROOT_ITEM.id, FORMAAL_COLLECTION_ID)
+                    }
                   />
                 )}
 
-                {/* Edit & Delete knapper vises KUN på Formål-nivå */}
                 {isLiveGoal && (
                   <>
                     <Button

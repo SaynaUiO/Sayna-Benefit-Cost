@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useAPI } from "../../Contexts/ApiContext";
 import { useAppContext } from "../../Contexts/AppContext";
 
-// MOCK DATA ER NÅ FJERNET!
 
 export const useGoalInitializer = () => {
     const [scope] = useAppContext();
