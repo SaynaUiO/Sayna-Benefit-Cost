@@ -26,40 +26,47 @@ interface ProfileOption {
 
 // 6 BENEFIT-PROFILER (BP)
 const benefitProfiles: ProfileOption[] = [
-  { label: "Uniform with delay", value: "BP_DELAY_UNIFORM" },
-  { label: "Delay with plateau", value: "BP_DELAY_PLATEAU" },
-  { label: "Delay with peak and deterioration", value: "BP_DELAY_PEAK_DET" },
+  { label: "Jevn, med oppstartsforsinkelse", value: "BP_DELAY_UNIFORM" },
   {
-    label: "Immediate effect with linear increase and plateau",
+    label: "Gradvis økning til stabilt nivå (Platå)",
+    value: "BP_DELAY_PLATEAU",
+  },
+  {
+    label: "Forsinkelse med toppeffekt og gradvis forringelse",
+    value: "BP_DELAY_PEAK_DET",
+  },
+  {
+    label: "Umiddelbar effekt med jevn økning til stabilt nivå",
     value: "BP_IMM_INCREASE",
   },
   {
-    label: "Beginners enthusiasm and deterioration",
+    label: "Rask økning, topp og rask forringelse (Nybegynner entusiasme)",
     value: "BP_BEGINNERS_DET",
   },
-  { label: "Uniform", value: "BP_UNIFORM" },
+  { label: "Jevn (uten forsinkelse/endring)", value: "BP_UNIFORM" },
 ];
 
 // 5 COST-PROFILER (SP)
 const costProfiles: ProfileOption[] = [
   {
-    label: "Development (1 period) with uniform post deployment",
+    label: "Høy utvikling (1 periode) med jevn etterfølgende drift",
     value: "SP_DEV1_UNIFORM",
   },
   {
-    label: "Development (1 period) with decreasing post deployment",
+    label: "Høy utvikling (1 periode) med synkende etterfølgende drift",
     value: "SP_DEV1_DECREASING",
   },
   {
-    label: "High development (1 period) with low decreasing post deployment",
+    label:
+      "Svært høy utvikling (1 periode) med lav, synkende etterfølgende drift",
     value: "SP_HIGH_DEV_LOW_DEC",
   },
   {
-    label: "Low development (1 period) with increasing post deployment",
+    label: "Lav utvikling (1 periode) med økende etterfølgende drift",
     value: "SP_LOW_DEV_INCREASING",
   },
   {
-    label: "High development (1 period) with decreasing post deployment",
+    label: "Høy utvikling (1 periode) med synkende etterfølgende drift",
     value: "SP_HIGH_DEV_DECREASING",
   },
 ];
