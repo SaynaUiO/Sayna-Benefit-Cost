@@ -2,17 +2,10 @@ import { useState, useEffect } from "react";
 import { useAppContext } from "../../Contexts/AppContext";
 import { useAPI } from "../../Contexts/ApiContext";
 import { GoalCollection, GoalTierTypeEnum } from "../../Models";
+import { ROOT_COLLECTION_DATA } from "../constants/goalConstants";
 
-//Denne filen kjører koden én gang for å opprette standard GoalCollection, og for å slette tidligere
 
-// Definer de faste dataene (kan også flyttes til en constants-fil)
-const rootData = [
-  { id: "root-formaal", name: "Formål", description: "Toppnivå mål/OKR'er." },
-  { id: "root-effektmaal", name: "Effektmål", description: "Målbare verdier." },
-  { id: "root-epic", name: "Epic", description: "Produktmål." },
-];
-
-const rootNames = rootData.map(d => d.name);
+const rootNames = ROOT_COLLECTION_DATA.map(d => d.name);
 
 export const useGoalStructureInitializer = () => {
   const [scope] = useAppContext();
@@ -42,7 +35,7 @@ export const useGoalStructureInitializer = () => {
         }
 
         // Oppretting:
-        const collectionsToCreate = rootData.filter(
+        const collectionsToCreate = ROOT_COLLECTION_DATA.filter(
           (d) => !existingNames.has(d.name)
         );
 

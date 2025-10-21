@@ -189,7 +189,6 @@ export const useGoalStructure = () => {
     epicGoals,
     formaalGoals,
     effektGoals,
-    EPIC_COLLECTION_ID,
 
     //Handelers:
     handlers: {
@@ -209,9 +208,4 @@ export const useGoalStructure = () => {
     costTimeModal,
     scope
   };
-
-
-  
-
-
 }
