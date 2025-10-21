@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAPI } from "../../Contexts/ApiContext";
 import { useAppContext } from "../../Contexts/AppContext";
-import { CostTime, Goal } from "../../Models";
-
+import { Goal } from "../../Models";
+import { EPIC_COLLECTION_ID, FORMAAL_COLLECTION_ID } from "../constants/goalConstants";
 
 //Typer og Konstanter: 
 interface FormData {
@@ -12,9 +12,6 @@ interface FormData {
 }
 
 type GoalType = "Objective" | "Benefit" | "Product" | string;
-
-const EPIC_ID = "root-epic";
-const FORMAAL_ID = "root-formaal";
 
 interface GoalFormProps {
   goalType: GoalType;
@@ -86,10 +83,10 @@ export const useGoalForm = ({
         goalCollectionId = goalCategory;
         break;
       case "Product":
-        goalCollectionId = EPIC_ID;
+        goalCollectionId = EPIC_COLLECTION_ID;
         break;
       case "Objective":
-        goalCollectionId = FORMAAL_ID;
+        goalCollectionId = FORMAAL_COLLECTION_ID;
         break;
       default:
         alert("Ugyldig måltype.");
@@ -141,7 +138,5 @@ export const useGoalForm = ({
     isSubmitting,
     handleChange,
     handleSave,
-    // Fjerner unødvendig eksport av selve typen: FormData
-    // FormData, 
   };
 };
