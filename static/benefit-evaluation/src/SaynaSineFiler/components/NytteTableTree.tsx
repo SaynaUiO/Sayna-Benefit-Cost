@@ -12,10 +12,10 @@ import Button from "@atlaskit/button";
 import { Goal } from "../../Models";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import Lozenge from "@atlaskit/lozenge";
-import { EFFEKT_COLLECTION_ID } from "../constants/goalConstants";
+import { NYTTE_COLLECTION_ID } from "../constants/goalConstants";
 
 interface BenefitRootItem {
-  id: typeof EFFEKT_COLLECTION_ID;
+  id: typeof NYTTE_COLLECTION_ID;
   name: string;
   goals: Goal[];
 }
@@ -42,7 +42,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
   const isDataEmpty = benefitgoals.length === 0;
 
   const BENEFIT_ROOT_ITEM: BenefitRootItem = {
-    id: EFFEKT_COLLECTION_ID,
+    id: NYTTE_COLLECTION_ID,
     name: "Planlagte Nyttevirkninger",
     goals: benefitgoals,
   };
@@ -62,7 +62,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
       <Rows
         items={items as TableItem[]}
         render={(item: TableItem) => {
-          const isRoot = item.id === EFFEKT_COLLECTION_ID;
+          const isRoot = item.id === NYTTE_COLLECTION_ID;
           const goal = item as Goal; // Kun gyldig hvis !isRoot
           const children = isRoot ? (item as BenefitRootItem).goals : [];
           const isLiveGoal = !isRoot;
@@ -93,7 +93,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
                     appearance="subtle"
                     iconBefore={<AddIcon size="small" label="Legg til " />}
                     onClick={() =>
-                      onAddGoal(BENEFIT_ROOT_ITEM.id, EFFEKT_COLLECTION_ID)
+                      onAddGoal(BENEFIT_ROOT_ITEM.id, NYTTE_COLLECTION_ID)
                     }
                   />
                 )}

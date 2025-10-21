@@ -5,7 +5,7 @@ import { useAppContext } from "../../Contexts/AppContext";
 import { Goal, GoalTableItem, GoalTableItemTypeEnum } from "../../Models";
 import { useGoalStructureInitializer } from "./useGoalStructureInitializer";
 import { useGoalInitializer } from "../MockData/goalsMockData";
-import { EPIC_COLLECTION_ID, EFFEKT_COLLECTION_ID, FORMAAL_COLLECTION_ID } from "../constants/goalConstants";
+import { EPIC_COLLECTION_ID, NYTTE_COLLECTION_ID, FORMAAL_COLLECTION_ID } from "../constants/goalConstants";
 
 type GoalType = "Objective" | "Benefit" | "Product";
 
@@ -178,7 +178,7 @@ export const useGoalStructure = () => {
     (goal) => goal.goalCollectionId === FORMAAL_COLLECTION_ID
   );
   const effektGoals = allGoals.filter(
-    (goal) => goal.goalCollectionId === EFFEKT_COLLECTION_ID
+    (goal) => goal.goalCollectionId === NYTTE_COLLECTION_ID
   );
   
   //Return verdier: 
