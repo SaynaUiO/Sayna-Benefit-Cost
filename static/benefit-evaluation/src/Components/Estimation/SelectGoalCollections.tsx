@@ -59,9 +59,9 @@ export const SelectGoalCollections = ({
         console.log("Rådata fra getAll:", goalTiers);
 
         //Sorter i riktig girarkisk rekkefølge:
-        const HIERARCHY_ORDER = ["Formål", "Effektmål", "Epic"];
+        const HIERARCHY_ORDER = ["Formål", "Planlagte Nyttevirkninger", "Epic"];
 
-        // 3. Sorter validGoalTiers: Formål (0) -> Effektmål (1) -> Epic (2)
+        // 3. Sorter validGoalTiers: Formål (0) -> Nytte (1) -> Epic (2)
         goalTiers.sort((a, b) => {
           const aIndex = HIERARCHY_ORDER.indexOf(a.name);
           const bIndex = HIERARCHY_ORDER.indexOf(b.name);
@@ -72,13 +72,13 @@ export const SelectGoalCollections = ({
         for (let index = 0; index < goalTiers.length - 1; index++) {
           //Itererer gjennom GoalTiers
           const lowerGoalTier = goalTiers[index + 1]; // Epic (nederst)
-          const upperGoalTier = goalTiers[index]; // Effektmål (over)
+          const upperGoalTier = goalTiers[index]; // Nytte (over)
 
           // Sørg for at ingen navn er tomme (den defensive fiksingen fra sist)
           const lowerGoalTierName = lowerGoalTier.name || lowerGoalTier.id;
           const upperGoalTierName = upperGoalTier.name || upperGoalTier.id;
           estimationOptions.push({
-            label: `${lowerGoalTierName} - ${upperGoalTierName}`, // Epic - Effektmål
+            label: `${lowerGoalTierName} - ${upperGoalTierName}`, // Epic - Nytte
             value: {
               goalTier: lowerGoalTier, // Dette er "nedre nivå"
               upperGoalTier: upperGoalTier, // Dette er "øvre nivå"

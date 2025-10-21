@@ -147,14 +147,14 @@ export const EstimationContainer = () => {
                 appearance="danger"
                 isDisabled={activeStep === 0}
               >
-                Back
+                Tilbake
               </Button>
               <Button
                 onClick={() => setActiveStep((active) => active + 1)}
                 appearance="primary"
                 isDisabled={activeStep === stages.length - 1}
               >
-                Next
+                Neste
               </Button>
             </ButtonGroup>
           </Flex>
