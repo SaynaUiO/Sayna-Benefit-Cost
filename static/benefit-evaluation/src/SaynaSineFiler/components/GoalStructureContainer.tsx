@@ -56,8 +56,11 @@ export const GoalStructureContainer = () => {
       {/* Effekt Tabell (Benefit) */}
       <BenefitTableTree
         data={effektGoals}
-        onAddGoal={(goalCollectionId) =>
-          handleAddGoal("Benefit", goalCollectionId)
+        onAddGoal={
+          (
+            _parentId,
+            goalCollectionId // Tar nå imot to argumenter
+          ) => handleAddGoal("Benefit", goalCollectionId) // Bruker den faktiske Collection ID'en
         }
         onEditGoal={handleEditGoal}
         onDeleteGoal={handleDeleteGoal}

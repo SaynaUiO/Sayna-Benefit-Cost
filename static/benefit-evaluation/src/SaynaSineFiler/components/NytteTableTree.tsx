@@ -13,7 +13,7 @@ import { Goal } from "../../Models";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import Lozenge from "@atlaskit/lozenge";
 
-const BENEFIT_COLLECTION_ID = "benefit-root";
+const BENEFIT_COLLECTION_ID = "root-effektmaal";
 
 interface BenefitRootItem {
   id: typeof BENEFIT_COLLECTION_ID; // Hardkodet ID
@@ -27,7 +27,11 @@ type TableItem = BenefitRootItem | Goal;
 // Define the component props
 interface BenefitTableTreeProps {
   data: Goal[]; // Alle Effektmål, Org.mål, Samf.mål
-  onAddGoal: (goalCollectionId: string) => void;
+  onAddGoal: (
+    parentId: string, // Item ID som klikkes (Root ID)
+    goalCollectionId: string, // Den faktiske collection ID'en vi skal opprette i
+    category?: string
+  ) => void;
   onEditGoal: (goal: Goal) => void;
   onDeleteGoal: (goalId: string) => void;
 }
@@ -102,7 +106,10 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
                   <Button
                     appearance="subtle"
                     iconBefore={<AddIcon size="small" label="Legg til " />}
-                    onClick={() => onAddGoal(BENEFIT_COLLECTION_ID)}
+                    onClick={() =>
+                      // OPPDATERT: Sender parent ID (Root ID) og Collection ID
+                      onAddGoal(BENEFIT_ROOT_ITEM.id, BENEFIT_COLLECTION_ID)
+                    }
                   />
                 )}
 
