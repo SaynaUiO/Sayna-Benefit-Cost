@@ -1,8 +1,8 @@
 //Fil som inneholder all fetching, states, oh handelers
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAPI } from "../../Contexts/ApiContext";
 import { useAppContext } from "../../Contexts/AppContext";
-import { Goal, GoalTableItem, GoalTableItemTypeEnum } from "../../Models";
+import { Goal, GoalCollection, GoalTableItem, GoalTableItemTypeEnum } from "../../Models";
 import { useGoalStructureInitializer } from "./useGoalStructureInitializer";
 import { useGoalInitializer } from "./useGoalDataInitializer";
 import { EPIC_COLLECTION_ID, NYTTE_COLLECTION_ID, FORMAAL_COLLECTION_ID } from "../constants/goalConstants";
@@ -34,6 +34,7 @@ export const useGoalStructure = () => {
 
   //State for Data og UI: 
   const [goals, setGoals] = useState<Goal[] | null>(null);
+  const [allCollections, setAllCollections] = useState<GoalCollection[] | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerContext, setDrawerContext] = useState<DrawerState | null>(null);
   const [costTimeModal, setCostTimeModal] = useState<CostTimeModalState | null>(null);
@@ -44,6 +45,7 @@ export const useGoalStructure = () => {
 
     try {
       const allCollections = await api.goalCollection.getAll(scope.id);
+      setAllCollections(allCollections); // <-- LAGRE HER
       let allGoals: Goal[] = [];
 
       for (const collection of allCollections) {
@@ -63,6 +65,14 @@ export const useGoalStructure = () => {
   useEffect(() => {
     fetchAndOrganizeGoals();
   }, [fetchAndOrganizeGoals]);
+
+
+  // 3. ISOLER Formål-samlingen fra state (allCollections)
+  const formaalCollectionData = useMemo(() => {
+    return allCollections?.find(
+        (c) => c.id === FORMAAL_COLLECTION_ID
+    );
+  }, [allCollections]);
 
 
   //Handelers for Drawer:
@@ -141,6 +151,34 @@ export const useGoalStructure = () => {
     [scope.id, api.goal, fetchAndOrganizeGoals, goals]
   );
 
+
+  //Handle update Objectiove description: 
+  const handleUpdateCollectionDescription = useCallback(
+    async (collectionToUpdate: GoalCollection, newDescription: string) => {
+        if (!scope.id) return;
+
+        const updatedCollection: GoalCollection = {
+            ...collectionToUpdate,
+            description: newDescription,
+        };
+
+        try {
+            await api.goalCollection.update(
+                scope.id,                 // 1. scopeId
+                updatedCollection         // 2. goalCollection (Inneholder ID-en)
+            );
+
+            console.log("GoalCollection beskrivelse oppdatert:", updatedCollection.id);
+            fetchAndOrganizeGoals();
+
+        } catch (error) {
+            console.error("Feil ved oppdatering av GoalCollection beskrivelse:", error);
+            alert("Klarte ikke å lagre beskrivelsen. Sjekk konsollen.");
+        }
+    },
+    [scope.id, api.goalCollection, fetchAndOrganizeGoals]
+);
+
   //Cost/Tieme modal handlers:
     const handleSetCostTime = (epicGoals: Goal[]) => {
     // VIKTIG: Mappingen fra Goal.type til GoalTableItem.type
@@ -188,6 +226,7 @@ export const useGoalStructure = () => {
     allGoals,
     epicGoals,
     formaalGoals,
+    formaalCollectionData,
     effektGoals,
 
     //Handelers:
@@ -198,6 +237,7 @@ export const useGoalStructure = () => {
       onCloseDrawer,
       handleSetCostTime,
       handleCostTimeModalClose,
+      handleUpdateCollectionDescription,
     },
 
     //UI state:

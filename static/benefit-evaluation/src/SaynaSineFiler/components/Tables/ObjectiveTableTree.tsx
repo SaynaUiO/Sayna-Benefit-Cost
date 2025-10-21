@@ -10,14 +10,17 @@ import Button from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
-import { Goal } from "../../../Models";
-import { InlineEditableTextfield } from "@atlaskit/inline-edit";
+import { Goal, GoalCollection } from "../../../Models";
+import InlineEdit, { InlineEditableTextfield } from "@atlaskit/inline-edit";
 import { FORMAAL_COLLECTION_ID } from "../../constants/goalConstants";
+import { useGoalStructure } from "../../hooks/useGoalStructure";
+import TextArea from "@atlaskit/textarea";
 
 interface ObjectiveRootItem {
   id: typeof FORMAAL_COLLECTION_ID;
   name: string;
   goals: Goal[];
+  description?: string;
 }
 type TableItem = ObjectiveRootItem | Goal;
 
@@ -38,12 +41,14 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
   onDeleteGoal,
   data: formaalGoals,
 }) => {
-  const FORMAAL_COLLECTION_ID = "root-formaal";
+  const { formaalCollectionData, handlers } = useGoalStructure();
+  const { handleUpdateCollectionDescription } = handlers;
 
   const OBJECTIVE_ROOT_ITEM: ObjectiveRootItem = {
     id: FORMAAL_COLLECTION_ID,
     name: "Formål",
     goals: formaalGoals,
+    description: formaalCollectionData?.description,
   };
 
   const items: ObjectiveRootItem[] = [OBJECTIVE_ROOT_ITEM];
@@ -77,16 +82,42 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
               {/* KOLONNE 2: Beskrivelse */}
               <Cell>
                 {isRoot && (
-                  <InlineEditableTextfield
-                    testId="editable-text-field"
-                    defaultValue={""}
+                  <InlineEdit
+                    defaultValue={(item as ObjectiveRootItem).description || ""}
+                    editView={({ errorMessage, ...fieldProps }) => (
+                      // @ts-ignore
+                      <TextArea
+                        {...fieldProps}
+                        isCompact={false}
+                        minimumRows={2}
+                        resize="horizontal"
+                        placeholder="Skriv inn beskrivelse her..."
+                      />
+                    )}
+                    readView={() => (
+                      <div
+                        style={{
+                          minHeight: "2em",
+                          padding: "6px",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {(item as ObjectiveRootItem).description ||
+                          "Legg til en beskrivelse her"}
+                      </div>
+                    )}
                     onConfirm={(newValue) =>
-                      console.log("Oppdatert rot-beskrivelse:", newValue)
+                      handleUpdateCollectionDescription(
+                        item as unknown as GoalCollection,
+                        newValue
+                      )
                     }
-                    placeholder={
-                      goal.description || "Legg til en beskrivelse her"
+                    editButtonLabel={
+                      (item as ObjectiveRootItem).description ||
+                      "Legg til beskrivelse"
                     }
-                    hideActionButtons
+                    keepEditViewOpenOnBlur
+                    readViewFitContainerWidth
                   />
                 )}
                 {isLiveGoal && goal.description}
