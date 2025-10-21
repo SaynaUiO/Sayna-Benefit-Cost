@@ -6,35 +6,27 @@ import {
   DrawerCloseButton,
 } from "@atlaskit/drawer/compiled";
 import TextField from "@atlaskit/textfield";
-import { useAppContext } from "../../Contexts/AppContext";
-import { useAPI } from "../../Contexts/ApiContext";
 import Button from "@atlaskit/button";
-import { useEffect } from "react";
-import { CostTime, Goal, GoalTypeEnum } from "../../Models";
-import { v4 as uuidv4 } from "uuid";
+import {} from "react";
+import { Goal } from "../../Models";
 import { useGoalForm } from "../hooks/useGoalDrawer";
+import {
+  NYTTE_COLLECTION_ID,
+  ROOT_COLLECTION_DATA,
+} from "../constants/goalConstants";
 
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
 
-const EFFEKTMAAL_ID = "root-effektmaal";
-const ORGANISASJONSMAAL_ID = "root-organisasjonsmaal";
-const SAMFUNNSMAAL_ID = "root-samfunnsmaal";
-
 const getGoalCategoryDisplayName = (categoryId: string): string => {
-  switch (categoryId) {
-    case EFFEKTMAAL_ID:
-      return "Effektmål";
-    case ORGANISASJONSMAAL_ID:
-      return "Organisasjonsmål";
-    case SAMFUNNSMAAL_ID:
-      return "Samfunnsmål";
-    default:
-      return categoryId
-        .replace("root-", "")
-        .split("-")
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(" ");
+  const data = ROOT_COLLECTION_DATA.find((d) => d.id === categoryId);
+  if (data) {
+    return data.name;
   }
+  return categoryId
+    .replace("root-", "")
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 };
 
 // --- Props (Beholdt) ---
@@ -52,11 +44,11 @@ type Props = {
 const GoalDrawer = (props: Props) => {
   const { goalType, goalCategory, isOpen, onClose, goalToEdit } = props;
 
-  // 1. Bruker den nye hooken for all logikk og state!
+  // Bruker hooken for all logikk og state!
   const { formData, isSubmitting, handleChange, handleSave } =
     useGoalForm(props);
 
-  // --- UI Tekst Logikk (Beholdt for ren visning) ---
+  // --- UI Tekst Logikk (Rensket og Konsistent) ---
 
   const categoryDisplayName = goalCategory
     ? getGoalCategoryDisplayName(goalCategory)
@@ -64,17 +56,16 @@ const GoalDrawer = (props: Props) => {
     ? "Nyttevirkning"
     : goalType;
 
+  // Bruker en replace-kjede for å sikre korrekte visningsnavn for typene
   const finalDisplayName = categoryDisplayName
     .replace("Product", "Epic")
     .replace("Objective", "Formål");
 
   const drawerTitle = goalToEdit
-    ? `Endre ${goalToEdit.id}`
+    ? `Endre ${goalToEdit.key || goalToEdit.id}`
     : `Opprett nytt ${finalDisplayName}`;
 
-  const buttonText = goalToEdit
-    ? "Lagre endringer"
-    : `Create ${goalCategory || goalType}`;
+  const buttonText = goalToEdit ? "Lagre endringer" : `Opprett `;
 
   // --- Hoved Render Funksjon ---
   return (
@@ -93,14 +84,14 @@ const GoalDrawer = (props: Props) => {
         >
           <h2>{drawerTitle}</h2>
 
-          {/* 2. DESCRIPTION FIELD */}
+          {/* DESCRIPTION FIELD */}
           <TextField
-            label="Description"
+            label="Beskrivelse"
             value={formData.description}
             onChange={(e) =>
               handleChange("description", (e.target as HTMLInputElement).value)
             }
-            placeholder="Detailed description"
+            placeholder="Detaljert beskrivelse"
             style={{ minHeight: 80 }}
             isRequired
           />
@@ -109,7 +100,7 @@ const GoalDrawer = (props: Props) => {
             <Button
               appearance="primary"
               onClick={handleSave}
-              isDisabled={isSubmitting} // Bruk state fra hooken
+              isDisabled={isSubmitting}
             >
               {buttonText}
             </Button>
