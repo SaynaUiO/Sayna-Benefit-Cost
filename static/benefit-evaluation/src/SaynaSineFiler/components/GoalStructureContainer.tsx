@@ -71,7 +71,9 @@ export const GoalStructureContainer = () => {
       <div style={{ marginBottom: "40px" }}>
         <EpicTableTree
           data={epicGoals}
-          onAddGoal={(_goalCollectionId) =>
+          onAddGoal={(_parentId, goalCollectionId) =>
+            // Bruk gjerne den mottatte ID'en (goalCollectionId) for bedre praksis,
+            // men hardkodingen din fungerer også her:
             handleAddGoal("Product", EPIC_COLLECTION_ID)
           }
           onEditGoal={handleEditGoal}

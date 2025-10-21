@@ -26,7 +26,11 @@ type TableItem = ProductRootItem | Goal;
 
 interface EpicTableTreeProps {
   data: Goal[]; //Henter ut alle epicsene
-  onAddGoal: (goalCollectionId: string) => void; //legger til en epic
+  onAddGoal: (
+    parentId: string, // Item ID som klikkes (Root ID)
+    goalCollectionId: string, // Den faktiske collection ID'en vi skal opprette i
+    category?: string
+  ) => void;
   onEditGoal: (goal: Goal) => void; //redigerer en epic
   onDeleteGoal: (goalId: string) => void; //sletter en epic
   onSetCostTime: (goals: Goal[]) => void; // Ny prop
@@ -106,7 +110,10 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                     appearance="subtle"
                     // Pass the icon component *as JSX*
                     iconBefore={<AddIcon size="small" label="Add Epic" />}
-                    onClick={() => onAddGoal(EPIC_COLLECTION_ID)}
+                    onClick={() =>
+                      // OPPDATERT: Sender parent ID (Root ID) og Collection ID
+                      onAddGoal(PRODUCT_ROOT_ITEM.id, "root-epic")
+                    }
                   />
                 )}
 
