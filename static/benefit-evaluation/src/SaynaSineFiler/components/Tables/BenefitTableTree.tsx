@@ -9,10 +9,10 @@ import TableTree, {
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import Button from "@atlaskit/button";
-import { Goal } from "../../Models";
+import { Goal } from "../../../Models";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import Lozenge from "@atlaskit/lozenge";
-import { NYTTE_COLLECTION_ID } from "../constants/goalConstants";
+import { NYTTE_COLLECTION_ID } from "../../constants/goalConstants";
 
 interface BenefitRootItem {
   id: typeof NYTTE_COLLECTION_ID;

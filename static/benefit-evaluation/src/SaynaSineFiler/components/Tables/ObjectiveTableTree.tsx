@@ -10,9 +10,9 @@ import Button from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
-import { Goal } from "../../Models";
+import { Goal } from "../../../Models";
 import { InlineEditableTextfield } from "@atlaskit/inline-edit";
-import { FORMAAL_COLLECTION_ID } from "../constants/goalConstants";
+import { FORMAAL_COLLECTION_ID } from "../../constants/goalConstants";
 
 interface ObjectiveRootItem {
   id: typeof FORMAAL_COLLECTION_ID;

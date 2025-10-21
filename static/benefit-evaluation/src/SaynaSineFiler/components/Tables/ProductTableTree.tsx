@@ -10,10 +10,10 @@ import Button from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
-import { Goal } from "../../Models";
+import { Goal } from "../../../Models";
 import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
 import Lozenge from "@atlaskit/lozenge";
-import { EPIC_COLLECTION_ID } from "../constants/goalConstants";
+import { EPIC_COLLECTION_ID } from "../../constants/goalConstants";
 
 interface ProductRootItem {
   id: typeof EPIC_COLLECTION_ID;
