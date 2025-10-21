@@ -7,7 +7,6 @@ import { ObjectiveTableTree } from "./FormaalTableTree";
 import { BenefitTableTree } from "./NytteTableTree";
 import GoalDrawer from "./GoalDrawer";
 import { SetEpicCostTime } from "../../Pages/GoalTiers/SetEpicCostTime";
-
 import { useGoalStructure } from "../hooks/useGoalStructure";
 
 export const GoalStructureContainer = () => {
@@ -16,7 +15,6 @@ export const GoalStructureContainer = () => {
     epicGoals,
     formaalGoals,
     effektGoals,
-    EPIC_COLLECTION_ID,
     handlers,
     drawer,
     costTimeModal,
@@ -74,7 +72,7 @@ export const GoalStructureContainer = () => {
           onAddGoal={(_parentId, goalCollectionId) =>
             // Bruk gjerne den mottatte ID'en (goalCollectionId) for bedre praksis,
             // men hardkodingen din fungerer også her:
-            handleAddGoal("Product", EPIC_COLLECTION_ID)
+            handleAddGoal("Product", goalCollectionId)
           }
           onEditGoal={handleEditGoal}
           onDeleteGoal={handleDeleteGoal}

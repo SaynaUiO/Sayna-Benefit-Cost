@@ -1,19 +1,12 @@
+// useGoalInitializer.ts
+
+// useGoalInitializer.ts (Rensket versjon)
+
 import { useEffect, useState } from "react";
 import { useAPI } from "../../Contexts/ApiContext";
 import { useAppContext } from "../../Contexts/AppContext";
-import { Goal } from "../../Models";
 
-// Sørg for at mockGoalData har den korrekte ID-en!
-const mockGoalData = [
-    // Effektmål Goals
-    { collectionId: "root-effektmaal", description: "Øke kundetilfredshet med 15% innen Q4." }, // ENDRET 'mal' til 'maal'
-    { collectionId: "root-effektmaal", description: "Redusere churn-rate med 5% i år." },       // ENDRET 'mal' til 'maal'
-    
-    // Epic Goals
-    { collectionId: "root-epic", description: "Implementere ny betalingsløsning V. 2.0." },
-    { collectionId: "root-epic", description: "Full overhaling av mobilappen." },
-];
-
+// MOCK DATA ER NÅ FJERNET!
 
 export const useGoalInitializer = () => {
     const [scope] = useAppContext();
@@ -22,42 +15,30 @@ export const useGoalInitializer = () => {
 
     useEffect(() => {
         
-        const seedGoals = async () => {
+        const completeInitialization = async () => {
+            // Sjekk om vi har scope.id og om vi allerede er initialisert
             if (!scope.id || initialized) {
                 return;
             }
             
             try {
-                // Sjekk databasen: Sjekk kun én samling for å se om vi er tomme
-                // Bruker "root-epic" da dette var der feilen oppstod, men bruker korrigert ID for effektmål i data
-                const existingGoals = await api.goal.getAll(scope.id, "root-epic"); 
+                // VIKTIG: All seeding-logikk (som brukte mockGoalData) er fjernet!
+                // Nå setter vi bare statusen til initialisert.
+                // Eventuell initialisering av standard Goals må nå gjøres manuelt eller fjernes.
                 
-                if (existingGoals.length === 0) {
-                    
-                    console.log("Starter SEKVENSIELL seeding av testmål...");
-                    
-                    // Løsningen: for...of tvinger ett kall om gangen
-                    for (const data of mockGoalData) {
-                        await api.goal.create(scope.id, data.collectionId, data.description);
-                        console.log(`Opprettet: ${data.description}`);
-                    }
-                    
-                    console.log("Sekvensiell seeding fullført.");
-
-                } else {
-                    console.log(`Testmål finnes allerede (${existingGoals.length} funnet), hopper over seeding.`);
-                }
+                console.log("Goal-initialisering fullført (Seeding er fjernet).");
 
                 setInitialized(true); 
             } catch (error) {
-                console.error("FEIL UNDER SEEDING ELLER SJEKK:", error);
+                // Feilbehandling forblir for å sikre at status settes uansett
+                console.error("FEIL UNDER INITIALISERING:", error);
                 setInitialized(true);
             }
         };
 
-        seedGoals();
+        completeInitialization();
         
-    }, [scope.id, initialized, api]); 
+    }, [scope.id, api]); 
 
     return { initialized };
 };

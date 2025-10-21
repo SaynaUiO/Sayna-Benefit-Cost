@@ -1,12 +1,11 @@
 //Fil som inneholder all fetching, states, oh handelers
-
 import { useCallback, useEffect, useState } from "react";
 import { useAPI } from "../../Contexts/ApiContext";
 import { useAppContext } from "../../Contexts/AppContext";
 import { Goal, GoalTableItem, GoalTableItemTypeEnum } from "../../Models";
 import { useGoalStructureInitializer } from "./useGoalStructureInitializer";
 import { useGoalInitializer } from "../MockData/goalsMockData";
-
+import { EPIC_COLLECTION_ID, EFFEKT_COLLECTION_ID, FORMAAL_COLLECTION_ID } from "../constants/goalConstants";
 
 type GoalType = "Objective" | "Benefit" | "Product";
 
@@ -23,10 +22,6 @@ interface CostTimeModalState {
   postfix: string;
 }
 
-//Hardkode GoalCollection ID-ene for filtrering: 
-const EPIC_COLLECTION_ID = "root-epic";
-const FORMAAL_COLLECTION_ID = "root-formaal";
-const EFFEKT_COLLECTION_ID = "root-effektmaal";
 
 export const useGoalStructure = () => {
   const [scope] = useAppContext();
