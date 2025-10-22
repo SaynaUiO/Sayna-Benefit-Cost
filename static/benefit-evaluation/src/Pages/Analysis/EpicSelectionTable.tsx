@@ -30,8 +30,8 @@ interface EpicSelectionTableProps {
 const head = {
   cells: [
     { key: "epic", content: "Epic", width: 15 }, // Økt bredde litt for lesbarhet
-    { key: "bp", content: "Total BP", width: 10 },
-    { key: "sp", content: "Total SP", width: 10 },
+    { key: "bp", content: "Nytte poeng (BP)", width: 10 },
+    { key: "sp", content: "Kostnad (SP)", width: 10 },
     { key: "bpProfile", content: "Velg BP profil", width: 30 },
     { key: "spProfile", content: "Velg SP profil", width: 30 },
   ],

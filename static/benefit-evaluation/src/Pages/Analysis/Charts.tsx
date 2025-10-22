@@ -61,6 +61,7 @@ export const PeriodizationChart: React.FC<PeriodizationChartProps> = ({
           display: true,
           text: "Netto Poeng (BP - SP)",
         },
+        min: -40,
         grid: {
           drawOnChartArea: true,
         },
@@ -75,11 +76,11 @@ export const PeriodizationChart: React.FC<PeriodizationChartProps> = ({
           text: "Akkumulert NPV",
         },
         // Sikrer at Null-linjen (Breakeven) er synlig og at aksen er riktig skalert
-        min: chartData.datasets[1]?.data
-          ? Math.min(0, ...chartData.datasets[1].data)
+        min: chartData.datasets[3]?.data
+          ? Math.min(0, ...chartData.datasets[3].data)
           : undefined,
-        max: chartData.datasets[1]?.data
-          ? Math.max(0, ...chartData.datasets[1].data)
+        max: chartData.datasets[3]?.data
+          ? Math.max(0, ...chartData.datasets[3].data)
           : undefined,
         grid: {
           drawOnChartArea: false,

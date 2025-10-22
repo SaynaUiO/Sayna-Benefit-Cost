@@ -38,8 +38,8 @@ export const PeriodizationChartContainer: React.FC<
         // BRUTTO GEVINST (BP) - LINJE
         {
           type: "line" as const,
-          label: "Brutto Gevinst (BP)",
-          borderColor: "rgb(0, 150, 0)",
+          label: "Total BP",
+          borderColor: "rgba(44, 154, 44, 1)",
           backgroundColor: "rgba(0, 150, 0, 0.1)",
           data: grossBenefitData,
           yAxisID: "yNetPoints",
@@ -50,8 +50,8 @@ export const PeriodizationChartContainer: React.FC<
         // BRUTTO KOSTNAD (SP) - LINJE
         {
           type: "line" as const,
-          label: "Brutto Kostnad (SP)",
-          borderColor: "rgb(255, 0, 0)",
+          label: "Total SP",
+          borderColor: "rgba(204, 78, 78, 1)",
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           data: grossCostData,
           yAxisID: "yNetPoints",
