@@ -91,18 +91,18 @@ export const HeaderNavigation = () => {
     <AtlassianNavigation
       label="site"
       renderProductHome={() => null}
-      renderHelp={() => (
-        <SpotlightTarget name="restart-onboarding">
-          <Help
-            tooltip="Restart onboarding"
-            onClick={() => {
-              api.onboarding.setOnboardingComplete(false).then(() => {
-                navigate("/goal-structure");
-              });
-            }}
-          />
-        </SpotlightTarget>
-      )}
+      // renderHelp={() => (
+      //   <SpotlightTarget name="restart-onboarding">
+      //     <Help
+      //       tooltip="Restart onboarding"
+      //       onClick={() => {
+      //         api.onboarding.setOnboardingComplete(false).then(() => {
+      //           navigate("/goal-structure");
+      //         });
+      //       }}
+      //     />
+      //   </SpotlightTarget>
+      // )}
       renderSettings={DefaultSettings}
       primaryItems={[
         <Flex
