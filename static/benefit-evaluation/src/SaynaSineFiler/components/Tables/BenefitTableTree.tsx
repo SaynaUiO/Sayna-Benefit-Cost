@@ -8,15 +8,11 @@ import TableTree, {
 } from "@atlaskit/table-tree";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
-import Button, { ButtonGroup } from "@atlaskit/button";
+import Button from "@atlaskit/button";
 import { Goal } from "../../../Models";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import Lozenge from "@atlaskit/lozenge";
 import { NYTTE_COLLECTION_ID } from "../../constants/goalConstants";
-import { SpotlightTarget } from "@atlaskit/onboarding";
-import { Box } from "@atlaskit/primitives/compiled";
-import { xcss } from "@atlaskit/primitives";
-import { token } from "@atlaskit/tokens";
 
 interface BenefitRootItem {
   id: typeof NYTTE_COLLECTION_ID;
@@ -74,17 +70,6 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
             ? "Planlagt Nyttevirkning"
             : goal.key || goal.id;
 
-          function cssMap(arg0: {
-            root: {
-              paddingTop: "var(--ds-space-050)";
-              paddingRight: "var(--ds-space-050)";
-              paddingBottom: "var(--ds-space-050)";
-              paddingLeft: "var(--ds-space-050)";
-            };
-          }) {
-            throw new Error("Function not implemented.");
-          }
-
           return (
             <Row itemId={item.id} items={children} hasChildren={isRoot}>
               <Cell>
@@ -103,38 +88,29 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
               </Cell>
 
               <Cell>
-                <SpotlightTarget name="add-goal">
-                  {isRoot && (
-                    <Button
-                      appearance="subtle"
-                      iconBefore={<AddIcon size="small" label="Legg til " />}
-                      onClick={() =>
-                        onAddGoal(BENEFIT_ROOT_ITEM.id, NYTTE_COLLECTION_ID)
-                      }
-                    />
-                  )}
-                </SpotlightTarget>
+                {isRoot && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<AddIcon size="small" label="Legg til " />}
+                    onClick={() =>
+                      onAddGoal(BENEFIT_ROOT_ITEM.id, NYTTE_COLLECTION_ID)
+                    }
+                  />
+                )}
 
                 {isLiveGoal && (
-                  <SpotlightTarget name="edit/delete-goal">
-                    <ButtonGroup>
-                      <Button
-                        appearance="subtle"
-                        iconBefore={
-                          <EditIcon size="small" label="Rediger Mål" />
-                        }
-                        onClick={() => onEditGoal(goal)}
-                      />
-
-                      <Button
-                        appearance="subtle"
-                        iconBefore={
-                          <TrashIcon size="small" label="Slett Mål" />
-                        }
-                        onClick={() => onDeleteGoal(goal.id)}
-                      />
-                    </ButtonGroup>
-                  </SpotlightTarget>
+                  <>
+                    <Button
+                      appearance="subtle"
+                      iconBefore={<EditIcon size="small" label="Rediger Mål" />}
+                      onClick={() => onEditGoal(goal)}
+                    />
+                    <Button
+                      appearance="subtle"
+                      iconBefore={<TrashIcon size="small" label="Slett Mål" />}
+                      onClick={() => onDeleteGoal(goal.id)}
+                    />
+                  </>
                 )}
               </Cell>
             </Row>

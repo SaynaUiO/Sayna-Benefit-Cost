@@ -15,7 +15,6 @@ import InlineEdit, { InlineEditableTextfield } from "@atlaskit/inline-edit";
 import { FORMAAL_COLLECTION_ID } from "../../constants/goalConstants";
 import { useGoalStructure } from "../../hooks/useGoalStructure";
 import TextArea from "@atlaskit/textarea";
-import { SpotlightTarget } from "@atlaskit/onboarding";
 
 interface ObjectiveRootItem {
   id: typeof FORMAAL_COLLECTION_ID;
@@ -82,49 +81,45 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
 
               {/* KOLONNE 2: Beskrivelse */}
               <Cell>
-                <SpotlightTarget name="inline-text">
-                  {isRoot && (
-                    <InlineEdit
-                      defaultValue={
-                        (item as ObjectiveRootItem).description || ""
-                      }
-                      editView={({ errorMessage, ...fieldProps }) => (
-                        // @ts-ignore
-                        <TextArea
-                          {...fieldProps}
-                          isCompact={false}
-                          minimumRows={2}
-                          resize="horizontal"
-                          placeholder="Skriv inn beskrivelse her..."
-                        />
-                      )}
-                      readView={() => (
-                        <div
-                          style={{
-                            minHeight: "2em",
-                            padding: "6px",
-                            wordBreak: "break-word",
-                          }}
-                        >
-                          {(item as ObjectiveRootItem).description ||
-                            "Legg til en beskrivelse her..."}
-                        </div>
-                      )}
-                      onConfirm={(newValue) =>
-                        handleUpdateCollectionDescription(
-                          item as unknown as GoalCollection,
-                          newValue
-                        )
-                      }
-                      editButtonLabel={
-                        (item as ObjectiveRootItem).description ||
-                        "Legg til beskrivelse"
-                      }
-                      keepEditViewOpenOnBlur
-                      readViewFitContainerWidth
-                    />
-                  )}
-                </SpotlightTarget>
+                {isRoot && (
+                  <InlineEdit
+                    defaultValue={(item as ObjectiveRootItem).description || ""}
+                    editView={({ errorMessage, ...fieldProps }) => (
+                      // @ts-ignore
+                      <TextArea
+                        {...fieldProps}
+                        isCompact={false}
+                        minimumRows={2}
+                        resize="horizontal"
+                        placeholder="Skriv inn beskrivelse her..."
+                      />
+                    )}
+                    readView={() => (
+                      <div
+                        style={{
+                          minHeight: "2em",
+                          padding: "6px",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {(item as ObjectiveRootItem).description ||
+                          "Legg til en beskrivelse her"}
+                      </div>
+                    )}
+                    onConfirm={(newValue) =>
+                      handleUpdateCollectionDescription(
+                        item as unknown as GoalCollection,
+                        newValue
+                      )
+                    }
+                    editButtonLabel={
+                      (item as ObjectiveRootItem).description ||
+                      "Legg til beskrivelse"
+                    }
+                    keepEditViewOpenOnBlur
+                    readViewFitContainerWidth
+                  />
+                )}
                 {isLiveGoal && goal.description}
               </Cell>
 

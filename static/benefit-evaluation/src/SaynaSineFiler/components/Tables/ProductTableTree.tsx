@@ -14,7 +14,6 @@ import { Goal } from "../../../Models";
 import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
 import Lozenge from "@atlaskit/lozenge";
 import { EPIC_COLLECTION_ID } from "../../constants/goalConstants";
-import { SpotlightTarget } from "@atlaskit/onboarding";
 
 interface ProductRootItem {
   id: typeof EPIC_COLLECTION_ID;
@@ -110,18 +109,14 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                 )}
 
                 {/* Cost/Time Button  */}
-                <SpotlightTarget name="cost/time">
-                  {isRoot && (
-                    <Button
-                      appearance="subtle"
-                      iconBefore={
-                        <BitbucketCompareIcon size="small" label="" />
-                      }
-                      isDisabled={isDataEmpty} // Deaktiver knappen hvis det ikke er noen Epics
-                      onClick={() => onSetCostTime(epicGoals)} // Sender alle Epics
-                    ></Button>
-                  )}
-                </SpotlightTarget>
+                {isRoot && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<BitbucketCompareIcon size="small" label="" />}
+                    isDisabled={isDataEmpty} // Deaktiver knappen hvis det ikke er noen Epics
+                    onClick={() => onSetCostTime(epicGoals)} // Sender alle Epics
+                  ></Button>
+                )}
 
                 {/* Edit Button  */}
                 {isLiveGoal && (
