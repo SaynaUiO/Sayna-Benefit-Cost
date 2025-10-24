@@ -5,6 +5,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@atlaskit/spotlight": "^0.7.1",
     "@forge/api": "^5.2.0",
     "@forge/events": "^1.0.1",
     "@forge/react": "^11.5.0",

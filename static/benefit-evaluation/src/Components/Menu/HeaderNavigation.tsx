@@ -31,6 +31,7 @@ export const HeaderNavigation = () => {
     });
     setSelectedTab(index?.name);
   }, [location]);
+  const endpoint = location.pathname.split("/").at(-1);
 
   const tabLinks: TabLink[] = [
     {
@@ -92,16 +93,13 @@ export const HeaderNavigation = () => {
       label="site"
       renderProductHome={() => null}
       renderHelp={() => (
-        <SpotlightTarget name="restart-onboarding">
-          <Help
-            tooltip="Restart onboarding"
-            onClick={() => {
-              api.onboarding.setOnboardingComplete(false).then(() => {
-                navigate("/goal-structure");
-              });
-            }}
-          />
-        </SpotlightTarget>
+        <Help
+          tooltip="Introduction"
+          isSelected={selectedTab === "Introduction"}
+          onClick={() => {
+            navigate("introduction");
+          }}
+        />
       )}
       renderSettings={DefaultSettings}
       primaryItems={[
