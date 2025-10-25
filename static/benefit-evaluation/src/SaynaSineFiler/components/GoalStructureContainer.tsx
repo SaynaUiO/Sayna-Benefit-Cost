@@ -1,6 +1,6 @@
 //Filen som samler alt sammen og brukes i GoalStructure.tsx for å få det opp på skjermen
 
-import { Goal, GoalTypeEnum } from "../../Models";
+import { GoalTypeEnum } from "../../Models";
 
 import { EpicTableTree } from "./Tables/ProductTableTree";
 import { ObjectiveTableTree } from "./Tables/ObjectiveTableTree";
@@ -8,8 +8,6 @@ import { BenefitTableTree } from "./Tables/BenefitTableTree";
 import GoalDrawer from "./GoalDrawer";
 import { SetEpicCostTime } from "../../Pages/GoalTiers/SetEpicCostTime";
 import { useGoalStructure } from "../hooks/useGoalStructure";
-import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
-import { useCallback, useState } from "react";
 
 export const GoalStructureContainer = () => {
   const {
@@ -22,13 +20,13 @@ export const GoalStructureContainer = () => {
     costTimeModal,
     scope,
     allGoals,
-    deleteModal,
   } = useGoalStructure();
 
   // Destrukturer handlers for renere bruk
   const {
     handleAddGoal,
     handleEditGoal,
+    handleDeleteGoal,
     onCloseDrawer,
     handleSetCostTime,
     handleCostTimeModalClose,
@@ -49,13 +47,7 @@ export const GoalStructureContainer = () => {
           handleAddGoal("Objective", goalCollectionId)
         }
         onEditGoal={handleEditGoal}
-        onDeleteGoal={(goalId: string) => {
-          const goal = allGoals.find((g) => g.id === goalId);
-          if (goal) {
-            // Siden TableTree sender GoalId, må du finne hele målet her FØR du kaller openDeleteModal
-            deleteModal.open(goalId); // Eller deleteModal.open(goal) hvis du endrer hooken
-          }
-        }}
+        onDeleteGoal={handleDeleteGoal}
       />
       <br />
 
@@ -69,13 +61,7 @@ export const GoalStructureContainer = () => {
           ) => handleAddGoal("Benefit", goalCollectionId) // Bruker den faktiske Collection ID'en
         }
         onEditGoal={handleEditGoal}
-        onDeleteGoal={(goalId: string) => {
-          const goal = allGoals.find((g) => g.id === goalId);
-          if (goal) {
-            // Siden TableTree sender GoalId, må du finne hele målet her FØR du kaller openDeleteModal
-            deleteModal.open(goalId); // Eller deleteModal.open(goal) hvis du endrer hooken
-          }
-        }}
+        onDeleteGoal={handleDeleteGoal}
       />
       <br />
 
@@ -89,14 +75,8 @@ export const GoalStructureContainer = () => {
             handleAddGoal("Product", goalCollectionId)
           }
           onEditGoal={handleEditGoal}
+          onDeleteGoal={handleDeleteGoal}
           onSetCostTime={handleSetCostTime}
-          onDeleteGoal={(goalId: string) => {
-            const goal = allGoals.find((g) => g.id === goalId);
-            if (goal) {
-              // Siden TableTree sender GoalId, må du finne hele målet her FØR du kaller openDeleteModal
-              deleteModal.open(goalId); // Eller deleteModal.open(goal) hvis du endrer hooken
-            }
-          }}
         />
       </div>
 
@@ -126,16 +106,6 @@ export const GoalStructureContainer = () => {
           postfix={costTimeModal.postfix}
           close={() => handleCostTimeModalClose(false)}
           refresh={() => handleCostTimeModalClose(true)}
-        />
-      )}
-
-      {/* Delete */}
-      {/* Delete Modal */}
-      {deleteModal.isOpen && deleteModal.goalToDelete && (
-        <DeleteConfirmationModal
-          itemName={deleteModal.goalToDelete.key || deleteModal.goalToDelete.id}
-          onClose={deleteModal.close} // Lukke-funksjon fra hooken
-          onConfirm={deleteModal.confirm} // API-kall-funksjonen fra hooken
         />
       )}
 

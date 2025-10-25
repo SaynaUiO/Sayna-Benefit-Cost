@@ -158,7 +158,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
     <ModalTransition>
       <Modal onClose={() => onClose(false)}>
         <ModalHeader>
-          <ModalTitle>Set Costs & Time</ModalTitle>
+          <ModalTitle>Angi Kostnader og Tid</ModalTitle>
         </ModalHeader>
         <ModalBody>
           <Stack space="space.100">
@@ -166,14 +166,15 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
               <>
                 <Inline space="space.050">
                   {props.upperIsMonetary
-                    ? "The cost is the expected lifecycle-costs of each epic."
-                    : "The cost is the expected lifecycle-cost points of each epic in relative points."}{" "}
-                  And these values will all be normalized to a total of 100 cost
-                  points.
+                    ? "Kostnaden er de forventede livssykluskostnadene for hver epic."
+                    : "Kostnaden er de forventede relative livssykluskost-poengene for hver epic."}{" "}
+                  Og alle disse verdiene vil bli normalisert til totalt 100
+                  kostnadspoeng.
                 </Inline>
                 <Inline space="space.050">
-                  The time is the expected relative time to complete each epic.
-                  This is a relative value, so not in hours or days.
+                  Tiden er den forventede relative tiden for å fullføre hver
+                  epic. Dette er en relativ verdi, altså ikke i timer eller
+                  dager.
                 </Inline>
                 <Inline space="space.050">
                   {"Total costs:"}
