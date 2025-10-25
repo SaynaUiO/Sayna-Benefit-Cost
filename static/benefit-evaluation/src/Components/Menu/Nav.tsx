@@ -95,13 +95,11 @@ export const Nav = () => {
       <LeftSidebar isFixed={true}>
         <SideNavigation label="project">
           <NavigationHeader>
-            <Header description="Benefitpoints and costs to your projects">
-              Benefit/Cost Estimation
-            </Header>
+            <Header description="Fordeling av nyttepoeng">BenefitOKR</Header>
           </NavigationHeader>
           <NestableNavigationContent>
             <SpotlightTarget name="project">
-              <Section hasSeparator title="Project">
+              <Section hasSeparator title="Prosjekt">
                 {project ? (
                   <ButtonItem
                     iconBefore={<PageIcon label="" />}
@@ -120,14 +118,14 @@ export const Nav = () => {
               </Section>
             </SpotlightTarget>
             <SpotlightTarget name="introduction-and-help">
-              <Section title="Introduction">
+              <Section title="Introduksjon">
                 <ButtonItem
                   isSelected={endpoint === "introduction"}
                   onClick={() => {
                     navigation("introduction");
                   }}
                 >
-                  Introduction
+                  Introduksjon
                 </ButtonItem>
               </Section>
             </SpotlightTarget>

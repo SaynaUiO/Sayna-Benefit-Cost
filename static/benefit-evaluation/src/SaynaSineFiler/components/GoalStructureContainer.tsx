@@ -121,10 +121,10 @@ export const GoalStructureContainer = () => {
       )}
 
       {/* Debug Output */}
-      <h2 style={{ marginTop: "30px" }}>Alle Hentede Goals (DEBUG)</h2>
+      {/* <h2 style={{ marginTop: "30px" }}>Alle Hentede Goals (DEBUG)</h2>
       <pre style={{ backgroundColor: "#f4f4f4", padding: "10px" }}>
         {JSON.stringify(allGoals, null, 2)}
-      </pre>
+      </pre> */}
     </div>
   );
 };
