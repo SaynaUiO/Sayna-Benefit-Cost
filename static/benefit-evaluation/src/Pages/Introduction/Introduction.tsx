@@ -1,114 +1,86 @@
-import { Box, xcss } from '@atlaskit/primitives'
+import { Box, xcss } from "@atlaskit/primitives";
 
 export const Introduction = () => {
-    const boxStyles = xcss({
-        borderColor: 'color.border.accent.gray',
-        borderStyle: 'solid',
-        borderRadius: 'border.radius.300',
-        borderWidth: 'border.width',
-        backgroundColor: 'color.background.input.pressed',
-        padding: 'space.200',
-    })
+  const boxStyles = xcss({
+    borderColor: "color.border.accent.gray",
+    borderStyle: "solid",
+    borderRadius: "border.radius.300",
+    borderWidth: "border.width",
+    backgroundColor: "color.background.input.pressed",
+    padding: "space.200",
+  });
 
-    return (
-        <div style={{ padding: '2rem' }}>
-            <h1 style={{ paddingBottom: '1rem' }}>
-                Welcome to Benefit/Cost Management
-            </h1>
-            Benefit/cost management is a strategic approach to evaluate whether
-            the investments in a project are justified by the benefits it
-            delivers. More info about benefit/cost management can be found
-            below.
-            <h2 style={{ paddingBottom: '1rem' }}>
-                Understanding Benefit/Cost Management
-            </h2>
-            <section>
-                <Box xcss={boxStyles}>
-                    <p>Involves:</p>
-                    <ul>
-                        <li>
-                            Assessing the benefit a project is expected to
-                            deliver, such as improved services or increased
-                            sales.
-                        </li>
-                        <li>
-                            Comparing these benefits against the associated
-                            lifecycle costs.
-                        </li>
-                        <li>
-                            Continuously monitoring and evaluating development
-                            activities to ensure that high benefit-to-cost
-                            products are delivered.
-                        </li>
-                    </ul>
-                    <p>
-                        This will give you a metric to estimate value in
-                        development activities, in addition to traditional
-                        metrics for time, cost and scope.
-                    </p>
-                </Box>
-            </section>
-            <h2 style={{ paddingBottom: '1rem' }}>Typical Steps</h2>
-            <Box xcss={boxStyles}>
-                <p>
-                    These are some of the typical steps involved in benefit/cost
-                    that you would be performing in this app:
-                </p>
-                <ol>
-                    <li>
-                        Selecting the correct epics for the project (Project
-                        configuration)
-                    </li>
-                    <li>
-                        Creating a goal collection and adding goals for the
-                        project (Goal Structure page)
-                    </li>
-                    <li>
-                        Assigning values, either weight or monetary value (worth
-                        points) for all the goals (Goal Structure page)
-                    </li>
-                    <li>
-                        Assign cost and time to each epic (Goal Structure page)
-                    </li>
-                    <li>
-                        Assign benefit points to estimate the epics' expected
-                        contribution (benefit) to goals (Estimation page)
-                    </li>
-                    <li>
-                        View and evaluate the order of how to complete the epics
-                        (Analysis page)
-                    </li>
-                </ol>
-            </Box>
-            <h2 style={{ paddingBottom: '1rem' }}>Addressing Soft Benefits</h2>
-            <Box xcss={boxStyles}>
-                <p>
-                    Soft benefits refer to qualitative returns that are
-                    challenging to quantify in monetary terms, often
-                    necessitating implicit methods for assessment due to
-                    practical limitations in precise quantification. To address
-                    these we use the MISHRI method:
-                </p>
-                <ol>
-                    <li>
-                        Assign measurable benefits to goals wherever
-                        possible.
-                    </li>
-                    <li>
-                        Compare and value soft benefits relative to other
-                        goals.
-                    </li>
-                    <li>
-                        Adjust the benefit value based on the relative
-                        importance of each goal.
-                    </li>
-                </ol>
-                <p>
-                    This approach helps in attributing value to less tangible
-                    benefits, ensuring they are accounted for in project
-                    evaluations.
-                </p>
-            </Box>
-        </div>
-    )
-}
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1 style={{ paddingBottom: "1rem" }}>Velkommen til BenefitOKR</h1>
+      Benefit/cost management er en strategisk tilnærming for å vurdere om
+      investeringene i et prosjekt kan rettferdiggjøres ut fra nytten det gir.
+      Mer informasjon om benefit/cost management finner du nedenfor.
+      <h2 style={{ paddingBottom: "1rem" }}>Forstå Benefit/Cost Management</h2>
+      <section>
+        <Box xcss={boxStyles}>
+          <p>Innebærer:</p>
+          <ul>
+            <li>
+              Å vurdere hvilken nytte et prosjekt forventes å levere, for
+              eksempel forbedrede tjenester eller økt salg.
+            </li>
+            <li>
+              Å sammenligne denne nytten med de tilhørende livssykluskostnadene.
+            </li>
+            <li>
+              Å kontinuerlig overvåke og evaluere utviklingsaktiviteter for å
+              sikre at produkter med høy nytte-kostnadsverdi leveres.
+            </li>
+          </ul>
+          <p>
+            Dette gir deg et mål for å estimere verdien av
+            utviklingsaktiviteter, i tillegg til de tradisjonelle målene for
+            tid, kostnad og omfang.
+          </p>
+        </Box>
+      </section>
+      <h2 style={{ paddingBottom: "1rem" }}>Vanlige fremgangsmåte</h2>
+      <Box xcss={boxStyles}>
+        <p>
+          Dette er noen av de typiske trinnene i benefit/cost-prosessen som du
+          vil utføre i denne appen:
+        </p>
+        <ol>
+          <li>
+            Opprette en målsamling og legge til mål for prosjektet
+            (Målstruktur-siden)
+          </li>
+          <li>
+            Tilordne verdier – enten vekting eller pengeverdi (verdi­poeng) –
+            til alle målene (Målstruktur-siden)
+          </li>
+          <li>Tilordne kostnad og tid til hver epic (Målstruktur-siden)</li>
+          <li>
+            Tilordne nyttepoeng for å estimere hvor mye hver epic forventes å
+            bidra (nytte) til målene (Estimerings-siden)
+          </li>
+          <li>
+            Se og evaluere rekkefølgen for hvordan epics bør fullføres
+            (Periodiserings-siden)
+          </li>
+        </ol>
+      </Box>
+      <h2 style={{ paddingBottom: "1rem" }}>Periodisering</h2>
+      <Box xcss={boxStyles}>
+        <p>
+          Periodisering handler om å fordele nytte (BP) og kostnad (SP) over tid
+          for å gi et mer realistisk bilde av et prosjekts økonomiske utvikling.
+          I stedet for å anta at gevinster og kostnader oppstår umiddelbart,
+          benyttes forhåndsdefinerte periodiseringsprofiler som viser hvordan
+          verdiskapning og utgifter fordeler seg gjennom prosjektets levetid.
+          Ved å bruke slike profiler kan man estimere den totale nytten og
+          kostnaden for hver Epic, og deretter beregne indikatorer som netto
+          nåverdi (NPV) og akkumulert netto nåverdi (Accumulated NPV). Dette gir
+          et helhetlig grunnlag for å vurdere økonomisk verdi og risiko over
+          tid.
+        </p>
+      </Box>
+    </div>
+  );
+};
