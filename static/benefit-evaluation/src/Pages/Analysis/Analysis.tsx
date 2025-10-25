@@ -7,6 +7,8 @@ import {
   calculateTotalPeriodization,
   PeriodizationPeriodResult,
 } from "./periodizationCalculations";
+import Button from "@atlaskit/button";
+import CrossIcon from "@atlaskit/icon/glyph/cross";
 
 // Importer periodiseringslogikk og typer
 import {
@@ -149,9 +151,6 @@ export const Analysis = () => {
     }
   }, [epicGoals, profileSelections]);
 
-  // FJERNEDE USEMEMO FOR chartData og chartDataJs.
-  // Denne logikken ligger nå i PeriodizationChartContainer.tsx
-
   //Fortsetter Onboarding:
   useEffect(() => {
     // Sjekk om onboardingen er fullført
@@ -166,6 +165,14 @@ export const Analysis = () => {
   const renderActiveSpotlight = () => {
     const spotlights = [
       <Spotlight
+        actionsBeforeElement="12/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -177,14 +184,22 @@ export const Analysis = () => {
             appearance: "subtle",
           },
         ]}
-        heading=""
+        heading="Epics tabell"
         target="first-table"
         key="first-table"
       >
-        Her ser vi en tabell over alle Epics med deres tilhørende Nyttepoeng- og
-        kostnads-verdier som vi fordelte tidligere.
+        Her ser du en tabell over alle epics, med tilhørende nyttepoeng- og
+        kostnadsverdier som ble fordelt tidligere.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="13/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -196,14 +211,22 @@ export const Analysis = () => {
             appearance: "subtle",
           },
         ]}
-        heading=""
+        heading="Endre profil"
         target="profile"
         key="profile"
       >
-        Ved å endre på profilene, vil du også endre på tabellen og grafen under.
-        På denne siden er alt dynamisk.
+        Profilene fungerer som maler for hvordan poengene fordeles over tid. Når
+        du endrer en profil, oppdateres tabellen og grafen under automatisk.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="14/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -215,14 +238,22 @@ export const Analysis = () => {
             appearance: "subtle",
           },
         ]}
-        heading=""
+        heading="Finansiell plan tabell"
         target="second-table"
         key="second-table"
       >
-        Denne tabellen viser finansiell plan over 10 til 20 år. Den viser den
-        samlede nytten (BP) og kostnaden (SP) for epicsene.
+        Tabellen viser den finansielle planen over en periode på 10–20 år, med
+        samlet nytte (BP) og kostnad (SP) for alle epics.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="15/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -234,13 +265,22 @@ export const Analysis = () => {
             appearance: "subtle",
           },
         ]}
-        heading=""
+        heading="Juster år"
         target="year-tooltip"
         key="year-tooltip"
       >
-        Med disse pilene kan du justere på årene.
+        Med disse pilene kan du justere hvor mange år den finansielle planen
+        skal dekke.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="16/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -252,16 +292,50 @@ export const Analysis = () => {
             appearance: "subtle",
           },
         ]}
-        heading=""
+        heading="Graf"
         target="third-table"
         key="third-table"
       >
-        Dette er en dynamisk graf som endrer seg når du endrer på profilene. Med
-        denne grafen kan du lett analysere de ulike verdiene i forhold til
-        hverandre. Du kan også trykk på de 4 boksene på toppen av grafen som
+        Dette er en dynamisk graf som oppdateres når du endrer på profilene.
+        Grafen lar deg enkelt analysere de ulike verdiene i forhold til
+        hverandre. Du kan også trykke på de fire boksene øverst, som
         representerer hver verdi, for å skjule dem i grafen.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="17/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Next",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Innstillinger"
+        target="settings"
+        key="settings"
+      >
+        Under Innstillinger kan du starte prosjektet på nytt om ønskelig.
+      </Spotlight>,
+      <Spotlight
+        actionsBeforeElement="18/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           { onClick: () => end(), text: "OK" },
           {
@@ -270,11 +344,12 @@ export const Analysis = () => {
             appearance: "subtle",
           },
         ]}
-        heading="Restart Onboarding"
+        heading="Start onboardingen på nytt"
         target="restart-onboarding"
         key="restart-onboarding"
       >
-        You can restart this onboarding at any time by pressing this help icon.
+        Du kan starte denne onboardingen på nytt når som helst ved å trykke på
+        dette hjelpeikonet.
       </Spotlight>,
     ];
 

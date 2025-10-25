@@ -97,9 +97,9 @@ export const PeriodizationChartContainer: React.FC<
   return (
     <div style={{ marginTop: "40px" }}>
       {/* NY TITTEL - Flyttet fra Analysis.tsx */}
-      <SpotlightTarget name="third-table">
-        <h3>3. Finansiell Plan (Gevinst, Kostnad, Netto) Over Tid </h3>
-      </SpotlightTarget>
+
+      <h3>3. Finansiell Plan (Gevinst, Kostnad, Netto) Over Tid </h3>
+
       <p>
         Diagrammet kombinerer Brutto Gevinst (BP), Brutto Kostnad (SP), Netto
         Poeng (stolper) og Akkumulert NPV (tynn linje, høyre akse). Nullpunktet
@@ -108,6 +108,9 @@ export const PeriodizationChartContainer: React.FC<
 
       {/* Ingen options prop sendes inn */}
       <PeriodizationChart chartData={chartDataJs} />
+      <SpotlightTarget name="third-table">
+        <div></div>
+      </SpotlightTarget>
     </div>
   );
 };

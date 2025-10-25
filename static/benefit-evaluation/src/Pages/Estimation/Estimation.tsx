@@ -11,6 +11,7 @@ import { EstimationContainer } from "./EstimationContainer";
 import { EstimationContextProvider } from "./EstimationContext";
 import { GoalTier, EstimationMode, EstimationProps } from "../../Models";
 import { Spotlight, SpotlightTransition } from "@atlaskit/onboarding";
+import CrossIcon from "@atlaskit/icon/glyph/cross";
 
 export const Estimation = () => {
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -128,6 +129,14 @@ export const Estimation = () => {
   const renderActiveSpotlight = () => {
     const spotlights = [
       <Spotlight
+        actionsBeforeElement="9/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -143,9 +152,18 @@ export const Estimation = () => {
         target="relation"
         key="relation"
       >
-        Her velger du hvilken målnivå relasjon du ønsker å evaluere.
+        Her velger du hvilken relasjon du ønsker å evaluere for å legge til
+        nyttepoeng.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="10/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -157,13 +175,22 @@ export const Estimation = () => {
             appearance: "subtle",
           },
         ]}
-        heading=""
+        heading="Fordel nyttepoeng"
         target="estimation-table"
         key="estimation-table"
       >
-        I denne tabellen fordeler du nyttepoeng....
+        I denne tabellen fordeler du nyttepoeng til hver oppgave for å vurdere
+        hvor mye den bidrar til oppnåelsen av målene.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="11/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => navToAnalysis(),
@@ -179,7 +206,8 @@ export const Estimation = () => {
         target="analysis"
         key="analysis"
       >
-        Videre har vi periodisering....
+        Videre har vi periodisering, som brukes til å fordele nyttepoengene over
+        tid for å vise når verdien forventes realisert.
       </Spotlight>,
     ];
 

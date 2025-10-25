@@ -4,6 +4,8 @@ import { useAppContext } from "../../Contexts/AppContext";
 import { useAPI } from "../../Contexts/ApiContext";
 import PageHeader from "@atlaskit/page-header";
 import { GoalTier } from "../../Models";
+import Button from "@atlaskit/button";
+import CrossIcon from "@atlaskit/icon/glyph/cross";
 
 import {
   Spotlight,
@@ -23,6 +25,23 @@ export const GoalStructure = () => {
   const api = useAPI();
   const location = useLocation();
   const refresh = location.state?.refresh;
+
+  //onBorading:
+  type Placement = (typeof options)[number];
+  const options = [
+    "top right",
+    "top center",
+    "top left",
+    "right bottom",
+    "right middle",
+    "right top",
+    "bottom left",
+    "bottom center",
+    "bottom right",
+    "left top",
+    "left middle",
+    "left bottom",
+  ] as const;
 
   const fetchData = async () => {
     return api.goalTier
@@ -72,10 +91,27 @@ export const GoalStructure = () => {
     // Hvis dette er siste spotlight
     navigate("../estimation");
   };
+  const [isSpotlightActive, setIsSpotlightActive] = useState(false);
+  const [dialogPlacement, setDialogPlacement] = useState(0);
+  const shiftPlacementOption = () => {
+    if (dialogPlacement !== options.length - 1) {
+      return setDialogPlacement(dialogPlacement + 1);
+    }
+    return setDialogPlacement(0);
+  };
+  const placement = options[dialogPlacement];
 
   const renderActiveSpotlight = () => {
     const spotlights = [
       <Spotlight
+        actionsBeforeElement="1/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -90,11 +126,47 @@ export const GoalStructure = () => {
         heading="BenefitOKR"
         target="project"
         key="project"
+        dialogPlacement={placement as Placement}
       >
-        Takk for at du bruker Benefit Management med OKR (BenefitOKR). En kort
-        introduksjon av prosjektsiden vil nå presenteres.
+        Takk for at du bruker BenefitOKR – et verktøy for Benefit Management med
+        OKR. Her får du en kort introduksjon til prosjektsiden.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="2/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Next",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Introduksjon og hjelp"
+        target="introduction-and-help"
+        key="introduction-and-help"
+      >
+        Mer informasjon om hvordan du bruker BenefitOKR finner du under
+        Intruduksjon.
+      </Spotlight>,
+      <Spotlight
+        actionsBeforeElement="3/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -109,12 +181,21 @@ export const GoalStructure = () => {
         heading="Målstruktur"
         target="goal-structure"
         key="goal-structure"
+        dialogPlacement={placement as Placement}
       >
-        Denne siden viser og administrerer alle målsamlinger. Den er strukturert
-        i OKR form med tre tabeller: Formål (Objective), Planlagte
-        Nyttevirkninger (Key Results), og Produkt (Epic).
+        Denne siden lar deg vise og administrere alle målsamlinger. Strukturen
+        følger OKR-rammeverket med tre tabeller: Formål (Objective), Planlagte
+        nyttevirkninger (Key Results) og Produkt (Epic).
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="4/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -129,11 +210,20 @@ export const GoalStructure = () => {
         heading="Formål"
         target="inline-text"
         key="inline-text"
+        dialogPlacement={placement as Placement}
       >
-        Her kan du skrive formålet med prosjektet direkte i feltet. Trykk på
-        "✓"-symbolet når du er ferdig.
+        Skriv formålet med prosjektet direkte i feltet, og trykk på "✓" når du
+        er ferdig.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="5/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -145,15 +235,24 @@ export const GoalStructure = () => {
             appearance: "subtle",
           },
         ]}
-        heading=""
+        heading="Opprette mål"
         target="add-goal"
         key="add-goal"
+        dialogPlacement={placement as Placement}
       >
-        Under "Handlinger" finner du et pluss-tegn i hver av de tre tabellene.
-        Ved å trykke på denne kan du opprette mål som hører til den aktualle
+        Under Handlinger finner du et pluss-tegn i hver av de tre tabellene. Ved
+        å trykke på dette kan du opprette mål som hører til den aktuelle
         tabellen.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="6/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -165,13 +264,22 @@ export const GoalStructure = () => {
             appearance: "subtle",
           },
         ]}
-        heading="Rediger og slett et mål "
+        heading="Rediger/slett"
         target="edit/delete-goal"
         key="edit/delete-goal"
+        dialogPlacement={placement as Placement}
       >
-        Her kan du redigere og slette et mål du har laget.
+        Her kan du redigere eller slette et mål du har opprettet.
       </Spotlight>,
       <Spotlight
+        actionsBeforeElement="7/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => next(),
@@ -183,14 +291,22 @@ export const GoalStructure = () => {
             appearance: "subtle",
           },
         ]}
-        heading="Legg til kostnad og tid verdier"
+        heading="Kostnad/tid"
         target="cost/time"
         key="cost/time"
+        dialogPlacement={placement as Placement}
       >
-        For et produkt kan du fordele kostnader og legge til tid.
+        For hvert produkt (Epic) kan du fordele kostnader og legge til tidsbruk.
       </Spotlight>,
-
       <Spotlight
+        actionsBeforeElement="8/18"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
         actions={[
           {
             onClick: () => {
@@ -207,8 +323,9 @@ export const GoalStructure = () => {
         heading="Estimation"
         target="estimation"
         key="estimation"
+        dialogPlacement={placement as Placement}
       >
-        The estimation tab is used for assigning benefit points to each task.
+        Estimerings fanen brukes til å tildele nyttepoeng til hver oppgave.
       </Spotlight>,
     ];
 
