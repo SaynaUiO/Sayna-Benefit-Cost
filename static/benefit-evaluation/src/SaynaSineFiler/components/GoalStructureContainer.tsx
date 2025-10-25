@@ -8,6 +8,7 @@ import { BenefitTableTree } from "./Tables/BenefitTableTree";
 import GoalDrawer from "./GoalDrawer";
 import { SetEpicCostTime } from "../../Pages/GoalTiers/SetEpicCostTime";
 import { useGoalStructure } from "../hooks/useGoalStructure";
+import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 
 export const GoalStructureContainer = () => {
   const {
@@ -20,16 +21,17 @@ export const GoalStructureContainer = () => {
     costTimeModal,
     scope,
     allGoals,
+    deleteModal,
   } = useGoalStructure();
 
   // Destrukturer handlers for renere bruk
   const {
     handleAddGoal,
     handleEditGoal,
-    handleDeleteGoal,
     onCloseDrawer,
     handleSetCostTime,
     handleCostTimeModalClose,
+    onDeleteGoal,
   } = handlers;
 
   // --- RENDERING ---
@@ -47,7 +49,7 @@ export const GoalStructureContainer = () => {
           handleAddGoal("Objective", goalCollectionId)
         }
         onEditGoal={handleEditGoal}
-        onDeleteGoal={handleDeleteGoal}
+        onDeleteGoal={onDeleteGoal}
       />
       <br />
 
@@ -61,7 +63,7 @@ export const GoalStructureContainer = () => {
           ) => handleAddGoal("Benefit", goalCollectionId) // Bruker den faktiske Collection ID'en
         }
         onEditGoal={handleEditGoal}
-        onDeleteGoal={handleDeleteGoal}
+        onDeleteGoal={onDeleteGoal}
       />
       <br />
 
@@ -75,7 +77,7 @@ export const GoalStructureContainer = () => {
             handleAddGoal("Product", goalCollectionId)
           }
           onEditGoal={handleEditGoal}
-          onDeleteGoal={handleDeleteGoal}
+          onDeleteGoal={onDeleteGoal}
           onSetCostTime={handleSetCostTime}
         />
       </div>
@@ -106,6 +108,15 @@ export const GoalStructureContainer = () => {
           postfix={costTimeModal.postfix}
           close={() => handleCostTimeModalClose(false)}
           refresh={() => handleCostTimeModalClose(true)}
+        />
+      )}
+
+      {/* Delete Modal */}
+      {deleteModal.isOpen && deleteModal.goalToDelete && (
+        <DeleteConfirmationModal
+          itemName={deleteModal.goalToDelete.key || deleteModal.goalToDelete.id}
+          onClose={deleteModal.onClose} // closeDeleteModal (Lukker modalen)
+          onConfirm={deleteModal.onConfirm} // handleDeleteGoalConfirm (Utfører sletting)
         />
       )}
 

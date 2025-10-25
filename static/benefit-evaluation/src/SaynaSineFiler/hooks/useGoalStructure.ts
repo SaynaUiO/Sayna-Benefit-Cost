@@ -39,6 +39,9 @@ export const useGoalStructure = () => {
   const [drawerContext, setDrawerContext] = useState<DrawerState | null>(null);
   const [costTimeModal, setCostTimeModal] = useState<CostTimeModalState | null>(null);
 
+  //State for sletting: 
+  const [goalToDelete, setGoalToDelete] = useState<Goal | null>(null); 
+
   //Data fetching logikk: 
    const fetchAndOrganizeGoals = useCallback(async () => {
     if (!fullyInitialized || !scope.id) return;
@@ -116,50 +119,44 @@ export const useGoalStructure = () => {
     setIsDrawerOpen(true);
   };
 
+  //Åpner Modal for sleting: 
+  const openDeleteModal = useCallback((goal: Goal) => { 
+        setGoalToDelete(goal); // Lagrer målet i state for modalen
+    }, []); 
+
+    // Funksjon for å lukke modalen
+    const closeDeleteModal = useCallback(() => {
+        setGoalToDelete(null); 
+    }, []);
+
   //Delete goal handler:
-  // Delete goal handler:
-const handleDeleteGoal = useCallback(
-    // 🎯 NYTT: Aksepter HELE målet som skal slettes
-    async (goalToDelete: Goal) => {
-      
-      // Vi trenger ikke lenger å søke i goals, siden vi har objektet!
-      // const goalToDelete = goals?.find((g) => g.id === goalId); // Fjernet
+const handleDeleteGoal = useCallback(async () => {
+        const goal = goalToDelete; 
 
-      if (!goalToDelete) { // Denne sjekken blir kanskje aldri truffet, men er god praksis
-        alert("Goal object not provided. Cannot delete.");
-        return;
-      }
-      
-      const goalId = goalToDelete.id; // Henter ID fra objektet
-      const collectionId = goalToDelete.goalCollectionId; // Henter UNIK ID fra objektet
+        if (!goal) {
+            console.error("Sletting mislyktes: Mål-objektet mangler i state.");
+            closeDeleteModal();
+            return;
+        }
 
-      if (
-        !window.confirm(
-          // Bruker key/id fra det mottatte objektet
-          `Er du sikker på at du vil slette målet ${
-            goalToDelete.key || goalId
-          }?` 
-        )
-      ) {
-        return;
-      }
+        const goalId = goal.id;
+        const collectionId = goal.goalCollectionId; 
 
-
-      try {
-        // Nå er collectionId og goalId GARANTERT unike for det klikkede målet
-        await api.goal.delete(scope.id, collectionId, goalId); 
-        console.log(
-          `Goal deleted successfully from ${collectionId}: ${goalId}`
-        );
-        fetchAndOrganizeGoals();
-      } catch (error) {
-        console.error("Failed to delete goal:", error);
-        alert("Klarte ikke å slette målet. Vennligst prøv igjen.");
-      }
-    },
-    // Avhengigheter er nå kun scope, api, og fetching
-    [scope.id, api.goal, fetchAndOrganizeGoals] 
-);
+        try {
+            // 2. API Kall
+            await api.goal.delete(scope.id, collectionId, goalId);
+            console.log(`Goal deleted successfully from ${collectionId}: ${goalId}`);
+            
+            // 3. Oppdatering og Lukking
+            fetchAndOrganizeGoals();
+            closeDeleteModal(); 
+            
+        } catch (error) {
+            console.error("Failed to delete goal:", error);
+            alert("Klarte ikke å slette målet. Vennligst prøv igjen.");
+            closeDeleteModal(); 
+        }
+    }, [scope.id, api.goal, fetchAndOrganizeGoals, closeDeleteModal, goalToDelete]);
 
   //Handle update Objectiove description: 
   const handleUpdateCollectionDescription = useCallback(
@@ -247,7 +244,16 @@ const handleDeleteGoal = useCallback(
       handleSetCostTime,
       handleCostTimeModalClose,
       handleUpdateCollectionDescription,
+      onDeleteGoal: openDeleteModal,
     },
+
+    //Delete state 
+        deleteModal: {
+            isOpen: !!goalToDelete, 
+            goalToDelete: goalToDelete,
+            onClose: closeDeleteModal,
+            onConfirm: handleDeleteGoal
+        },
 
     //UI state:
     drawer: {
