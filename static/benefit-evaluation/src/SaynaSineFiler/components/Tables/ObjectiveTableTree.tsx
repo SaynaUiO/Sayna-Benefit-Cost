@@ -33,7 +33,7 @@ interface ObjectiveTableTreeProps {
     category?: string
   ) => void;
   onEditGoal: (goal: Goal) => void;
-  onDeleteGoal: (goalId: string) => void;
+  onDeleteGoal: (goal: Goal) => void;
 }
 
 export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
@@ -160,7 +160,7 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                     <Button
                       appearance="subtle"
                       iconBefore={<TrashIcon size="small" label="Slett Mål" />}
-                      onClick={() => onDeleteGoal(goal.id)}
+                      onClick={() => onDeleteGoal(goal)}
                     />
                   </>
                 )}

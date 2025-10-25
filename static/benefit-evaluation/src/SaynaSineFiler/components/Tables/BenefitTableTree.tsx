@@ -31,7 +31,7 @@ interface BenefitTableTreeProps {
     category?: string
   ) => void;
   onEditGoal: (goal: Goal) => void;
-  onDeleteGoal: (goalId: string) => void;
+  onDeleteGoal: (goal: Goal) => void;
 }
 
 export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
@@ -122,7 +122,7 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
                           iconBefore={
                             <TrashIcon size="small" label="Slett Mål" />
                           }
-                          onClick={() => onDeleteGoal(goal.id)}
+                          onClick={() => onDeleteGoal(goal)}
                         />
                       </ButtonGroup>
                     )}

@@ -117,28 +117,37 @@ export const useGoalStructure = () => {
   };
 
   //Delete goal handler:
-  const handleDeleteGoal = useCallback(
-    async (goalId: string) => {
-      const goalToDelete = goals?.find((g) => g.id === goalId);
+  // Delete goal handler:
+const handleDeleteGoal = useCallback(
+    // 🎯 NYTT: Aksepter HELE målet som skal slettes
+    async (goalToDelete: Goal) => {
+      
+      // Vi trenger ikke lenger å søke i goals, siden vi har objektet!
+      // const goalToDelete = goals?.find((g) => g.id === goalId); // Fjernet
 
-      if (!goalToDelete) {
-        alert("Goal not found in current data set. Cannot delete.");
+      if (!goalToDelete) { // Denne sjekken blir kanskje aldri truffet, men er god praksis
+        alert("Goal object not provided. Cannot delete.");
         return;
       }
+      
+      const goalId = goalToDelete.id; // Henter ID fra objektet
+      const collectionId = goalToDelete.goalCollectionId; // Henter UNIK ID fra objektet
+
       if (
         !window.confirm(
+          // Bruker key/id fra det mottatte objektet
           `Er du sikker på at du vil slette målet ${
             goalToDelete.key || goalId
-          }?`
+          }?` 
         )
       ) {
         return;
       }
 
-      const collectionId = goalToDelete.goalCollectionId;
 
       try {
-        await api.goal.delete(scope.id, collectionId, goalId);
+        // Nå er collectionId og goalId GARANTERT unike for det klikkede målet
+        await api.goal.delete(scope.id, collectionId, goalId); 
         console.log(
           `Goal deleted successfully from ${collectionId}: ${goalId}`
         );
@@ -148,9 +157,9 @@ export const useGoalStructure = () => {
         alert("Klarte ikke å slette målet. Vennligst prøv igjen.");
       }
     },
-    [scope.id, api.goal, fetchAndOrganizeGoals, goals]
-  );
-
+    // Avhengigheter er nå kun scope, api, og fetching
+    [scope.id, api.goal, fetchAndOrganizeGoals] 
+);
 
   //Handle update Objectiove description: 
   const handleUpdateCollectionDescription = useCallback(

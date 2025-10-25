@@ -32,7 +32,7 @@ interface EpicTableTreeProps {
     category?: string
   ) => void;
   onEditGoal: (goal: Goal) => void;
-  onDeleteGoal: (goalId: string) => void;
+  onDeleteGoal: (goal: Goal) => void;
   onSetCostTime: (goals: Goal[]) => void;
 }
 
@@ -139,7 +139,7 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                   <Button
                     appearance="subtle"
                     iconBefore={<TrashIcon size="small" label="Delete Goal" />}
-                    onClick={() => onDeleteGoal(goal.id)}
+                    onClick={() => onDeleteGoal(goal)}
                   ></Button>
                 )}
               </Cell>
