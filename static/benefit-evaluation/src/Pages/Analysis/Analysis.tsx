@@ -367,9 +367,9 @@ export const Analysis = () => {
       )}
       <PageHeader>Periodisering</PageHeader>
       <p>
-        På denne siden får du en oversikt over estimeringen av benefit of cost
-        over tid. Velg profiler for hver Epic under for å se den finansielle
-        planen.
+        På denne siden får du en oversikt over estimeringen av nytte og kostnad
+        over tid. Ved å velge profiler for hver epic nedenfor, kan du se hvordan
+        den finansielle planen utvikler seg og endres basert på fordelingen.
       </p>
 
       <div>

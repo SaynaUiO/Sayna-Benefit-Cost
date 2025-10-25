@@ -23,11 +23,11 @@ interface TotalResultsTableProps {
 const totalTableHead = {
   cells: [
     { key: "period", content: "År" },
-    { key: "grossBenefit", content: "Brutto Gevinst (BP)" },
-    { key: "grossCost", content: "Brutto Kostnad (SP)" },
-    { key: "netPoints", content: "Netto Poeng" },
-    { key: "discount", content: "Discount Factor " },
-    { key: "netNPV", content: "Netto Nåverdi" },
+    { key: "grossBenefit", content: " Total BP" },
+    { key: "grossCost", content: "Total SP" },
+    { key: "netPoints", content: "Nettoverdi" },
+    { key: "discount", content: "Diskonteringsfaktor" },
+    { key: "netNPV", content: "Netto Nåverdi (NPV)" },
     { key: "accumulatedNPV", content: "Akkumulert NPV" },
   ],
 };

@@ -48,7 +48,7 @@ export const PeriodizationChart: React.FC<PeriodizationChartProps> = ({
       },
       title: {
         display: true,
-        text: "Netto Poeng og Akkumulert NPV over tid",
+        text: "Nettoverdi og Akkumulert NPV over tid",
       },
     },
     scales: {
@@ -59,7 +59,7 @@ export const PeriodizationChart: React.FC<PeriodizationChartProps> = ({
         position: "left" as const,
         title: {
           display: true,
-          text: "Netto Poeng (BP - SP)",
+          text: "Nettoverdi (BP - SP)",
         },
         min: -40,
         grid: {

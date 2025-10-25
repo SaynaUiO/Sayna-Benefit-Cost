@@ -63,7 +63,7 @@ export const PeriodizationChartContainer: React.FC<
         // STOLPER (Netto Poeng)
         {
           type: "bar" as const,
-          label: "Netto Poeng ",
+          label: "Nettoverdi (BP - SP)",
           backgroundColor: (context: any) => {
             const value = context.raw;
             return value >= 0
@@ -98,12 +98,13 @@ export const PeriodizationChartContainer: React.FC<
     <div style={{ marginTop: "40px" }}>
       {/* NY TITTEL - Flyttet fra Analysis.tsx */}
 
-      <h3>3. Finansiell Plan (Gevinst, Kostnad, Netto) Over Tid </h3>
+      <h3>Finansiell Plan (Gevinst, Kostnad, Netto) Over Tid </h3>
 
       <p>
-        Diagrammet kombinerer Brutto Gevinst (BP), Brutto Kostnad (SP), Netto
-        Poeng (stolper) og Akkumulert NPV (tynn linje, høyre akse). Nullpunktet
-        (Breakeven) er der den Akkumulerte NPV-linjen krysser null-linjen.
+        Diagrammet kombinerer Brutto Gevinst (BP), Brutto Kostnad (SP),
+        Nettoverdi (stolper) og Akkumulert NPV (tynn linje, høyre akse).
+        Nullpunktet (breakeven) markeres der den akkumulerte NPV-linjen krysser
+        null-linjen.
       </p>
 
       {/* Ingen options prop sendes inn */}
