@@ -9,6 +9,7 @@ import { ChartData, ChartOptions } from "chart.js";
 
 // Importer typen for periodiseringsresultatene, for å definere props
 import { PeriodizationPeriodResult } from "./periodizationCalculations";
+import { SpotlightTarget } from "@atlaskit/onboarding";
 
 // Definerer props for denne komponenten
 interface PeriodizationChartContainerProps {
@@ -62,7 +63,7 @@ export const PeriodizationChartContainer: React.FC<
         // STOLPER (Netto Poeng)
         {
           type: "bar" as const,
-          label: "Netto Poeng (Kvartalsvis)",
+          label: "Netto Poeng ",
           backgroundColor: (context: any) => {
             const value = context.raw;
             return value >= 0
@@ -96,7 +97,9 @@ export const PeriodizationChartContainer: React.FC<
   return (
     <div style={{ marginTop: "40px" }}>
       {/* NY TITTEL - Flyttet fra Analysis.tsx */}
-      <h3>3. Finansiell Plan (Gevinst, Kostnad, Netto) Over Tid </h3>
+      <SpotlightTarget name="third-table">
+        <h3>3. Finansiell Plan (Gevinst, Kostnad, Netto) Over Tid </h3>
+      </SpotlightTarget>
       <p>
         Diagrammet kombinerer Brutto Gevinst (BP), Brutto Kostnad (SP), Netto
         Poeng (stolper) og Akkumulert NPV (tynn linje, høyre akse). Nullpunktet

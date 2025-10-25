@@ -14,6 +14,7 @@ import {
   benefitProfileMap,
   costProfileMap,
 } from "./periodizationTypes";
+import { SpotlightTarget } from "@atlaskit/onboarding";
 
 // Definerer props for denne komponenten
 interface EpicSelectionTableProps {
@@ -83,15 +84,17 @@ export const EpicSelectionTable: React.FC<EpicSelectionTableProps> = ({
           {
             key: "bpProfile",
             content: (
-              <Select
-                options={benefitProfiles}
-                value={currentBP}
-                onChange={(option) =>
-                  handleProfileChange(epicId, "bp", option as ProfileOption)
-                }
-                placeholder="Velg BP-profil..."
-                spacing="compact"
-              />
+              <SpotlightTarget name="profile">
+                <Select
+                  options={benefitProfiles}
+                  value={currentBP}
+                  onChange={(option) =>
+                    handleProfileChange(epicId, "bp", option as ProfileOption)
+                  }
+                  placeholder="Velg BP-profil..."
+                  spacing="compact"
+                />
+              </SpotlightTarget>
             ),
           },
           {
@@ -126,10 +129,15 @@ export const EpicSelectionTable: React.FC<EpicSelectionTableProps> = ({
   }
 
   return (
-    <DynamicTable
-      caption="Liste over epics og profilvalg"
-      head={head}
-      rows={rows}
-    />
+    <>
+      <DynamicTable
+        caption="Liste over epics og profilvalg"
+        head={head}
+        rows={rows}
+      />
+      <SpotlightTarget name="first-table">
+        <div></div>
+      </SpotlightTarget>
+    </>
   );
 };

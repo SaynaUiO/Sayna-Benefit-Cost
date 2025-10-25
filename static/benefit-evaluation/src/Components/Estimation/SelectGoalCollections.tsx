@@ -12,6 +12,7 @@ import HipchatChevronDoubleDownIcon from "@atlaskit/icon/glyph/hipchat/chevron-d
 import Tooltip from "@atlaskit/tooltip";
 import { GoalTier } from "../../Models/GoalTierModel";
 import { GoalTierTypeEnum } from "../../Models";
+import { SpotlightTarget } from "@atlaskit/onboarding";
 
 //Denne filen er for nedtrekkslista i Estimates.
 
@@ -131,6 +132,11 @@ export const SelectGoalCollections = ({
           const { goalTier, upperGoalTier: upperGoalTier } = options[0].value;
           ChooseGoalTier(goalTier, upperGoalTier);
           setLoading(false);
+        } else if (options.length > 1) {
+          const defaultOption = options[options.length - 1];
+          const { goalTier, upperGoalTier } = defaultOption.value;
+          ChooseGoalTier(goalTier, upperGoalTier);
+          setLoading(false);
         } else {
           console.debug("No option selected");
           setLoading(false);
@@ -202,28 +208,30 @@ export const SelectGoalCollections = ({
               }
             />
           </Tooltip>
-          <Select
-            inputId="single-select-example"
-            className="single-select"
-            classNamePrefix="react-select"
-            isLoading={isLoading}
-            value={selectedOption}
-            autoFocus
-            onChange={(value) => {
-              const option = value as GoalTierOption;
-              const { goalTier, upperGoalTier } = option.value;
-              ChooseGoalTier(goalTier, upperGoalTier);
-            }}
-            isDisabled={isLoading || isDisabled}
-            options={options}
-            placeholder={
-              isLoading
-                ? "Loading..."
-                : options && options.length > 0
-                ? "Select which tiers to evaluate"
-                : "No goal collections found"
-            }
-          />
+          <SpotlightTarget name="relation">
+            <Select
+              inputId="single-select-example"
+              className="single-select"
+              classNamePrefix="react-select"
+              isLoading={isLoading}
+              value={selectedOption}
+              autoFocus
+              onChange={(value) => {
+                const option = value as GoalTierOption;
+                const { goalTier, upperGoalTier } = option.value;
+                ChooseGoalTier(goalTier, upperGoalTier);
+              }}
+              isDisabled={isLoading || isDisabled}
+              options={options}
+              placeholder={
+                isLoading
+                  ? "Loading..."
+                  : options && options.length > 0
+                  ? "Select which tiers to evaluate"
+                  : "No goal collections found"
+              }
+            />
+          </SpotlightTarget>
           <Tooltip content="Evaluate One Rank Up">
             <Button
               onClick={() => selectRankAboveCurrent()}

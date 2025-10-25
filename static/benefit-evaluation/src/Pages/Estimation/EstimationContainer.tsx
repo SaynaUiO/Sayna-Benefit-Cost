@@ -15,6 +15,7 @@ import PageHeader from "@atlaskit/page-header";
 import Tooltip from "@atlaskit/tooltip";
 import Lozenge, { ThemeAppearance } from "@atlaskit/lozenge";
 import { ProgressIndicator } from "@atlaskit/progress-indicator";
+import { SpotlightTarget } from "@atlaskit/onboarding";
 
 export const EstimationContainer = () => {
   const {
@@ -90,39 +91,80 @@ export const EstimationContainer = () => {
           </div>
         </>
       )}
-      <Box xcss={containerStyle}>
-        {!stepwiseTabOpen && (
-          <Box xcss={HeaderGridStyle}>
-            <UpperGoalContainer>
-              {upperGoals.map((upperGoal) => {
-                return (
-                  <EstimationUpperGoalLabel
-                    key={`${upperGoal.id}-label`}
-                    upperGoal={upperGoal}
-                  />
-                );
-              })}
-            </UpperGoalContainer>
+      <SpotlightTarget name="estimation-table">
+        <Box xcss={containerStyle}>
+          {!stepwiseTabOpen && (
+            <Box xcss={HeaderGridStyle}>
+              <UpperGoalContainer>
+                {upperGoals.map((upperGoal) => {
+                  return (
+                    <EstimationUpperGoalLabel
+                      key={`${upperGoal.id}-label`}
+                      upperGoal={upperGoal}
+                    />
+                  );
+                })}
+              </UpperGoalContainer>
+            </Box>
+          )}
+          {/* ContentGrid */}
+          <Box xcss={ContentGridStyle}>
+            {estimationTargets.map((target, index) => {
+              return (
+                <EstimationTargetContextProvider
+                  key={target.scope.id}
+                  index={index}
+                  simplified={stepwiseTabOpen}
+                  currentStep={activeStep}
+                />
+              );
+            })}
           </Box>
-        )}
-        {/* ContentGrid */}
-        <Box xcss={ContentGridStyle}>
-          {estimationTargets.map((target, index) => {
-            return (
-              <EstimationTargetContextProvider
-                key={target.scope.id}
-                index={index}
-                simplified={stepwiseTabOpen}
-                currentStep={activeStep}
-              />
-            );
-          })}
-        </Box>
-        {stepwiseTabOpen && (
+          {stepwiseTabOpen && (
+            <Flex
+              xcss={xcss({
+                position: "sticky",
+                bottom: "48px",
+                padding: "space.100",
+                backgroundColor: "elevation.surface.sunken",
+                zIndex: "dialog",
+                borderTop: "1px solid",
+                borderColor: "color.border",
+                justifyContent: "flex-end",
+              })}
+            >
+              <ButtonGroup>
+                <Button
+                  appearance={appearance}
+                  isDisabled={
+                    getUpperGoalDP(upperGoals[activeStep].id) ===
+                    pointsToDistribute
+                  }
+                >
+                  {getUpperGoalDP(upperGoals[activeStep].id)} /{" "}
+                  {pointsToDistribute}
+                </Button>
+                <Button
+                  onClick={() => setActiveStep((active) => active - 1)}
+                  appearance="danger"
+                  isDisabled={activeStep === 0}
+                >
+                  Tilbake
+                </Button>
+                <Button
+                  onClick={() => setActiveStep((active) => active + 1)}
+                  appearance="primary"
+                  isDisabled={activeStep === stages.length - 1}
+                >
+                  Neste
+                </Button>
+              </ButtonGroup>
+            </Flex>
+          )}
           <Flex
             xcss={xcss({
               position: "sticky",
-              bottom: "48px",
+              bottom: "0px",
               padding: "space.100",
               backgroundColor: "elevation.surface.sunken",
               zIndex: "dialog",
@@ -132,68 +174,29 @@ export const EstimationContainer = () => {
             })}
           >
             <ButtonGroup>
-              <Button
-                appearance={appearance}
-                isDisabled={
-                  getUpperGoalDP(upperGoals[activeStep].id) ===
-                  pointsToDistribute
-                }
-              >
-                {getUpperGoalDP(upperGoals[activeStep].id)} /{" "}
-                {pointsToDistribute}
-              </Button>
-              <Button
-                onClick={() => setActiveStep((active) => active - 1)}
-                appearance="danger"
-                isDisabled={activeStep === 0}
-              >
-                Tilbake
-              </Button>
-              <Button
-                onClick={() => setActiveStep((active) => active + 1)}
+              <Tooltip content="Assign benefit points one goal at a time">
+                <Button
+                  onClick={() =>
+                    setStepwiseTabOpen((currentValue) => !currentValue)
+                  }
+                >
+                  Fordel trinnvis
+                </Button>
+              </Tooltip>
+              <LoadingButton
                 appearance="primary"
-                isDisabled={activeStep === stages.length - 1}
+                isDisabled={!readyToSubmit}
+                isLoading={isSubmitting}
+                onClick={() => {
+                  onSubmit();
+                }}
               >
-                Neste
-              </Button>
+                Lagre
+              </LoadingButton>
             </ButtonGroup>
           </Flex>
-        )}
-        <Flex
-          xcss={xcss({
-            position: "sticky",
-            bottom: "0px",
-            padding: "space.100",
-            backgroundColor: "elevation.surface.sunken",
-            zIndex: "dialog",
-            borderTop: "1px solid",
-            borderColor: "color.border",
-            justifyContent: "flex-end",
-          })}
-        >
-          <ButtonGroup>
-            <Tooltip content="Assign benefit points one goal at a time">
-              <Button
-                onClick={() =>
-                  setStepwiseTabOpen((currentValue) => !currentValue)
-                }
-              >
-                Fordel trinnvis
-              </Button>
-            </Tooltip>
-            <LoadingButton
-              appearance="primary"
-              isDisabled={!readyToSubmit}
-              isLoading={isSubmitting}
-              onClick={() => {
-                onSubmit();
-              }}
-            >
-              Lagre
-            </LoadingButton>
-          </ButtonGroup>
-        </Flex>
-      </Box>
+        </Box>
+      </SpotlightTarget>
     </>
   );
 };

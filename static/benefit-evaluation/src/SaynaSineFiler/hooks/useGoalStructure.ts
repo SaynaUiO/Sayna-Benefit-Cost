@@ -116,40 +116,55 @@ export const useGoalStructure = () => {
     setIsDrawerOpen(true);
   };
 
-  //Delete goal handler:
-  const handleDeleteGoal = useCallback(
-    async (goalId: string) => {
-      const goalToDelete = goals?.find((g) => g.id === goalId);
+// Delete goal handler:
+// NY STATE FOR MODAL OG MÅL
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [goalToDeleteId, setGoalToDeleteId] = useState<string | null>(null);
+    
+    // Finn målet som er aktuelt for sletting (for å vise navn i modalen)
+    const goalToDelete = goals?.find(g => g.id === goalToDeleteId);
 
-      if (!goalToDelete) {
-        alert("Goal not found in current data set. Cannot delete.");
-        return;
-      }
-      if (
-        !window.confirm(
-          `Er du sikker på at du vil slette målet ${
-            goalToDelete.key || goalId
-          }?`
-        )
-      ) {
-        return;
-      }
+    // Funksjon for å starte sletteprosessen (kalles fra sletteknappen i UI)
+    const openDeleteModal = useCallback((goalId: string) => {
+        setGoalToDeleteId(goalId);
+        setIsDeleteModalOpen(true);
+    }, []);
 
-      const collectionId = goalToDelete.goalCollectionId;
+    // Funksjon for å lukke modalen
+    const closeDeleteModal = useCallback(() => {
+        setIsDeleteModalOpen(false);
+        setGoalToDeleteId(null); // Nullstill ID ved lukking
+    }, []);
 
-      try {
-        await api.goal.delete(scope.id, collectionId, goalId);
-        console.log(
-          `Goal deleted successfully from ${collectionId}: ${goalId}`
-        );
-        fetchAndOrganizeGoals();
-      } catch (error) {
-        console.error("Failed to delete goal:", error);
-        alert("Klarte ikke å slette målet. Vennligst prøv igjen.");
-      }
+const handleDeleteGoal = useCallback(async () => {
+        const goal = goalToDelete; // Hent målet fra state
+
+        if (!goal) {
+            console.error("Attempted delete without a selected goal.");
+            closeDeleteModal();
+            return;
+        }
+
+        const goalId = goal.id;
+        const collectionId = goal.goalCollectionId;
+        
+        try {
+            // 1. API Kall for sletting
+            await api.goal.delete(scope.id, collectionId, goalId);
+            console.log(`Goal deleted successfully from ${collectionId}: ${goalId}`);
+            
+            // 2. Oppdater UI og lukk
+            fetchAndOrganizeGoals();
+            closeDeleteModal(); 
+            
+        } catch (error) {
+            console.error("Failed to delete goal:", error);
+            alert("Klarte ikke å slette målet. Vennligst prøv igjen.");
+            closeDeleteModal(); 
+        }
     },
-    [scope.id, api.goal, fetchAndOrganizeGoals, goals]
-  );
+    [scope.id, api.goal, fetchAndOrganizeGoals, closeDeleteModal, goalToDelete]
+);
 
 
   //Handle update Objectiove description: 
@@ -228,6 +243,14 @@ export const useGoalStructure = () => {
     formaalGoals,
     formaalCollectionData,
     effektGoals,
+
+    deleteModal: { 
+        isOpen: isDeleteModalOpen,
+        goalToDelete: goalToDelete,
+        open: openDeleteModal, 
+        close: closeDeleteModal, 
+        confirm: handleDeleteGoal, 
+    },
 
     //Handelers:
     handlers: {

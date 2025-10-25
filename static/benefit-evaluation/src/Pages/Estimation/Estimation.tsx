@@ -10,6 +10,7 @@ import PageHeader from "@atlaskit/page-header";
 import { EstimationContainer } from "./EstimationContainer";
 import { EstimationContextProvider } from "./EstimationContext";
 import { GoalTier, EstimationMode, EstimationProps } from "../../Models";
+import { Spotlight, SpotlightTransition } from "@atlaskit/onboarding";
 
 export const Estimation = () => {
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -22,6 +23,20 @@ export const Estimation = () => {
   const navigate = useNavigate();
   const [scope] = useAppContext();
   const api = useAPI();
+  const [isOnboardingCompleted, setOnboardingCompleted] =
+    useState<boolean>(true);
+  const [activeSpotlight, setActiveSpotlight] = useState<null | number>(null);
+  const next = () => setActiveSpotlight((activeSpotlight || 0) + 1);
+  const back = () => setActiveSpotlight((activeSpotlight || 1) - 1);
+  const end = () => {
+    api.onboarding.setOnboardingComplete(true);
+    setActiveSpotlight(0);
+    setOnboardingCompleted(true);
+  };
+  const navToAnalysis = () => {
+    // Hvis dette er siste spotlight
+    navigate("../analysis");
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -99,8 +114,87 @@ export const Estimation = () => {
     );
   }, [error]);
 
+  //Fortsetter Onboarding:
+  useEffect(() => {
+    // Sjekk om onboardingen er fullført
+    api.onboarding.isOnboardingComplete().then((completed: boolean) => {
+      if (!completed) {
+        // Hvis IKKE fullført, start Estimation-spesifikke spotlights her
+        setActiveSpotlight(0);
+      }
+    });
+  }, [api]);
+
+  const renderActiveSpotlight = () => {
+    const spotlights = [
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Next",
+          },
+          {
+            onClick: () => next(),
+            text: "neste",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Relasjon evaluering"
+        target="relation"
+        key="relation"
+      >
+        Her velger du hvilken målnivå relasjon du ønsker å evaluere.
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Next",
+          },
+          {
+            onClick: () => next(),
+            text: "neste",
+            appearance: "subtle",
+          },
+        ]}
+        heading=""
+        target="estimation-table"
+        key="estimation-table"
+      >
+        I denne tabellen fordeler du nyttepoeng....
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          {
+            onClick: () => navToAnalysis(),
+            text: "Fortsett i periodisering ->",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Periodisering"
+        target="analysis"
+        key="analysis"
+      >
+        Videre har vi periodisering....
+      </Spotlight>,
+    ];
+
+    if (activeSpotlight === null) {
+      return null;
+    }
+
+    return spotlights[activeSpotlight];
+  };
+
   return (
     <>
+      {activeSpotlight !== null && (
+        <SpotlightTransition>{renderActiveSpotlight()}</SpotlightTransition>
+      )}
       <PageHeader
         bottomBar={
           <SelectGoalCollections

@@ -17,6 +17,7 @@ export const GoalStructure = () => {
   const [items, setItems] = useState<GoalTier[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isRankable, setRankable] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const [scope] = useAppContext();
   const api = useAPI();
@@ -67,6 +68,10 @@ export const GoalStructure = () => {
     setActiveSpotlight(0);
     setOnboardingCompleted(true);
   };
+  const navToEstimation = () => {
+    // Hvis dette er siste spotlight
+    navigate("../estimation");
+  };
 
   const renderActiveSpotlight = () => {
     const spotlights = [
@@ -82,12 +87,12 @@ export const GoalStructure = () => {
             appearance: "subtle",
           },
         ]}
-        heading="Benefit/Cost"
+        heading="BenefitOKR"
         target="project"
         key="project"
       >
-        Thanks for using Benefit/Cost, a brief introduction of the project pages
-        will now follow.
+        Takk for at du bruker Benefit Management med OKR (BenefitOKR). En kort
+        introduksjon av prosjektsiden vil nå presenteres.
       </Spotlight>,
       <Spotlight
         actions={[
@@ -101,20 +106,97 @@ export const GoalStructure = () => {
             appearance: "subtle",
           },
         ]}
-        heading="Goal Structure"
+        heading="Målstruktur"
         target="goal-structure"
         key="goal-structure"
       >
-        View and administrate all the goal collections, set cost and time per
-        epic and create goals. A goal structure is a layer/tier of goals, at the
-        bottom you can find epics, above that you might find project goals,
-        followed by company goals and so on.
+        Denne siden viser og administrerer alle målsamlinger. Den er strukturert
+        i OKR form med tre tabeller: Formål (Objective), Planlagte
+        Nyttevirkninger (Key Results), og Produkt (Epic).
       </Spotlight>,
       <Spotlight
         actions={[
           {
             onClick: () => next(),
             text: "Next",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Formål"
+        target="inline-text"
+        key="inline-text"
+      >
+        Her kan du skrive formålet med prosjektet direkte i feltet. Trykk på
+        "✓"-symbolet når du er ferdig.
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Next",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading=""
+        target="add-goal"
+        key="add-goal"
+      >
+        Under "Handlinger" finner du et pluss-tegn i hver av de tre tabellene.
+        Ved å trykke på denne kan du opprette mål som hører til den aktualle
+        tabellen.
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Next",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Rediger og slett et mål "
+        target="edit/delete-goal"
+        key="edit/delete-goal"
+      >
+        Her kan du redigere og slette et mål du har laget.
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Next",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Legg til kostnad og tid verdier"
+        target="cost/time"
+        key="cost/time"
+      >
+        For et produkt kan du fordele kostnader og legge til tid.
+      </Spotlight>,
+
+      <Spotlight
+        actions={[
+          {
+            onClick: () => {
+              navToEstimation();
+            },
+            text: "Fortsett i estimering ->",
           },
           {
             onClick: () => back(),
@@ -127,41 +209,6 @@ export const GoalStructure = () => {
         key="estimation"
       >
         The estimation tab is used for assigning benefit points to each task.
-      </Spotlight>,
-      <Spotlight
-        actions={[
-          {
-            onClick: () => next(),
-            text: "Next",
-          },
-          {
-            onClick: () => back(),
-            text: "Back",
-            appearance: "subtle",
-          },
-        ]}
-        heading="Analysis"
-        target="analysis"
-        key="analysis"
-      >
-        View an analysis of graphs and a table over all the entered values and
-        sort by the preferred metric. Graphs like burndown chart, timeline
-        chart.
-      </Spotlight>,
-      <Spotlight
-        actions={[
-          { onClick: () => end(), text: "OK" },
-          {
-            onClick: () => back(),
-            text: "Go back",
-            appearance: "subtle",
-          },
-        ]}
-        heading="Restart Onboarding"
-        target="restart-onboarding"
-        key="restart-onboarding"
-      >
-        You can restart this onboarding at any time by pressing this help icon.
       </Spotlight>,
     ];
 

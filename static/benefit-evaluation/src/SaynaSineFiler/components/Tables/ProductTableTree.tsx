@@ -14,6 +14,7 @@ import { Goal } from "../../../Models";
 import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
 import Lozenge from "@atlaskit/lozenge";
 import { EPIC_COLLECTION_ID } from "../../constants/goalConstants";
+import { SpotlightTarget } from "@atlaskit/onboarding";
 
 interface ProductRootItem {
   id: typeof EPIC_COLLECTION_ID;
@@ -59,7 +60,7 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
         <Header width={700}>Beskrivelse</Header>
         <Header width={100}>Tid</Header>
         <Header width={120}>Kostnad</Header>
-        <Header width={100}>Benefit Points</Header>
+        <Header width={100}>Nytte Poeng</Header>
         <Header width={130}>Handlinger</Header>
       </Headers>
 
@@ -109,14 +110,18 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                 )}
 
                 {/* Cost/Time Button  */}
-                {isRoot && (
-                  <Button
-                    appearance="subtle"
-                    iconBefore={<BitbucketCompareIcon size="small" label="" />}
-                    isDisabled={isDataEmpty} // Deaktiver knappen hvis det ikke er noen Epics
-                    onClick={() => onSetCostTime(epicGoals)} // Sender alle Epics
-                  ></Button>
-                )}
+                <SpotlightTarget name="cost/time">
+                  {isRoot && (
+                    <Button
+                      appearance="subtle"
+                      iconBefore={
+                        <BitbucketCompareIcon size="small" label="" />
+                      }
+                      isDisabled={isDataEmpty} // Deaktiver knappen hvis det ikke er noen Epics
+                      onClick={() => onSetCostTime(epicGoals)} // Sender alle Epics
+                    ></Button>
+                  )}
+                </SpotlightTarget>
 
                 {/* Edit Button  */}
                 {isLiveGoal && (

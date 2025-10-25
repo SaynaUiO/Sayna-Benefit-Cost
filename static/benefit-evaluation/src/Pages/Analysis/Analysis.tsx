@@ -21,6 +21,7 @@ import { EpicSelectionTable } from "./EpicSelectionTable";
 import { TotalResultsTable } from "./TotalResultsTable";
 // VIKTIG: Importerer den nye containeren
 import { PeriodizationChartContainer } from "./PeriodizationChartContainer";
+import { Spotlight, SpotlightTransition } from "@atlaskit/onboarding";
 
 export const Analysis = () => {
   const [scope] = useAppContext();
@@ -38,6 +39,18 @@ export const Analysis = () => {
 
   const MIN_YEARS = 10;
   const MAX_YEARS = 20;
+
+  //Onboarding:
+  const [isOnboardingCompleted, setOnboardingCompleted] =
+    useState<boolean>(true);
+  const [activeSpotlight, setActiveSpotlight] = useState<null | number>(null);
+  const next = () => setActiveSpotlight((activeSpotlight || 0) + 1);
+  const back = () => setActiveSpotlight((activeSpotlight || 1) - 1);
+  const end = () => {
+    api.onboarding.setOnboardingComplete(true);
+    setActiveSpotlight(null);
+    setOnboardingCompleted(true);
+  };
 
   // KONTROLLFUNKSJONER (BEHOLDES HER da de endrer STATE)
   const incrementYears = useCallback(() => {
@@ -139,8 +152,144 @@ export const Analysis = () => {
   // FJERNEDE USEMEMO FOR chartData og chartDataJs.
   // Denne logikken ligger nå i PeriodizationChartContainer.tsx
 
+  //Fortsetter Onboarding:
+  useEffect(() => {
+    // Sjekk om onboardingen er fullført
+    api.onboarding.isOnboardingComplete().then((completed: boolean) => {
+      if (!completed) {
+        // Hvis IKKE fullført, start Estimation-spesifikke spotlights her
+        setActiveSpotlight(0);
+      }
+    });
+  }, [api]);
+
+  const renderActiveSpotlight = () => {
+    const spotlights = [
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Neste",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading=""
+        target="first-table"
+        key="first-table"
+      >
+        Her ser vi en tabell over alle Epics med deres tilhørende Nyttepoeng- og
+        kostnads-verdier som vi fordelte tidligere.
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Neste",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading=""
+        target="profile"
+        key="profile"
+      >
+        Ved å endre på profilene, vil du også endre på tabellen og grafen under.
+        På denne siden er alt dynamisk.
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Neste",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading=""
+        target="second-table"
+        key="second-table"
+      >
+        Denne tabellen viser finansiell plan over 10 til 20 år. Den viser den
+        samlede nytten (BP) og kostnaden (SP) for epicsene.
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Neste",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading=""
+        target="year-tooltip"
+        key="year-tooltip"
+      >
+        Med disse pilene kan du justere på årene.
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Neste",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading=""
+        target="third-table"
+        key="third-table"
+      >
+        Dette er en dynamisk graf som endrer seg når du endrer på profilene. Med
+        denne grafen kan du lett analysere de ulike verdiene i forhold til
+        hverandre. Du kan også trykk på de 4 boksene på toppen av grafen som
+        representerer hver verdi, for å skjule dem i grafen.
+      </Spotlight>,
+      <Spotlight
+        actions={[
+          { onClick: () => end(), text: "OK" },
+          {
+            onClick: () => back(),
+            text: "Go back",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Restart Onboarding"
+        target="restart-onboarding"
+        key="restart-onboarding"
+      >
+        You can restart this onboarding at any time by pressing this help icon.
+      </Spotlight>,
+    ];
+
+    if (activeSpotlight === null) {
+      return null;
+    }
+
+    return spotlights[activeSpotlight];
+  };
+
   return (
     <>
+      {activeSpotlight !== null && (
+        <SpotlightTransition>{renderActiveSpotlight()}</SpotlightTransition>
+      )}
       <PageHeader>Periodisering</PageHeader>
       <p>
         På denne siden får du en oversikt over estimeringen av benefit of cost

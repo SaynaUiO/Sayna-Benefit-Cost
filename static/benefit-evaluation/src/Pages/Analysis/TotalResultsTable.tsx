@@ -7,6 +7,7 @@ import HipchatChevronDoubleDownIcon from "@atlaskit/icon/glyph/hipchat/chevron-d
 
 // Importer typen for periodiseringsresultatene
 import { PeriodizationPeriodResult } from "./periodizationCalculations"; // Antar at stien er riktig
+import { Spotlight, SpotlightTarget } from "@atlaskit/onboarding";
 
 // Definerer props for denne komponenten
 interface TotalResultsTableProps {
@@ -56,44 +57,51 @@ export const TotalResultsTable: React.FC<TotalResultsTableProps> = ({
   }, [periodizationResults]);
 
   return (
-    <div>
-      {/* KONTROLL FOR TIDSRAMME (KNAPPER) - Flyttet fra Analysis.tsx */}
-      <div
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <h3 style={{ marginRight: "10px" }}>
-          Finansiell plan over {numberOfPeriods} år
-        </h3>
+    <>
+      <div>
+        {/* KONTROLL FOR TIDSRAMME (KNAPPER) - Flyttet fra Analysis.tsx */}
+        <div
+          style={{
+            marginBottom: "20px",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <h3 style={{ marginRight: "10px" }}>
+            Finansiell plan over {numberOfPeriods} år
+          </h3>
 
-        {/* Knapp for å redusere år */}
-        <Tooltip content={"Reduser antall år"}>
-          <Button
-            onClick={decrementYears}
-            isDisabled={numberOfPeriods <= MIN_YEARS}
-            iconBefore={<HipchatChevronDoubleDownIcon label="Reduser år" />}
-          />
-        </Tooltip>
+          {/* Knapp for å redusere år */}
+          <SpotlightTarget name="year-tooltip">
+            <Tooltip content={"Reduser antall år"}>
+              <Button
+                onClick={decrementYears}
+                isDisabled={numberOfPeriods <= MIN_YEARS}
+                iconBefore={<HipchatChevronDoubleDownIcon label="Reduser år" />}
+              />
+            </Tooltip>
+          </SpotlightTarget>
 
-        {/* Knapp for å øke år */}
-        <Tooltip content={"Øk antall år"}>
-          <Button
-            onClick={incrementYears}
-            isDisabled={numberOfPeriods >= MAX_YEARS}
-            iconBefore={<HipchatChevronDoubleUpIcon label="Øk år" />}
-          />
-        </Tooltip>
+          {/* Knapp for å øke år */}
+          <Tooltip content={"Øk antall år"}>
+            <Button
+              onClick={incrementYears}
+              isDisabled={numberOfPeriods >= MAX_YEARS}
+              iconBefore={<HipchatChevronDoubleUpIcon label="Øk år" />}
+            />
+          </Tooltip>
+        </div>
+
+        <DynamicTable
+          head={totalTableHead}
+          rows={totalTableRows}
+          rowsPerPage={4}
+          defaultPage={1}
+        />
       </div>
-
-      <DynamicTable
-        head={totalTableHead}
-        rows={totalTableRows}
-        rowsPerPage={4}
-        defaultPage={1}
-      />
-    </div>
+      <SpotlightTarget name="second-table">
+        <div></div>
+      </SpotlightTarget>
+    </>
   );
 };
