@@ -158,7 +158,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
     <ModalTransition>
       <Modal onClose={() => onClose(false)}>
         <ModalHeader>
-          <ModalTitle>Angi Kostnader og Tid</ModalTitle>
+          <ModalTitle>Angi kostnader og tid</ModalTitle>
         </ModalHeader>
         <ModalBody>
           <Stack space="space.100">
@@ -166,18 +166,16 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
               <>
                 <Inline space="space.050">
                   {props.upperIsMonetary
-                    ? "Kostnaden er de forventede livssykluskostnadene for hver epic."
-                    : "Kostnaden er de forventede relative livssykluskost-poengene for hver epic."}{" "}
-                  Og alle disse verdiene vil bli normalisert til totalt 100
-                  kostnadspoeng.
+                    ? "Kostnaden er de forventede livssykluskostnadene for hver enkelt epic."
+                    : "Kostnaden er de forventede livssykluskostnadspoengene for hver epic, angitt i relative poeng."}{" "}
                 </Inline>
                 <Inline space="space.050">
-                  Tiden er den forventede relative tiden for å fullføre hver
-                  epic. Dette er en relativ verdi, altså ikke i timer eller
-                  dager.
+                  Tiden er den forventede relative tiden det tar å fullføre hver
+                  epic. Dette er en relativ verdi, og måles derfor ikke i timer
+                  eller dager.
                 </Inline>
                 <Inline space="space.050">
-                  {"Total costs:"}
+                  {"Total kostnad:"}
                   <Tooltip content={"Total costs"}>
                     <Lozenge appearance="new" isBold>
                       {total}
@@ -185,7 +183,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
                   </Tooltip>
                 </Inline>
                 <Inline space="space.050">
-                  {"Total time:"}
+                  {"Total tid:"}
                   <Tooltip content={"Total time"}>
                     <Lozenge appearance="new" isBold>
                       {total_time}
@@ -234,7 +232,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
                       />
                     ))}
                   </Flex>
-                  <HelperMessage>All fields need to be filled</HelperMessage>
+                  <HelperMessage>Alle felt må fylles ut.</HelperMessage>
                 </div>
               </>
             ) : (
@@ -244,7 +242,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
         </ModalBody>
         <ModalFooter>
           <Button appearance="subtle" onClick={() => onClose(false)}>
-            Cancel
+            Avbryt
           </Button>
           <LoadingButton
             appearance="primary"
@@ -252,7 +250,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
             isDisabled={!validate}
             onClick={() => submit()}
           >
-            Set Time and Cost
+            Angi kostnader og tid
           </LoadingButton>
         </ModalFooter>
       </Modal>
