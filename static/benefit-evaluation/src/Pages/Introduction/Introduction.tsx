@@ -13,10 +13,10 @@ export const Introduction = () => {
   return (
     <div style={{ padding: "2rem" }}>
       <h1 style={{ paddingBottom: "1rem" }}>Velkommen til BenefitOKR</h1>
-      Benefit/cost management er en strategisk tilnærming for å vurdere om
+      BenefitOKR management er en strategisk tilnærming for å vurdere om
       investeringene i et prosjekt kan rettferdiggjøres ut fra nytten det gir.
-      Mer informasjon om benefit/cost management finner du nedenfor.
-      <h2 style={{ paddingBottom: "1rem" }}>Forstå Benefit/Cost Management</h2>
+      Mer informasjon om BenefitOKR management finner du nedenfor.
+      <h2 style={{ paddingBottom: "1rem" }}>Forstå BenefitOKR Management</h2>
       <section>
         <Box xcss={boxStyles}>
           <p>Innebærer:</p>
@@ -43,8 +43,8 @@ export const Introduction = () => {
       <h2 style={{ paddingBottom: "1rem" }}>Vanlige fremgangsmåte</h2>
       <Box xcss={boxStyles}>
         <p>
-          Dette er noen av de typiske trinnene i benefit/cost-prosessen som du
-          vil utføre i denne appen:
+          Dette er noen av de typiske trinnene i BenefitOKR-prosessen som du vil
+          utføre i denne appen:
         </p>
         <ol>
           <li>
