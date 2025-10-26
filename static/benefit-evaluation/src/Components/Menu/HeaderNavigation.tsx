@@ -80,7 +80,7 @@ export const HeaderNavigation = () => {
   const DefaultSettings = () => (
     <SpotlightTarget name="settings">
       <Settings
-        tooltip="Settings"
+        tooltip="Innsitillinger"
         isSelected={selectedTab === "Settings"}
         onClick={() => navigate("settings")}
       />
@@ -94,7 +94,7 @@ export const HeaderNavigation = () => {
       renderHelp={() => (
         <SpotlightTarget name="restart-onboarding">
           <Help
-            tooltip="Restart onboarding"
+            tooltip="Start onboardingen på nytt"
             onClick={() => {
               api.onboarding.setOnboardingComplete(false).then(() => {
                 navigate("/goal-structure");

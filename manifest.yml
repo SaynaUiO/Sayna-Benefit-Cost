@@ -5,7 +5,7 @@ modules:
       queue: queue-name
       resolver:
         function: resolver
-      title: Sayna:)
+      title: BenefitOKR
       layout: blank
   function:
     - key: resolver
