@@ -87,23 +87,21 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
 
               {/* KOLONNE 2: Beskrivelse */}
               <Cell>
-                <SpotlightTarget name="inline-text">
-                  {isRoot && (
-                    <InlineEdit
-                      defaultValue={
-                        (item as ObjectiveRootItem).description || ""
-                      }
-                      editView={({ errorMessage, ...fieldProps }) => (
-                        // @ts-ignore
-                        <TextArea
-                          {...fieldProps}
-                          isCompact={false}
-                          minimumRows={2}
-                          resize="horizontal"
-                          placeholder="Skriv inn beskrivelse her..."
-                        />
-                      )}
-                      readView={() => (
+                {isRoot && (
+                  <InlineEdit
+                    defaultValue={(item as ObjectiveRootItem).description || ""}
+                    editView={({ errorMessage, ...fieldProps }) => (
+                      // @ts-ignore
+                      <TextArea
+                        {...fieldProps}
+                        isCompact={false}
+                        minimumRows={2}
+                        resize="horizontal"
+                        placeholder="Skriv inn beskrivelse her..."
+                      />
+                    )}
+                    readView={() => (
+                      <SpotlightTarget name="inline-text">
                         <div
                           style={{
                             minHeight: "2em",
@@ -114,22 +112,23 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                           {(item as ObjectiveRootItem).description ||
                             "Legg til en beskrivelse her"}
                         </div>
-                      )}
-                      onConfirm={(newValue) =>
-                        handleUpdateCollectionDescription(
-                          item as unknown as GoalCollection,
-                          newValue
-                        )
-                      }
-                      editButtonLabel={
-                        (item as ObjectiveRootItem).description ||
-                        "Legg til beskrivelse"
-                      }
-                      keepEditViewOpenOnBlur
-                      readViewFitContainerWidth
-                    />
-                  )}
-                </SpotlightTarget>
+                      </SpotlightTarget>
+                    )}
+                    onConfirm={(newValue) =>
+                      handleUpdateCollectionDescription(
+                        item as unknown as GoalCollection,
+                        newValue
+                      )
+                    }
+                    editButtonLabel={
+                      (item as ObjectiveRootItem).description ||
+                      "Legg til beskrivelse"
+                    }
+                    keepEditViewOpenOnBlur
+                    readViewFitContainerWidth
+                  />
+                )}
+
                 {isLiveGoal && goal.description}
               </Cell>
 
