@@ -67,6 +67,21 @@
     "uuid": "^11.1.0",
     "web-vitals": "^2.1.4"
   },
+  "overrides": {
+  "react": "$react", 
+  "@atlaskit/atlassian-navigation": {
+    "react": "$react"
+  },
+  
+  "react-dom": "$react-dom",
+  "@atlaskit/page-layout": {
+    "react-dom": "$react-dom"
+  },
+
+  "@apideck/better-ajv-errors": {
+      "ajv": "8.17.1"
+  }
+},
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
