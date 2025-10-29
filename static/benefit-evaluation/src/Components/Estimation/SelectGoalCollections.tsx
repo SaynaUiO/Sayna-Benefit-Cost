@@ -59,16 +59,12 @@ export const SelectGoalCollections = ({
       .then((goalTiers) => {
         console.log("Rådata fra getAll:", goalTiers);
 
-        // 🎯 NY RENSELOGIKK: FJERN UØNSKEDE 'GOALS' OG LEGG TIL MANGLENDE 'SCOPEID'
-        // Dette trinnet er helt riktig!
         const cleanedGoalTiers = goalTiers.map((tier) => {
-          // Setter ScopeID og fjerner goals for Formål
           if (tier.id === "root-formaal" && (tier as any).goals) {
             const cleanTier = { ...tier, scopeId: tier.scopeId || scope.id };
             delete (cleanTier as any).goals;
             return cleanTier as GoalTier;
           }
-          // Legger til ScopeID for andre nivåer som mangler det
           if (!tier.scopeId) {
             return { ...tier, scopeId: scope.id } as GoalTier;
           }
