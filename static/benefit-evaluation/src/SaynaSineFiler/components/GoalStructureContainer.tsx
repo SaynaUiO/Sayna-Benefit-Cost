@@ -45,7 +45,7 @@ export const GoalStructureContainer = () => {
       {/* Mål Tabell (Objective) */}
       <ObjectiveTableTree
         data={formaalGoals}
-        onAddGoal={(goalCollectionId) =>
+        onAddGoal={(_parentId, goalCollectionId) =>
           handleAddGoal("Objective", goalCollectionId)
         }
         onEditGoal={handleEditGoal}

@@ -249,6 +249,14 @@ export const Estimation = () => {
           {isLoading && <Loading />}
         </>
       )}
+
+      {/* <pre className="text-xs mt-4 bg-gray-100 p-2">
+        {JSON.stringify(upperGoalTier, null, 3)}
+      </pre>
+
+      <pre className="text-xs mt-4 bg-gray-100 p-2">
+        {JSON.stringify(goalTier, null, 3)}
+      </pre> */}
     </>
   );
 };

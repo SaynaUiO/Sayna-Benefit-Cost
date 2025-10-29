@@ -59,34 +59,51 @@ export const SelectGoalCollections = ({
       .then((goalTiers) => {
         console.log("Rådata fra getAll:", goalTiers);
 
+        // 🎯 NY RENSELOGIKK: FJERN UØNSKEDE 'GOALS' OG LEGG TIL MANGLENDE 'SCOPEID'
+        // Dette trinnet er helt riktig!
+        const cleanedGoalTiers = goalTiers.map((tier) => {
+          // Setter ScopeID og fjerner goals for Formål
+          if (tier.id === "root-formaal" && (tier as any).goals) {
+            const cleanTier = { ...tier, scopeId: tier.scopeId || scope.id };
+            delete (cleanTier as any).goals;
+            return cleanTier as GoalTier;
+          }
+          // Legger til ScopeID for andre nivåer som mangler det
+          if (!tier.scopeId) {
+            return { ...tier, scopeId: scope.id } as GoalTier;
+          }
+
+          return tier;
+        });
+
         //Sorter i riktig girarkisk rekkefølge:
         const HIERARCHY_ORDER = ["Formål", "Planlagte Nyttevirkninger", "Epic"];
 
         // 3. Sorter validGoalTiers: Formål (0) -> Nytte (1) -> Epic (2)
-        goalTiers.sort((a, b) => {
+        cleanedGoalTiers.sort((a, b) => {
           const aIndex = HIERARCHY_ORDER.indexOf(a.name);
           const bIndex = HIERARCHY_ORDER.indexOf(b.name);
           return aIndex - bIndex;
         });
 
-        const estimationOptions: GoalTierOption[] = []; //Lager en tom liste
-        for (let index = 0; index < goalTiers.length - 1; index++) {
-          //Itererer gjennom GoalTiers
-          const lowerGoalTier = goalTiers[index + 1]; // Epic (nederst)
-          const upperGoalTier = goalTiers[index]; // Nytte (over)
+        const estimationOptions: GoalTierOption[] = [];
+
+        // 🎯 FIX: BRUK cleanedGoalTiers HER!
+        for (let index = 0; index < cleanedGoalTiers.length - 1; index++) {
+          const lowerGoalTier = cleanedGoalTiers[index + 1];
+          const upperGoalTier = cleanedGoalTiers[index];
 
           // Sørg for at ingen navn er tomme (den defensive fiksingen fra sist)
           const lowerGoalTierName = lowerGoalTier.name || lowerGoalTier.id;
           const upperGoalTierName = upperGoalTier.name || upperGoalTier.id;
           estimationOptions.push({
-            label: `${lowerGoalTierName} - ${upperGoalTierName}`, // Epic - Nytte
+            label: `${lowerGoalTierName} - ${upperGoalTierName}`,
             value: {
-              goalTier: lowerGoalTier, // Dette er "nedre nivå"
-              upperGoalTier: upperGoalTier, // Dette er "øvre nivå"
+              goalTier: lowerGoalTier,
+              upperGoalTier: upperGoalTier,
             },
           });
         }
-        //estimationOptions.reverse(); //Reserveres for at høyere nivå skal vises flrst
         console.debug(estimationOptions);
         return estimationOptions;
       })
