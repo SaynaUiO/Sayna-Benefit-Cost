@@ -96,13 +96,8 @@ export const SetValues = (props: SetValuesProps) => {
 
     try {
       await api.goal.setAllBP(updatedGoals);
-
-      setSubmitting(false); // Skal fjerne loading fra knappen
-
-      // 🌟 AGGRESSIV TEST: Sett 100ms forsinkelse (HÅPER DETTE HJELPER PÅ RENDERINGEN) 🌟
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      onClose(true); // Kaller refresh() -> fetchAndOrganizeGoals()
+      setSubmitting(false);
+      onClose(true);
     } catch (error) {
       console.error("Error setting goal points", error); // Oppdatert melding
       setSubmitting(false);
