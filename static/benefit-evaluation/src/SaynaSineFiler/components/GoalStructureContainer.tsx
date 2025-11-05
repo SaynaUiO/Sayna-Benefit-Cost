@@ -15,7 +15,7 @@ export const GoalStructureContainer = () => {
     loading,
     epicGoals,
     formaalGoals,
-    effektGoals,
+    benefitGoals,
     handlers,
     drawer,
     costTimeModal,
@@ -53,9 +53,9 @@ export const GoalStructureContainer = () => {
       />
       <br />
 
-      {/* Effekt Tabell (Benefit) */}
+      {/* (Benefit) */}
       <BenefitTableTree
-        data={effektGoals}
+        data={benefitGoals}
         onAddGoal={
           (
             _parentId,

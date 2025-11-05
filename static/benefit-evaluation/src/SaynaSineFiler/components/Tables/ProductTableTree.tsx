@@ -57,10 +57,10 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
     <TableTree>
       <Headers>
         <Header width={250}>Produktmål</Header>
-        <Header width={700}>Beskrivelse</Header>
-        <Header width={100}>Tid</Header>
-        <Header width={120}>Kostnad</Header>
-        <Header width={100}>Nytte Poeng</Header>
+        <Header width={720}>Beskrivelse</Header>
+        <Header width={90}>Tid</Header>
+        <Header width={100}>Kostnad</Header>
+        <Header width={125}>Nyttepoeng</Header>
         <Header width={130}>Handlinger</Header>
       </Headers>
 

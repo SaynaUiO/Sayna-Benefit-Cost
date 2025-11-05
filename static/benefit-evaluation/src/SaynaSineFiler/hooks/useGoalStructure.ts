@@ -221,7 +221,7 @@ const handleDeleteGoal = useCallback(async () => {
   const formaalGoals = allGoals.filter(
     (goal) => goal.goalCollectionId === FORMAAL_COLLECTION_ID
   );
-  const effektGoals = allGoals.filter(
+  const benefitGoals = allGoals.filter(
     (goal) => goal.goalCollectionId === NYTTE_COLLECTION_ID
   );
   
@@ -233,7 +233,7 @@ const handleDeleteGoal = useCallback(async () => {
     epicGoals,
     formaalGoals,
     formaalCollectionData,
-    effektGoals,
+    benefitGoals,
 
     //Handelers:
     handlers: {

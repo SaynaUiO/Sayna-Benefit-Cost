@@ -54,10 +54,10 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
       <TableTree>
         <Headers>
           <Header width={250}>Planlagte Nyttevirkninger</Header>
-          <Header width={700}>Beskrivelse</Header>
+          <Header width={720}>Beskrivelse</Header>
+          <Header width={90}></Header>
           <Header width={100}></Header>
-          <Header width={120}></Header>
-          <Header width={150}>Nytte Poeng</Header>
+          <Header width={125}>Nyttepoeng</Header>
           <Header width={130}>Handlinger</Header>
         </Headers>
 
