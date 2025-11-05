@@ -16,6 +16,8 @@ import { FORMAAL_COLLECTION_ID } from "../../constants/goalConstants";
 import { useGoalStructure } from "../../hooks/useGoalStructure";
 import TextArea from "@atlaskit/textarea";
 import { SpotlightTarget } from "@atlaskit/onboarding";
+import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
+import Lozenge from "@atlaskit/lozenge";
 
 interface ObjectiveRootItem {
   id: typeof FORMAAL_COLLECTION_ID;
@@ -58,10 +60,11 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
     <TableTree>
       <Headers>
         <Header width={250}>Formål</Header>
-        <Header width={700}>Beskrivelse</Header>
+        <Header width={720}>Beskrivelse</Header>
+        <Header width={90}></Header>
         <Header width={100}></Header>
-        <Header width={230}></Header>
-        <Header width={120}>Handlinger</Header>
+        <Header width={125}>Nyttepoeng</Header>
+        <Header width={130}>Handlinger</Header>
       </Headers>
 
       <Rows
@@ -135,6 +138,13 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
               <Cell></Cell>
               <Cell></Cell>
 
+              <Cell>
+                {" "}
+                <Lozenge appearance="new" isBold>
+                  {!isRoot && goal.balancedPoints?.value}{" "}
+                </Lozenge>
+              </Cell>
+
               {/* KOLONNE 5: Handlinger */}
               <Cell>
                 {isRoot && (
@@ -147,6 +157,14 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                       onAddGoal(OBJECTIVE_ROOT_ITEM.id, FORMAAL_COLLECTION_ID)
                     }
                   />
+                )}
+
+                {isRoot && (
+                  <Button
+                    appearance="subtle"
+                    iconBefore={<BitbucketCompareIcon size="small" label="" />}
+                    onClick={() => {}} // Sender alle Epics
+                  ></Button>
                 )}
 
                 {isLiveGoal && (
