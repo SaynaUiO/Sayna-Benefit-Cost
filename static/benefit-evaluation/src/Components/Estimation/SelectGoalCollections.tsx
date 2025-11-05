@@ -34,7 +34,7 @@ export const SelectGoalCollections = ({
   onChange,
   isDisabled,
 }: SelectGoalCollectionsProps) => {
-  const [options, setOptions] = useState<GoalTierOption[]>(); //En liste over tilgjengelige valg Epic-Eff, Eff-Org, Org-Samf
+  const [options, setOptions] = useState<GoalTierOption[]>();
   const [isLoading, setLoading] = useState<boolean>(true); //Om data fortsatt hentes
   const [selectedOption, setSelectedOption] = useState<GoalTierOption>(); //Det alternativet som har blitt valgt, f.eks Epic-Eff
 

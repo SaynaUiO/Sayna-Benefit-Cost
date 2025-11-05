@@ -1,22 +1,30 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import DynamicTable from "@atlaskit/dynamic-table";
 import Lozenge from "@atlaskit/lozenge";
 import Select from "@atlaskit/select";
 import { Goal } from "../../Models";
-// Sørg for at du importerer alle nødvendige typer og konstanter
-// OPPDATERT IMPORT
 import {
   EpicProfileSelections,
   ProfileOption,
-  // LEGG TIL DISSE FIRE IMPORTENE:
   benefitProfiles,
   costProfiles,
   benefitProfileMap,
   costProfileMap,
 } from "./periodizationTypes";
 import { SpotlightTarget } from "@atlaskit/onboarding";
+import Button from "@atlaskit/button";
+import CashIcon from "@atlaskit/icon/core/cash";
+import { Box, xcss } from "@atlaskit/primitives";
 
-// Definerer props for denne komponenten
+import Modal, {
+  ModalTransition,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
+} from "@atlaskit/modal-dialog";
+import { EconomicConfig } from "./EconomicConfig";
+
+// *OPPDATERTE PROPS*
 interface EpicSelectionTableProps {
   epicGoals: Goal[] | null;
   profileSelections: EpicProfileSelections;
@@ -25,39 +33,65 @@ interface EpicSelectionTableProps {
     type: "bp" | "sp",
     selectedOption: ProfileOption | null
   ) => void;
+  // *NYE PROPS FOR NOK-BEREGNING*
+  bpNokFactor: number;
+  spNokFactor: number;
+  handleFactorChange: (factorType: "bp" | "sp", newValue: number) => void;
 }
 
-// Head-definisjonen for Epic-tabellen
+// *OPPDATERT HEAD-DEFINISJON*
 const head = {
   cells: [
-    { key: "epic", content: "Epic", width: 15 }, // Økt bredde litt for lesbarhet
+    { key: "epic", content: "Epic", width: 10 },
     { key: "bp", content: "Nyttepoeng (BP)", width: 10 },
+    { key: "bpNok", content: "Nytteverdi (Mill. NOK)", width: 15 }, // NY KOLONNE
     { key: "sp", content: "Kostnad (SP)", width: 10 },
-    { key: "bpProfile", content: "Velg BP profil", width: 30 },
-    { key: "spProfile", content: "Velg SP profil", width: 30 },
+    { key: "spNok", content: "Kostnad (Mill. NOK)", width: 15 }, // NY KOLONNE
+    { key: "bpProfile", content: "Velg BP profil", width: 20 },
+    { key: "spProfile", content: "Velg SP profil", width: 20 },
   ],
 };
-
-// ProfileOptionMap is imported from "./periodizationTypes" and reused here.
 
 export const EpicSelectionTable: React.FC<EpicSelectionTableProps> = ({
   epicGoals,
   profileSelections,
   handleProfileChange,
+  // Tar imot de nye konverteringsfaktorene
+  bpNokFactor,
+  spNokFactor,
+  handleFactorChange, // Ny funksjon
 }) => {
+  // *NY STATE* for å kontrollere Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  // Funksjon for å formatere tallet til én desimal
+  const formatNokValue = (value: number) => {
+    // Sikrer at 0 eller veldig små verdier vises pent
+    if (isNaN(value) || value === 0) return "0.0";
+    return value.toFixed(2).replace(".", ",");
+  };
+
   // Flytter rad-genereringen inn i denne komponenten
   const rows = useMemo(() => {
     return epicGoals?.map((epic) => {
       const epicId = epic.id;
 
-      // Henter de lagrede nøklene (string) fra state
-      // Setter en fallback til standardprofiler, selv om Analysis.tsx burde håndtere defaults.
+      // Henter de rå BP og SP verdiene
+      const rawBP = epic.balancedPoints?.value || 0;
+      const rawSP = epic.issueCost?.cost || 0;
+
+      // *BEREGNING AV NOK-VERDIER*
+      const bpNokValue = rawBP * bpNokFactor;
+      const spNokValue = rawSP * spNokFactor;
+
+      // Henter profilvalg... (Uendret logikk)
       const currentKeys = profileSelections[epicId] || {
         benefitProfileKey: benefitProfiles[0].value,
         costProfileKey: costProfiles[0].value,
       };
-
-      // Konverterer nøkkelen tilbake til ProfileOption for Select-komponenten (visning)
       const currentBP = benefitProfileMap[currentKeys.benefitProfileKey];
       const currentSP = costProfileMap[currentKeys.costProfileKey];
 
@@ -65,22 +99,43 @@ export const EpicSelectionTable: React.FC<EpicSelectionTableProps> = ({
         key: epicId,
         cells: [
           { key: "epic", content: epic.key },
+          // BP (Nyttepoeng)
           {
             key: "bp",
             content: (
               <Lozenge appearance="new" isBold>
-                {String(epic.balancedPoints?.value || "")}
+                {String(rawBP)}
               </Lozenge>
             ),
           },
+          // *NY KOLONNE: Nytteverdi (NOK)*
+          {
+            key: "bpNok",
+            content: (
+              <Lozenge appearance="inprogress" isBold>
+                {formatNokValue(bpNokValue)}
+              </Lozenge>
+            ),
+          },
+          // SP (Kostnad)
           {
             key: "sp",
             content: (
               <Lozenge appearance="success" isBold>
-                {String(epic.issueCost?.cost || "")}
+                {String(rawSP)}
               </Lozenge>
             ),
           },
+          // *NY KOLONNE: Kostnad (NOK)*
+          {
+            key: "spNok",
+            content: (
+              <Lozenge appearance="removed" isBold>
+                {formatNokValue(spNokValue)}
+              </Lozenge>
+            ),
+          },
+          // BP Profil (Uendret logikk)
           {
             key: "bpProfile",
             content: (
@@ -97,6 +152,7 @@ export const EpicSelectionTable: React.FC<EpicSelectionTableProps> = ({
               </SpotlightTarget>
             ),
           },
+          // SP Profil (Uendret logikk)
           {
             key: "spProfile",
             content: (
@@ -118,6 +174,8 @@ export const EpicSelectionTable: React.FC<EpicSelectionTableProps> = ({
     epicGoals,
     profileSelections,
     handleProfileChange,
+    bpNokFactor, // Legg til som avhengighet
+    spNokFactor, // Legg til som avhengighet
     benefitProfileMap,
     costProfileMap,
     benefitProfiles,
@@ -128,13 +186,52 @@ export const EpicSelectionTable: React.FC<EpicSelectionTableProps> = ({
     return <div>Laster Epics eller ingen Epics funnet...</div>;
   }
 
+  const headerContainerStyles = xcss({
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "space.100",
+  });
+
   return (
     <>
-      <DynamicTable
-        caption="Liste over epics og profilvalg"
-        head={head}
-        rows={rows}
-      />
+      <ModalTransition>
+        {isModalOpen && (
+          <Modal onClose={closeModal}>
+            <ModalHeader>
+              <ModalTitle> Konverter poeng til NOK (Millioner)</ModalTitle>
+            </ModalHeader>
+
+            {/* INKLUDERER ECONOMIC CONFIG INNE I MODALEN */}
+            <EconomicConfig
+              bpNokFactor={bpNokFactor}
+              spNokFactor={spNokFactor}
+              onFactorChange={handleFactorChange}
+            />
+
+            <ModalFooter>
+              <Button appearance="primary" onClick={closeModal}>
+                Lagre
+              </Button>
+            </ModalFooter>
+          </Modal>
+        )}
+      </ModalTransition>
+
+      {/* Container for Tittel og Ikon (Løsning på Steg 1) */}
+      <Box xcss={headerContainerStyles}>
+        <h3 style={{ marginRight: "10px" }}>Liste over epics og profilvalg</h3>
+
+        {/* CashIcon-knappen, som åpner Modalen */}
+        <Button
+          appearance="subtle"
+          iconBefore={
+            <CashIcon size="medium" label="Økonomisk konfigurering" />
+          }
+          onClick={openModal} // Åpner Modalen
+        ></Button>
+      </Box>
+
+      <DynamicTable caption=" " head={head} rows={rows} />
       <SpotlightTarget name="first-table">
         <div></div>
       </SpotlightTarget>

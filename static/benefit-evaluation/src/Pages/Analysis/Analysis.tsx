@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import PageHeader from "@atlaskit/page-header";
 import { Goal } from "../../Models";
 import { useAppContext } from "../../Contexts/AppContext";
@@ -39,6 +39,10 @@ export const Analysis = () => {
   const [numberOfPeriods, setNumberOfPeriods] = useState<number>(10);
   const [inputError, setInputError] = useState<string | null>(null); // beholdes for funksjoner
 
+  // *NYE STATS FOR NOK-FAKTORER*
+  const [bpNokFactor, setBpNokFactor] = useState<number>(0.225); // Standardverdi for BP (millioner NOK)
+  const [spNokFactor, setSpNokFactor] = useState<number>(0.6); // Standardverdi for SP (millioner NOK)
+
   const MIN_YEARS = 10;
   const MAX_YEARS = 20;
 
@@ -65,6 +69,18 @@ export const Analysis = () => {
     setNumberOfPeriods((prevYears) => Math.max(prevYears - 1, MIN_YEARS));
   }, []);
 
+  // *NY FUNKSJON: Håndterer endring i NOK-faktor*
+  const handleFactorChange = useCallback(
+    (factorType: "bp" | "sp", newValue: number) => {
+      if (factorType === "bp") {
+        setBpNokFactor(newValue);
+      } else {
+        setSpNokFactor(newValue);
+      }
+    },
+    []
+  );
+
   // --- EFFEKTER OG BEREGNINGER ---
 
   // 1. Beregn periodisering
@@ -78,11 +94,21 @@ export const Analysis = () => {
       const results = calculateTotalPeriodization(
         epicGoals,
         profileSelections,
-        numberOfPeriods
+        numberOfPeriods,
+        // NYE ARGUMENTER: Send inn NOK-faktorene
+        bpNokFactor,
+        spNokFactor
       );
       setPeriodizationResults(results);
     }
-  }, [epicGoals, profileSelections, numberOfPeriods]);
+  }, [
+    epicGoals,
+    profileSelections,
+    numberOfPeriods,
+    // NYE AVHENGIGHETER: Kjører beregningen på nytt når faktorene endres
+    bpNokFactor,
+    spNokFactor,
+  ]);
 
   // 2. Fetch epic data fra goal funksjonen
   const fetchEpicGoals = useCallback(async () => {
@@ -373,11 +399,15 @@ export const Analysis = () => {
       </p>
 
       <div>
-        {/* 1. EPIC SELECTION TABLE */}
+        {/* 1. EPIC SELECTION TABLE (OPPDATERT MED NYE PROPS) */}
         <EpicSelectionTable
           epicGoals={epicGoals}
           profileSelections={profileSelections}
           handleProfileChange={handleProfileChange}
+          bpNokFactor={bpNokFactor}
+          spNokFactor={spNokFactor}
+          // *NY PROP*: Sender funksjonen som håndterer endringen i staten
+          handleFactorChange={handleFactorChange}
         />
       </div>
 
