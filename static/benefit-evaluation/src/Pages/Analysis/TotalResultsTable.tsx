@@ -68,7 +68,7 @@ export const TotalResultsTable: React.FC<TotalResultsTableProps> = ({
           }}
         >
           <h3 style={{ marginRight: "10px" }}>
-            Finansiell plan over {numberOfPeriods} år
+            Finansiell plan over {numberOfPeriods} år (millioner NOK)
           </h3>
 
           {/* Knapp for å redusere år */}

@@ -74,7 +74,12 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
           const isLiveGoal = !isRoot;
 
           return (
-            <Row itemId={item.id} items={children} hasChildren={isRoot}>
+            <Row
+              itemId={item.id}
+              items={children}
+              hasChildren={isRoot}
+              isDefaultExpanded
+            >
               <Cell>
                 <strong>{isRoot ? PRODUCT_ROOT_ITEM.name : goal.key}</strong>
               </Cell>

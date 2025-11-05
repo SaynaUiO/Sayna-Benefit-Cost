@@ -23,6 +23,8 @@ import Modal, {
   ModalTitle,
 } from "@atlaskit/modal-dialog";
 import { EconomicConfig } from "./EconomicConfig";
+import { token } from "@atlaskit/tokens";
+import Tooltip from "@atlaskit/tooltip";
 
 // *OPPDATERTE PROPS*
 interface EpicSelectionTableProps {
@@ -222,13 +224,19 @@ export const EpicSelectionTable: React.FC<EpicSelectionTableProps> = ({
         <h3 style={{ marginRight: "10px" }}>Liste over epics og profilvalg</h3>
 
         {/* CashIcon-knappen, som åpner Modalen */}
-        <Button
-          appearance="subtle"
-          iconBefore={
-            <CashIcon size="medium" label="Økonomisk konfigurering" />
-          }
-          onClick={openModal} // Åpner Modalen
-        ></Button>
+        <Tooltip content="Konverter poeng til NOK">
+          <Button
+            appearance="subtle"
+            iconBefore={
+              <CashIcon
+                color={token("color.text.success")}
+                size="medium"
+                label="Økonomisk konfigurering"
+              />
+            }
+            onClick={openModal} // Åpner Modalen
+          ></Button>
+        </Tooltip>
       </Box>
 
       <DynamicTable caption=" " head={head} rows={rows} />
