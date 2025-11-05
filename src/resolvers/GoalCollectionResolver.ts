@@ -1,5 +1,5 @@
 import Resolver from "@forge/resolver";
-import { changeRanking, createGoalCollection, deleteGoalCollection, flushGoalCollections, getAllGoalCollections, getAllGoalCollectionsByRanking, getGoalCollection, updateGoalCollection } from "../services/GoalCollectionService";
+import {  createGoalCollection, deleteGoalCollection, getAllGoalCollections, getAllGoalCollectionsByRanking, getGoalCollection, updateGoalCollection } from "../services/GoalCollectionService";
 import { GoalCollection } from "../models/GoalCollectionModel";
 
 export const goalCollectionResolver = (resolver: Resolver) => {
@@ -26,10 +26,5 @@ export const goalCollectionResolver = (resolver: Resolver) => {
   //Delete
   resolver.define('deleteGoalCollection', async ({ payload: { scopeId, id } }) => {
     return await deleteGoalCollection(scopeId, id);
-  });
-
-  //GetAll
-  resolver.define('changeGoalCollectionRanking', async ({ payload: { scopeId, id1, id2 } }) => {
-    return changeRanking(scopeId, id1, id2)
   });
 }

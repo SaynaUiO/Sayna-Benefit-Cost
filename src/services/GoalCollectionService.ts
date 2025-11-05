@@ -25,41 +25,12 @@ export const deleteGoalCollection = async (scopeId: string, id: string) => {
   });
 }
 
-export const flushGoalCollections = async (scopeId) => {
-  console.log(`Flush Goal Collections: gc-${scopeId}-`)
-  await getAllIds(scopeId).then(async (ids) => {
-    Promise.all(ids.map((id) => (
-      deleteGoalCollection(scopeId, id)
-    ))).then(() => {
-      return GCHeadDA.remove(scopeId)
-    });
-  });
-}
-
 export const getGoalCollection = async (scopeId: string, id: string): Promise<GoalCollection> => {
   console.log(`Getting Goal Collection: gc-${scopeId}-${id}`)
   return GCDA.get(scopeId, id).then((goalCollection): GoalCollection => ({
     ...goalCollection,
     type: GoalTierTypeEnum.GOAL_COLLECTION,
   }))
-}
-
-export const changeRanking = async (scopeId: string, id1: string, id2: string) => {
-  console.log(`Changing goal collection ranking: gc-${scopeId}-${id1} to gc-${scopeId}-${id2}'s position`)
-  return GCHeadDA.get(scopeId).then((head) => {
-    const ids = head.goalCollectionIds ? head.goalCollectionIds : [];
-    const index = ids.indexOf(id1);
-    const new_index = ids.indexOf(id2);
-    if (new_index >= ids.length) {
-      let k = new_index - ids.length + 1;
-      while (k--) {
-        ids.push('');
-      }
-    }
-    ids.splice(new_index, 0, ids.splice(index, 1)[0]);
-    // return GCHeadDA.set(scopeId, { nextId: head.nextId, goalCollectionIds: ids });
-    return GCHeadDA.set(scopeId, { goalCollectionIds: ids });
-  });
 }
 
 export const updateGoalCollection = async (scopeId: string, goalCollection: GoalCollection) => {
@@ -138,40 +109,3 @@ export const createGoalCollection = async (scopeId: string, goalCollection: Goal
   await addIdToHead(scopeId, goalCollection.id); // <--- NEW LINE
   return GCDA.set(scopeId, goalCollection);
 };
-
-//Nye metoder (Må legge til mandatory fields, da hele systemet fucker seg, så kan ct fikse det senere.): 
-
-// export const createGoal = async (scopeId: string, newGoal: GC2) => {
-    
-//   // We only save the fields we explicitly want, ensuring a clean structure.
-//   const cleanGoalToSave = {
-//     // === MANDATORY FIELDS ADDED TO SATISFY DAGoalCollection ===
-//     scopeId: scopeId, 
-//     status: "To Do", 
-
-//     id: newGoal.id,
-//     parentId: newGoal.parentId,
-//     name: newGoal.name,
-//     description: newGoal.description,
-//     goalType: newGoal.goalType,
-//     tier: newGoal.tier,
-
-//     ...(newGoal.timeEstimate !== undefined && { timeEstimate: newGoal.timeEstimate }),
-//     ...(newGoal.costEstimate !== undefined && { costEstimate: newGoal.costEstimate }),
-    
-//     title: newGoal.name, 
-//     subtask: [], 
-    
-    
-// };
-
-//   // 1. Add the ID to the head (This logic is usually for ranking, keep it if necessary)
-//   await addIdToHead(scopeId, newGoal.id); 
-
-//   // 2. Use raw Forge Storage to save the clean object
-//   // You must replace GCDA.set with storage.set(key, value)
-//   await GCDA.set(newGoal.id, cleanGoalToSave); 
-  
-//   // 3. Return the clean object
-//   return cleanGoalToSave;
-// };

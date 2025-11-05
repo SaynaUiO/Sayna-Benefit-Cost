@@ -1,5 +1,4 @@
 import { Result } from "@forge/api";
-import { flushGoalCollections } from "./GoalCollectionService";
 import { PfDA, PfHeadDA } from "../dataAccess/PortfolioDA";
 import { deleteIdFromHead, getAllIds, getNextId } from "../heads/PortfolioHead";
 import { ScopeTypeEnum, balancedPoints, Portfolio, PortfolioItemIdentifier } from "../models";
@@ -69,28 +68,28 @@ export const deletePortfolio = async (id: string) => {
   return Promise.all(promises).then(() => {
     return PfDA.remove(id).then(async () => {
       return deleteIdFromHead(id).then(() => {
-        return flushGoalCollections(id)
+        return ""
       });
     });
   }).catch((err) => {
     console.error(err);
     return PfDA.remove(id).then(async () => {
       return deleteIdFromHead(id).then(() => {
-        return flushGoalCollections(id)
+        return ""
       });
     })
   })
 }
 
-export const flushPortfolios = async () => {
-  return getAllIds().then(async (ids) => {
-    return PfHeadDA.remove().then(async () => {
-      Promise.all(ids.map((id) => {
-        deletePortfolio(id);
-      }));
-    });
-  });
-}
+// export const flushPortfolios = async () => {
+//   return getAllIds().then(async (ids) => {
+//     return PfHeadDA.remove().then(async () => {
+//       Promise.all(ids.map((id) => {
+//         deletePortfolio(id);
+//       }));
+//     });
+//   });
+// }
 
 export const setPortfolioItemPointsToPortfolio = async (portfolioId: string, portfolioItemPoints: balancedPoints): Promise<void> => {
   const portfolio = await getPortfolio(portfolioId);

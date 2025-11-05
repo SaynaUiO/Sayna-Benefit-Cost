@@ -1,18 +1,5 @@
 import { GCHeadDA } from "../dataAccess/GoalCollectionDA";
 
-//Head
-//Remove nextID: 
-// export const getNextId = async (scopeId: string): Promise<string> => {
-//   console.log(`Get Next Goal Collection id: gc-${scopeId}-`)
-//   return GCHeadDA.get(scopeId).then((head) => {
-//     const id = head ? head.nextId : 0;
-//     const goalCollectionIds = head ? head.goalCollectionIds : [];
-//     goalCollectionIds.push(`${id}`);
-//     GCHeadDA.set(scopeId, { nextId: id + 1, goalCollectionIds: goalCollectionIds })
-//     return `${id}`;
-//   });
-// }
-
 //New function for uuid: 
 export const addIdToHead = async (scopeId: string, id: string): Promise<void> => {
   console.log(`Add Goal Collection to Head: ${id}`);

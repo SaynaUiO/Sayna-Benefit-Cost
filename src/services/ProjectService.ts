@@ -3,7 +3,6 @@ import { storageAPI, Method } from "../api/storageAPI";
 import { FetchedProjects, Project, FetchedProject, projectPropertyKeys, IssueStatus, IssueType, ScopeTypeEnum, balancedPoints } from "../models";
 import { route } from "@forge/api";
 import { addPortfolioItem, removePortfolioItem } from "./PortfolioService";
-import { flushGoalCollections } from "./GoalCollectionService";
 import { flushEpicCostTime, resetIssues } from "./IssueService";
 import { getIssueStatusesById, getIssueType } from "./IssueTypeService";
 import { getAllIssueTypes } from "./IssueTypeService";
@@ -216,9 +215,6 @@ export const resetProject = async (projectId: string) => {
       }),
       resetIssueStatuses(projectId).catch((_) => {
         console.error('Could not reset Issue Statuses');
-      }),
-      flushGoalCollections(projectId).catch((_) => {
-        console.error('Could not flush Goal Collections');
       }),
       disconnectProjectToPortfolio(projectId).catch((_) => {
         console.error('Could not disconnect Project to Portfolio');

@@ -19,8 +19,5 @@ export const goalCollectionApi = () => {
     delete: (scopeId: string, id: string) => {
       return invoke("deleteGoalCollection", { scopeId: scopeId, id: id });
     },
-    changeRanking: (scopeId: string, id1: string, id2: string) => {
-      return invoke("changeGoalCollectionRanking", { scopeId: scopeId, id1: id1, id2: id2 });
-    },
   }
 }
