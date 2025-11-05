@@ -15,6 +15,7 @@ import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
 import Lozenge from "@atlaskit/lozenge";
 import { EPIC_COLLECTION_ID } from "../../constants/goalConstants";
 import { SpotlightTarget } from "@atlaskit/onboarding";
+import Tooltip from "@atlaskit/tooltip";
 
 interface ProductRootItem {
   id: typeof EPIC_COLLECTION_ID;
@@ -81,7 +82,9 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
               isDefaultExpanded
             >
               <Cell>
-                <strong>{isRoot ? PRODUCT_ROOT_ITEM.name : goal.key}</strong>
+                <Tooltip content="Initiatives i OKR">
+                  <strong>{isRoot ? PRODUCT_ROOT_ITEM.name : goal.key}</strong>
+                </Tooltip>
               </Cell>
               <Cell>{!isRoot && goal.description}</Cell>
               <Cell>

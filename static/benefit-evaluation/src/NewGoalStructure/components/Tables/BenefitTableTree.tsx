@@ -14,6 +14,7 @@ import AddIcon from "@atlaskit/icon/glyph/add";
 import Lozenge from "@atlaskit/lozenge";
 import { NYTTE_COLLECTION_ID } from "../../constants/goalConstants";
 import { SpotlightTarget } from "@atlaskit/onboarding";
+import Tooltip from "@atlaskit/tooltip";
 
 interface BenefitRootItem {
   id: typeof NYTTE_COLLECTION_ID;
@@ -80,7 +81,9 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
                 isDefaultExpanded
               >
                 <Cell>
-                  <strong>{primaryLabel}</strong>
+                  <Tooltip content="Key Results i OKR">
+                    <strong>{primaryLabel}</strong>
+                  </Tooltip>
                 </Cell>
 
                 <Cell>{isLiveGoal ? goal.description : ""}</Cell>

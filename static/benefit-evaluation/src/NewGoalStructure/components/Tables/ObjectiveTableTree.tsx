@@ -18,6 +18,7 @@ import TextArea from "@atlaskit/textarea";
 import { SpotlightTarget } from "@atlaskit/onboarding";
 import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
 import Lozenge from "@atlaskit/lozenge";
+import Tooltip from "@atlaskit/tooltip";
 
 interface ObjectiveRootItem {
   id: typeof FORMAAL_COLLECTION_ID;
@@ -87,7 +88,9 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
             >
               {/* KOLONNE 1: Formål Navn / Nøkkel */}
               <Cell>
-                <strong>{primaryLabel}</strong>
+                <Tooltip content="Objective i OKR">
+                  <strong>{primaryLabel}</strong>
+                </Tooltip>
               </Cell>
 
               {/* KOLONNE 2: Beskrivelse */}
