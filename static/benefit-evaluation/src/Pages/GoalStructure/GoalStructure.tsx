@@ -13,7 +13,7 @@ import {
   SpotlightTarget,
 } from "@atlaskit/onboarding";
 
-import { GoalStructureContainer } from "../../SaynaSineFiler/components/GoalStructureContainer";
+import { GoalStructureContainer } from "../../NewGoalStructure/components/GoalStructureContainer";
 
 export const GoalStructure = () => {
   const [items, setItems] = useState<GoalTier[]>([]);
