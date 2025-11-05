@@ -22,6 +22,12 @@ interface CostTimeModalState {
   postfix: string;
 }
 
+interface SetValuesModalState { // <-- Kritiske manglende interface
+  isOpen: boolean;
+  goals: Goal[]; 
+  goal_tier_id: string; 
+}
+
 
 export const useGoalStructure = () => {
   const [scope] = useAppContext();
@@ -32,12 +38,16 @@ export const useGoalStructure = () => {
   const { initialized: goalsInitialized } = useGoalInitializer();
   const fullyInitialized = collectionsInitialized && goalsInitialized;
 
+  // NYTT: Loading state for datahenting
+  const [loadingData, setLoadingData] = useState<boolean>(true);
+
   //State for Data og UI: 
   const [goals, setGoals] = useState<Goal[] | null>(null);
   const [allCollections, setAllCollections] = useState<GoalCollection[] | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerContext, setDrawerContext] = useState<DrawerState | null>(null);
   const [costTimeModal, setCostTimeModal] = useState<CostTimeModalState | null>(null);
+  const [setValuesModal, setSetValuesModal] = useState<SetValuesModalState | null>(null); // <-- LAGT TIL
 
   //State for sletting: 
   const [goalToDelete, setGoalToDelete] = useState<Goal | null>(null); 
@@ -46,24 +56,28 @@ export const useGoalStructure = () => {
    const fetchAndOrganizeGoals = useCallback(async () => {
     if (!fullyInitialized || !scope.id) return;
 
+    setLoadingData(true);
+
     try {
-      const allCollections = await api.goalCollection.getAll(scope.id);
-      setAllCollections(allCollections); // <-- LAGRE HER
-      let allGoals: Goal[] = [];
+        const allCollections = await api.goalCollection.getAll(scope.id);
+        setAllCollections(allCollections); 
 
-      for (const collection of allCollections) {
-        const goalsInCollection = await api.goal.getAll(
-          scope.id,
-          collection.id
+        // Parallelliserer henting av mål for hver Collection
+        const goalPromises = allCollections.map(collection => 
+            api.goal.getAll(scope.id, collection.id) 
         );
-        allGoals = allGoals.concat(goalsInCollection);
-      }
+        
+        const goalsByCollection = await Promise.all(goalPromises);
+        let allGoals: Goal[] = goalsByCollection.flat(); 
 
-      setGoals(allGoals);
+        setGoals(allGoals);
+            
     } catch (error) {
-      console.error("Feil under henting av data:", error);
+        console.error("Feil under henting av data:", error);
+    } finally {
+        setLoadingData(false); // Setter loading til false uansett
     }
-  }, [fullyInitialized, scope.id, api]);
+    }, [fullyInitialized, scope.id, api]);
 
   useEffect(() => {
     fetchAndOrganizeGoals();
@@ -212,6 +226,32 @@ const handleDeleteGoal = useCallback(async () => {
     }
   };
 
+
+  // Handlere for SetValues Modal (STABILISERT)
+  const handleOpenSetValuesModal = useCallback(
+    (goals: Goal[], goalCollectionId: string) => {
+      setSetValuesModal({
+        isOpen: true,
+        goals: goals,
+        goal_tier_id: goalCollectionId,
+      });
+    },
+    []
+  );
+
+  // Synkron lukking (kun lukker modalen)
+  const handleCloseSetValuesModal = useCallback(
+    () => {
+      setSetValuesModal(null); 
+    },
+    []
+  );
+
+  // Dedikert refresh (kaller fetchAndOrganizeGoals)
+  const handleRefreshData = useCallback(() => {
+    fetchAndOrganizeGoals(); 
+  }, [fetchAndOrganizeGoals]);
+
   //Data filtrering for rendering: 
    const allGoals = goals || [];
   
@@ -244,6 +284,9 @@ const handleDeleteGoal = useCallback(async () => {
       handleSetCostTime,
       handleCostTimeModalClose,
       handleUpdateCollectionDescription,
+      handleOpenSetValuesModal, 
+      handleCloseSetValuesModal,
+      handleRefreshData,
       onDeleteGoal: openDeleteModal,
     },
 
@@ -261,6 +304,7 @@ const handleDeleteGoal = useCallback(async () => {
       context: drawerContext,
     },
     costTimeModal,
+    setValuesModal,
     scope
   };
 }

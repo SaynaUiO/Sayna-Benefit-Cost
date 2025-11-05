@@ -9,6 +9,7 @@ import GoalDrawer from "./GoalDrawer";
 import { SetEpicCostTime } from "../../Pages/GoalTiers/SetEpicCostTime";
 import { useGoalStructure } from "../hooks/useGoalStructure";
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
+import { SetValues } from "../../Pages/GoalTiers/SetValues";
 
 export const GoalStructureContainer = () => {
   const {
@@ -19,6 +20,7 @@ export const GoalStructureContainer = () => {
     handlers,
     drawer,
     costTimeModal,
+    setValuesModal,
     scope,
     allGoals,
     deleteModal,
@@ -32,6 +34,9 @@ export const GoalStructureContainer = () => {
     handleSetCostTime,
     handleCostTimeModalClose,
     onDeleteGoal,
+    handleCloseSetValuesModal,
+    handleRefreshData,
+    handleOpenSetValuesModal,
   } = handlers;
 
   // --- RENDERING ---
@@ -50,6 +55,7 @@ export const GoalStructureContainer = () => {
         }
         onEditGoal={handleEditGoal}
         onDeleteGoal={onDeleteGoal}
+        onSetValues={handleOpenSetValuesModal}
       />
       <br />
 
@@ -117,6 +123,18 @@ export const GoalStructureContainer = () => {
           itemName={deleteModal.goalToDelete.key || deleteModal.goalToDelete.id}
           onClose={deleteModal.onClose} // closeDeleteModal (Lukker modalen)
           onConfirm={deleteModal.onConfirm} // handleDeleteGoalConfirm (Utfører sletting)
+        />
+      )}
+
+      {/* 🌟 SetValues Modal (NY OG KORRIGERT IMPLEMENTASJON) 🌟 */}
+      {setValuesModal && setValuesModal.isOpen && (
+        <SetValues
+          goal_tier_id={setValuesModal.goal_tier_id}
+          goals={setValuesModal.goals}
+          // Synkron lukking: Kaller bare setSetValuesModal(null)
+          close={handleCloseSetValuesModal}
+          // Synkron refresh: Kaller fetchAndOrganizeGoals()
+          refresh={handleRefreshData}
         />
       )}
 

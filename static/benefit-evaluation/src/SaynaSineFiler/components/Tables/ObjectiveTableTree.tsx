@@ -36,12 +36,14 @@ interface ObjectiveTableTreeProps {
   ) => void;
   onEditGoal: (goal: Goal) => void;
   onDeleteGoal: (goal: Goal) => void;
+  onSetValues: (goals: Goal[], goalCollectionId: string) => void;
 }
 
 export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
   onAddGoal,
   onEditGoal,
   onDeleteGoal,
+  onSetValues,
   data: formaalGoals,
 }) => {
   const { formaalCollectionData, handlers } = useGoalStructure();
@@ -163,7 +165,9 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                   <Button
                     appearance="subtle"
                     iconBefore={<BitbucketCompareIcon size="small" label="" />}
-                    onClick={() => {}} // Sender alle Epics
+                    onClick={() =>
+                      onSetValues(formaalGoals, FORMAAL_COLLECTION_ID)
+                    }
                   ></Button>
                 )}
 
