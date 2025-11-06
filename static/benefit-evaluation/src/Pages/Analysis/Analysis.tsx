@@ -39,7 +39,6 @@ export const Analysis = () => {
   const [numberOfPeriods, setNumberOfPeriods] = useState<number>(10);
   const [inputError, setInputError] = useState<string | null>(null); // beholdes for funksjoner
 
-  // *NYE STATS FOR NOK-FAKTORER*
   const [bpNokFactor, setBpNokFactor] = useState<number>(0.225); // Standardverdi for BP (millioner NOK)
   const [spNokFactor, setSpNokFactor] = useState<number>(0.6); // Standardverdi for SP (millioner NOK)
 
@@ -69,7 +68,7 @@ export const Analysis = () => {
     setNumberOfPeriods((prevYears) => Math.max(prevYears - 1, MIN_YEARS));
   }, []);
 
-  // *NY FUNKSJON: Håndterer endring i NOK-faktor*
+  // Håndterer endring i NOK-faktor*
   const handleFactorChange = useCallback(
     (factorType: "bp" | "sp", newValue: number) => {
       if (factorType === "bp") {
@@ -95,20 +94,12 @@ export const Analysis = () => {
         epicGoals,
         profileSelections,
         numberOfPeriods,
-        // NYE ARGUMENTER: Send inn NOK-faktorene
         bpNokFactor,
         spNokFactor
       );
       setPeriodizationResults(results);
     }
-  }, [
-    epicGoals,
-    profileSelections,
-    numberOfPeriods,
-    // NYE AVHENGIGHETER: Kjører beregningen på nytt når faktorene endres
-    bpNokFactor,
-    spNokFactor,
-  ]);
+  }, [epicGoals, profileSelections, numberOfPeriods, bpNokFactor, spNokFactor]);
 
   // 2. Fetch epic data fra goal funksjonen
   const fetchEpicGoals = useCallback(async () => {
@@ -191,7 +182,7 @@ export const Analysis = () => {
   const renderActiveSpotlight = () => {
     const spotlights = [
       <Spotlight
-        actionsBeforeElement="12/18"
+        actionsBeforeElement="13/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -218,7 +209,7 @@ export const Analysis = () => {
         kostnadsverdier som ble fordelt tidligere.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="13/18"
+        actionsBeforeElement="14/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -245,7 +236,37 @@ export const Analysis = () => {
         du endrer en profil, oppdateres tabellen og grafen under automatisk.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="14/18"
+        actionsBeforeElement="15/20"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Neste",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Poeng til NOK"
+        target="pointsToNok"
+        key="pointsToNok"
+      >
+        Ved å trykke på dette ikonet kan du tilordne en monetær verdi til både 1
+        Benefit Point (BP) og 1 Size Point (SP) i NOK. Du definerer deretter
+        selv verdien for å muliggjøre konvertering av de estimerte
+        poengverdiene.
+      </Spotlight>,
+
+      <Spotlight
+        actionsBeforeElement="16/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -272,7 +293,7 @@ export const Analysis = () => {
         samlet nytte (BP) og kostnad (SP) for alle epics.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="15/18"
+        actionsBeforeElement="17/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -299,7 +320,7 @@ export const Analysis = () => {
         skal dekke.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="16/18"
+        actionsBeforeElement="18/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -328,7 +349,7 @@ export const Analysis = () => {
         representerer hver verdi, for å skjule dem i grafen.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="17/18"
+        actionsBeforeElement="19/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -354,7 +375,7 @@ export const Analysis = () => {
         Under Innstillinger kan du starte prosjektet på nytt om ønskelig.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="18/18"
+        actionsBeforeElement="20/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}

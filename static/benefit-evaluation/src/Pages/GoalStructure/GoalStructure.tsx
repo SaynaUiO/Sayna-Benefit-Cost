@@ -104,7 +104,7 @@ export const GoalStructure = () => {
   const renderActiveSpotlight = () => {
     const spotlights = [
       <Spotlight
-        actionsBeforeElement="1/18"
+        actionsBeforeElement="1/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -128,11 +128,11 @@ export const GoalStructure = () => {
         key="project"
         dialogPlacement={placement as Placement}
       >
-        Takk for at du bruker BenefitOKR – et verktøy for Benefit Management med
-        OKR. Her får du en kort introduksjon til prosjektsiden.
+        Takk for at du bruker BenefitOKR – et verktøy for Benefits Management
+        med OKR. Her får du en kort introduksjon til prosjektsiden.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="2/18"
+        actionsBeforeElement="2/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -156,10 +156,10 @@ export const GoalStructure = () => {
         key="introduction-and-help"
       >
         Mer informasjon om hvordan du bruker BenefitOKR finner du under
-        Intruduksjon.
+        Introduksjon.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="3/18"
+        actionsBeforeElement="3/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -185,10 +185,10 @@ export const GoalStructure = () => {
       >
         Denne siden lar deg vise og administrere alle målsamlinger. Strukturen
         følger OKR-rammeverket med tre tabeller: Formål (Objective), Planlagte
-        nyttevirkninger (Key Results) og Produkt (Epic).
+        nyttevirkninger (Key Results) og Produkt/Epic (Initiatives).
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="4/18"
+        actionsBeforeElement="4/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -216,7 +216,7 @@ export const GoalStructure = () => {
         er ferdig.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="5/18"
+        actionsBeforeElement="5/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -243,9 +243,11 @@ export const GoalStructure = () => {
         Under Handlinger finner du et pluss-tegn i hver av de tre tabellene. Ved
         å trykke på dette kan du opprette mål som hører til den aktuelle
         tabellen.
+        <br></br>
+        Test det ut nå, trykk på "+"
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="6/18"
+        actionsBeforeElement="6/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -272,7 +274,7 @@ export const GoalStructure = () => {
         Her kan du redigere eller slette et mål du har opprettet.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="7/18"
+        actionsBeforeElement="7/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -299,7 +301,36 @@ export const GoalStructure = () => {
         For hvert produkt (Epic) kan du fordele kostnader og legge til tidsbruk.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="8/18"
+        actionsBeforeElement="8/20"
+        headingAfterElement={
+          <Button
+            iconBefore={<CrossIcon size="small" label="end" />}
+            appearance="subtle"
+            onClick={() => end()}
+          />
+        }
+        actions={[
+          {
+            onClick: () => next(),
+            text: "Next",
+          },
+          {
+            onClick: () => back(),
+            text: "Back",
+            appearance: "subtle",
+          },
+        ]}
+        heading="Vekt for Formål"
+        target="formaal-weight"
+        key="formaal-weight"
+        dialogPlacement={placement as Placement}
+      >
+        Det samme ikonet er tilgjengelig for Formål, men her kan du fordele
+        nyttepoeng direkte siden Formål representerer det øverste nivået i
+        målstrukturen og dermed ikke har et overordnet hierarkisk nivå.
+      </Spotlight>,
+      <Spotlight
+        actionsBeforeElement="9/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -325,7 +356,7 @@ export const GoalStructure = () => {
         key="estimation"
         dialogPlacement={placement as Placement}
       >
-        Estimerings fanen brukes til å tildele nyttepoeng til hver oppgave.
+        Resten av nyttepoengen fordeles i Estimerings fanen.
       </Spotlight>,
     ];
 

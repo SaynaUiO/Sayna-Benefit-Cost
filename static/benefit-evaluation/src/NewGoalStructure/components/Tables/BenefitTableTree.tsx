@@ -99,37 +99,33 @@ export const BenefitTableTree: React.FC<BenefitTableTreeProps> = ({
 
                 <Cell>
                   {isRoot && (
-                    <SpotlightTarget name="add-goal">
-                      <Button
-                        appearance="subtle"
-                        iconBefore={<AddIcon size="small" label="Legg til " />}
-                        onClick={() =>
-                          onAddGoal(BENEFIT_ROOT_ITEM.id, NYTTE_COLLECTION_ID)
-                        }
-                      />
-                    </SpotlightTarget>
+                    <Button
+                      appearance="subtle"
+                      iconBefore={<AddIcon size="small" label="Legg til " />}
+                      onClick={() =>
+                        onAddGoal(BENEFIT_ROOT_ITEM.id, NYTTE_COLLECTION_ID)
+                      }
+                    />
                   )}
 
-                  <SpotlightTarget name="edit/delete-goal">
-                    {isLiveGoal && (
-                      <ButtonGroup>
-                        <Button
-                          appearance="subtle"
-                          iconBefore={
-                            <EditIcon size="small" label="Rediger Mål" />
-                          }
-                          onClick={() => onEditGoal(goal)}
-                        />
-                        <Button
-                          appearance="subtle"
-                          iconBefore={
-                            <TrashIcon size="small" label="Slett Mål" />
-                          }
-                          onClick={() => onDeleteGoal(goal)}
-                        />
-                      </ButtonGroup>
-                    )}
-                  </SpotlightTarget>
+                  {isLiveGoal && (
+                    <ButtonGroup>
+                      <Button
+                        appearance="subtle"
+                        iconBefore={
+                          <EditIcon size="small" label="Rediger Mål" />
+                        }
+                        onClick={() => onEditGoal(goal)}
+                      />
+                      <Button
+                        appearance="subtle"
+                        iconBefore={
+                          <TrashIcon size="small" label="Slett Mål" />
+                        }
+                        onClick={() => onDeleteGoal(goal)}
+                      />
+                    </ButtonGroup>
+                  )}
                 </Cell>
               </Row>
             );

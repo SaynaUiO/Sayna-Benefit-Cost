@@ -6,7 +6,7 @@ import TableTree, {
   Header,
   Headers,
 } from "@atlaskit/table-tree";
-import Button from "@atlaskit/button";
+import Button, { ButtonGroup } from "@atlaskit/button";
 import AddIcon from "@atlaskit/icon/glyph/add";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
@@ -108,18 +108,21 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
 
               <Cell>
                 {isRoot && (
-                  <Button
-                    appearance="subtle"
-                    iconBefore={<AddIcon size="small" label="Add Epic" />}
-                    onClick={() =>
-                      onAddGoal(PRODUCT_ROOT_ITEM.id, EPIC_COLLECTION_ID)
-                    }
-                  />
+                  <SpotlightTarget name="add-goal">
+                    <Button
+                      appearance="subtle"
+                      iconBefore={<AddIcon size="small" label="Add Epic" />}
+                      onClick={() =>
+                        onAddGoal(PRODUCT_ROOT_ITEM.id, EPIC_COLLECTION_ID)
+                      }
+                    />
+                  </SpotlightTarget>
                 )}
 
                 {/* Cost/Time Button  */}
-                <SpotlightTarget name="cost/time">
-                  {isRoot && (
+
+                {isRoot && (
+                  <SpotlightTarget name="cost/time">
                     <Button
                       appearance="subtle"
                       iconBefore={
@@ -128,28 +131,32 @@ export const EpicTableTree: React.FC<EpicTableTreeProps> = ({
                       isDisabled={isDataEmpty} // Deaktiver knappen hvis det ikke er noen Epics
                       onClick={() => onSetCostTime(epicGoals)} // Sender alle Epics
                     ></Button>
-                  )}
-                </SpotlightTarget>
+                  </SpotlightTarget>
+                )}
 
                 {/* Edit Button  */}
-                {isLiveGoal && (
-                  <Button
-                    appearance="subtle"
-                    iconBefore={<EditIcon size="small" label="Edit Goal" />}
-                    onClick={() => {
-                      onEditGoal(goal);
-                    }}
-                  ></Button>
-                )}
+                <SpotlightTarget name="edit/delete-goal">
+                  {isLiveGoal && (
+                    <ButtonGroup>
+                      <Button
+                        appearance="subtle"
+                        iconBefore={<EditIcon size="small" label="Edit Goal" />}
+                        onClick={() => {
+                          onEditGoal(goal);
+                        }}
+                      ></Button>
 
-                {/* Delete Button  */}
-                {isLiveGoal && (
-                  <Button
-                    appearance="subtle"
-                    iconBefore={<TrashIcon size="small" label="Delete Goal" />}
-                    onClick={() => onDeleteGoal(goal)}
-                  ></Button>
-                )}
+                      {/* Delete Button  */}
+                      <Button
+                        appearance="subtle"
+                        iconBefore={
+                          <TrashIcon size="small" label="Delete Goal" />
+                        }
+                        onClick={() => onDeleteGoal(goal)}
+                      ></Button>
+                    </ButtonGroup>
+                  )}
+                </SpotlightTarget>
               </Cell>
             </Row>
           );

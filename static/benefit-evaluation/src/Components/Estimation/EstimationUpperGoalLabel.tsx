@@ -47,7 +47,7 @@ export const EstimationUpperGoalLabel = ({
           <Tooltip
             content={
               relation.method === balancedPointsEnum.WEIGHT
-                ? "Weight"
+                ? "Weight Denne?"
                 : "Monetary Value"
             }
           >

@@ -225,17 +225,19 @@ export const EpicSelectionTable: React.FC<EpicSelectionTableProps> = ({
 
         {/* CashIcon-knappen, som åpner Modalen */}
         <Tooltip content="Konverter poeng til NOK">
-          <Button
-            appearance="subtle"
-            iconBefore={
-              <CashIcon
-                color={token("color.text.success")}
-                size="medium"
-                label="Økonomisk konfigurering"
-              />
-            }
-            onClick={openModal} // Åpner Modalen
-          ></Button>
+          <SpotlightTarget name="pointsToNok">
+            <Button
+              appearance="subtle"
+              iconBefore={
+                <CashIcon
+                  color={token("color.text.success")}
+                  size="medium"
+                  label="Økonomisk konfigurering"
+                />
+              }
+              onClick={openModal} // Åpner Modalen
+            ></Button>
+          </SpotlightTarget>
         </Tooltip>
       </Box>
 

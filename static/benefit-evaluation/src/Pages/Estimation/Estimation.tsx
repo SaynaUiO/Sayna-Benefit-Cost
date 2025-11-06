@@ -129,7 +129,7 @@ export const Estimation = () => {
   const renderActiveSpotlight = () => {
     const spotlights = [
       <Spotlight
-        actionsBeforeElement="9/18"
+        actionsBeforeElement="10/120"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -156,7 +156,7 @@ export const Estimation = () => {
         nyttepoeng.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="10/18"
+        actionsBeforeElement="11/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
@@ -183,7 +183,7 @@ export const Estimation = () => {
         hvor mye den bidrar til oppnåelsen av målene.
       </Spotlight>,
       <Spotlight
-        actionsBeforeElement="11/18"
+        actionsBeforeElement="12/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}

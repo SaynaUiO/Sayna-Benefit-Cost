@@ -165,13 +165,17 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                 )}
 
                 {isRoot && (
-                  <Button
-                    appearance="subtle"
-                    iconBefore={<BitbucketCompareIcon size="small" label="" />}
-                    onClick={() =>
-                      onSetValues(formaalGoals, FORMAAL_COLLECTION_ID)
-                    }
-                  ></Button>
+                  <SpotlightTarget name="formaal-weight">
+                    <Button
+                      appearance="subtle"
+                      iconBefore={
+                        <BitbucketCompareIcon size="small" label="" />
+                      }
+                      onClick={() =>
+                        onSetValues(formaalGoals, FORMAAL_COLLECTION_ID)
+                      }
+                    ></Button>
+                  </SpotlightTarget>
                 )}
 
                 {isLiveGoal && (
