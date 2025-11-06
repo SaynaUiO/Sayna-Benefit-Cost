@@ -261,15 +261,25 @@ export const SelectGoalCollections = ({
         </Grid>
         {selectedOption && (
           <p>
-            Fordel nyttepoeng mellom{" "}
-            {Number(goal_tier_type) === GoalTierTypeEnum.ISSUE_TYPE
-              ? `epics`
-              : `${selectedOption?.value.goalTier.name} målene,`}{" "}
-            for å vise hvor mye hvert mål bidrar til de overordnede{" "}
-            {Number(goal_tier_type) === GoalTierTypeEnum.ISSUE_TYPE
-              ? "epic"
-              : ""}{" "}
-            {selectedOption?.value.upperGoalTier.name}ene .
+            {/* Sjekker om det er Epic-nivået (enten via TYPE eller via navnet) */}
+            {Number(goal_tier_type) === GoalTierTypeEnum.ISSUE_TYPE ||
+            selectedOption?.value.goalTier.name
+              .toLowerCase()
+              .includes("epic") ? (
+              // TEKST FOR EPIC
+              <>
+                Fordel nyttepoeng blant epicene, for å anslå hvor mye hvert epic
+                bidrar til hver planlagte nyttevirkning. Ta for deg en
+                nyttevirkning om gangen og fordel 100 poeng blant epicene.
+              </>
+            ) : (
+              // TEKST FOR PLANLAGTE NYTTEVIRKNINGER (PN)
+              <>
+                Fordel nyttepoeng blant de planlagte nyttevirkningnene for å
+                anslå hvor mye hver planlagte nyttevirkning bidrar til de
+                overordnede Formålene.
+              </>
+            )}
           </p>
         )}
       </Stack>
