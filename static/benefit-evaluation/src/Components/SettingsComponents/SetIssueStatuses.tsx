@@ -111,7 +111,7 @@ export const SetIssueStatuses = (props: SetIssueStatusesProps) => {
           setSelectedIssueStatuses(value as value[]);
         }}
         options={options}
-        placeholder="Select Epic Issuetype"
+        placeholder="Velg Epic Issuetype"
       />
       <Inline
         xcss={xcss({ marginTop: "space.100" })}

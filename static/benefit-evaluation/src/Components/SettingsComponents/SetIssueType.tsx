@@ -138,7 +138,7 @@ export const SetIssueType = (props: SetEpicIssueTypeProps) => {
             }
           }}
           options={options}
-          placeholder="Select Epic Issuetype"
+          placeholder="Velg Epic Issuetype"
         />
         <Inline
           xcss={xcss({ marginTop: "space.100" })}
