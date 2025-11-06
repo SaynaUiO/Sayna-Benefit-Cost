@@ -61,7 +61,7 @@ export const PeriodizationChart: React.FC<PeriodizationChartProps> = ({
           display: true,
           text: "Nettoverdi (BP - SP)",
         },
-        min: -40,
+        min: -5,
         grid: {
           drawOnChartArea: true,
         },
