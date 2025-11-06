@@ -14,6 +14,8 @@ import {
   NYTTE_COLLECTION_ID,
   ROOT_COLLECTION_DATA,
 } from "../constants/goalConstants";
+import TextArea from "@atlaskit/textarea";
+import { Field } from "@atlaskit/form";
 
 //This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
 
@@ -85,16 +87,19 @@ const GoalDrawer = (props: Props) => {
           <h2>{drawerTitle}</h2>
 
           {/* DESCRIPTION FIELD */}
-          <TextField
-            label="Beskrivelse"
-            value={formData.description}
-            onChange={(e) =>
-              handleChange("description", (e.target as HTMLInputElement).value)
-            }
-            placeholder="Detaljert beskrivelse"
-            style={{ minHeight: 80 }}
-            isRequired
-          />
+          <Field name="description" label="Beskrivelse" isRequired>
+            {({ fieldProps }) => (
+              // @ts-ignore
+              <TextArea
+                {...fieldProps}
+                value={formData.description}
+                onChange={(e) => handleChange("description", e.target.value)}
+                placeholder="Detaljert beskrivelse...."
+                minimumRows={4}
+                resize="vertical"
+              />
+            )}
+          </Field>
 
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
