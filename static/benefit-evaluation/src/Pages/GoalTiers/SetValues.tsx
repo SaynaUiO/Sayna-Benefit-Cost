@@ -127,7 +127,7 @@ export const SetValues = (props: SetValuesProps) => {
       <Modal onClose={() => onClose(false)}>
         <ModalHeader>
           <ModalTitle>Set poeng for formål (strukturerte mål)</ModalTitle>
-          <Tooltip content='You can set value estimates of goals by giving relative weights ("goal points").'>
+          <Tooltip content="Du kan angi verdiberegninger for formål ved å gi dem relative vekter («målpoeng»).">
             <Box
               style={{
                 cursor: "pointer",

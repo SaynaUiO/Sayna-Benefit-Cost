@@ -5,9 +5,7 @@ import { useAPI } from "../../Contexts/ApiContext";
 import { Inline } from "@atlaskit/primitives";
 import { useAppContext } from "../../Contexts/AppContext";
 
-
 export const ResetEverything = () => {
-
   const { showAlert } = useAlert();
 
   const api = useAPI();
@@ -15,24 +13,29 @@ export const ResetEverything = () => {
 
   const reset = () => {
     showAlert({
-      title: "Reset Everything",
-      body: "Are you sure you want to reset the entire app? This includes ALL PROJECTS and ALL DATA. This action cannot be undone.",
-      confirmText: "Reset",
+      title: "Nullstill alt",
+      body: "Er du sikker på at du vil tilbakestille hele appen? Dette vil slette ALLE PROSJEKTER og ALL DATA. Denne handlingen kan ikke angres.",
+      confirmText: "Nullstill",
       onConfirm: async () => {
-        return api.app.reset().then(() => {
-          navigate("/");
-        }).catch((error) => {
-          console.error(error)
-        });
+        return api.app
+          .reset()
+          .then(() => {
+            navigate("/");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       },
-      onCancel: () => {}
+      onCancel: () => {},
     });
-  }
-  
-  return(
+  };
+
+  return (
     <Inline space="space.300" spread="space-between">
-      <h4>Reset Everything</h4>
-      <Button appearance='danger' onClick={() => reset()}>Reset</Button>
+      <h4>Nullstill alt</h4>
+      <Button appearance="danger" onClick={() => reset()}>
+        Nullstill
+      </Button>
     </Inline>
-  )
-}
+  );
+};

@@ -5,9 +5,7 @@ import { useAPI } from "../../Contexts/ApiContext";
 import { Inline } from "@atlaskit/primitives";
 import { useAppContext } from "../../Contexts/AppContext";
 
-
 export const ResetProject = () => {
-
   const { showAlert } = useAlert();
 
   const [scope] = useAppContext();
@@ -17,24 +15,27 @@ export const ResetProject = () => {
 
   const reset = () => {
     showAlert({
-      title: "Reset Project",
-      body: `Are you sure you want to reset ${scope.name}?`,
-      confirmText: "Reset",
+      title: "Nullstill prosjektet",
+      body: `Er du sikker på at du vil nullstille ${scope.name}?`,
+      confirmText: "Nullstill",
       onConfirm: async () => {
-        return api.project.reset(scope.id).then(() => {
-          navigate("/");
-        }).catch((error) => {
-          console.error(error)
-        });
+        return api.project
+          .reset(scope.id)
+          .then(() => {
+            navigate("/");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       },
-      onCancel: () => {}
+      onCancel: () => {},
     });
-  }
-  
-  return(
+  };
+
+  return (
     <Inline space="space.300" spread="space-between">
-      <h4>Reset Project</h4>
-      <Button onClick={() => reset()}>Reset</Button>
+      <h4>Nullstill project</h4>
+      <Button onClick={() => reset()}>Nullstill</Button>
     </Inline>
-  )
-}
+  );
+};

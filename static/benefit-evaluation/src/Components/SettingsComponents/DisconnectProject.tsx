@@ -5,7 +5,6 @@ import { useAPI } from "../../Contexts/ApiContext";
 import { useAppContext } from "../../Contexts/AppContext";
 
 export const DisconnectProject = () => {
-
   const { showAlert } = useAlert();
   const [scope] = useAppContext();
   const api = useAPI();
@@ -16,19 +15,19 @@ export const DisconnectProject = () => {
       body: `Are you sure you want to disconnect ${scope.name} from a portfolio?`,
       confirmText: "Disconnect",
       onConfirm: async () => {
-        return api.project.disconnect(scope.id)
-        .catch((error) => {
-          console.error(error)
-        })
+        return api.project.disconnect(scope.id).catch((error) => {
+          console.error(error);
+        });
       },
-      onCancel: () => {}
+      onCancel: () => {},
     });
-  }
+  };
 
-  return(
-    <Inline space="space.300" spread="space-between">
-      <h4>Disconnect Project From Portfolio</h4>
-      <Button onClick={() => disconnect()}>Disconnect</Button>
-    </Inline>
-  )
-}
+  return (
+    // <Inline space="space.300" spread="space-between">
+    //   <h4>Disconnect Project From Portfolio</h4>
+    //   <Button onClick={() => disconnect()}>Disconnect</Button>
+    // </Inline>
+    <></>
+  );
+};
