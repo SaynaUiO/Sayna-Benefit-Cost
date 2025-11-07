@@ -72,7 +72,7 @@ export const GoalLabel = ({ goal, simplified }: EstimationPopupProps) => {
           <Tooltip
             content={
               goal.type === GoalTypeEnum.GOAL
-                ? "Balanced Points"
+                ? "Jevne nyttepoeng"
                 : "Benefit Points"
             }
           >
