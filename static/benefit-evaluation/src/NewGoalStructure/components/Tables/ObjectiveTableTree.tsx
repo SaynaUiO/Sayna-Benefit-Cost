@@ -11,7 +11,7 @@ import AddIcon from "@atlaskit/icon/glyph/add";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import { Goal, GoalCollection } from "../../../Models";
-import InlineEdit, { InlineEditableTextfield } from "@atlaskit/inline-edit";
+import InlineEdit from "@atlaskit/inline-edit";
 import { FORMAAL_COLLECTION_ID } from "../../constants/goalConstants";
 import { useGoalStructure } from "../../hooks/useGoalStructure";
 import TextArea from "@atlaskit/textarea";
@@ -19,6 +19,9 @@ import { SpotlightTarget } from "@atlaskit/onboarding";
 import BitbucketCompareIcon from "@atlaskit/icon/glyph/bitbucket/compare";
 import Lozenge from "@atlaskit/lozenge";
 import Tooltip from "@atlaskit/tooltip";
+
+// Import the hook
+import { useTranslation } from "@forge/react";
 
 interface ObjectiveRootItem {
   id: typeof FORMAAL_COLLECTION_ID;
@@ -47,12 +50,13 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
   onSetValues,
   data: formaalGoals,
 }) => {
+  const { t } = useTranslation();
   const { formaalCollectionData, handlers } = useGoalStructure();
   const { handleUpdateCollectionDescription } = handlers;
 
   const OBJECTIVE_ROOT_ITEM: ObjectiveRootItem = {
     id: FORMAAL_COLLECTION_ID,
-    name: "Formål",
+    name: t("objective_table.root_name"),
     goals: formaalGoals,
     description: formaalCollectionData?.description,
   };
@@ -62,22 +66,24 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
   return (
     <TableTree>
       <Headers>
-        <Header width={250}>Formål</Header>
-        <Header width={720}>Beskrivelse</Header>
+        <Header width={250}>{t("objective_table.headers.name")}</Header>
+        <Header width={720}>{t("objective_table.headers.description")}</Header>
         <Header width={90}></Header>
         <Header width={100}></Header>
-        <Header width={125}>Nyttepoeng</Header>
-        <Header width={130}>Handlinger</Header>
+        <Header width={125}>{t("objective_table.headers.points")}</Header>
+        <Header width={130}>{t("objective_table.headers.actions")}</Header>
       </Headers>
 
       <Rows
         items={items as TableItem[]}
         render={(item: TableItem) => {
-          const isRoot = item.id === FORMAAL_COLLECTION_ID; // Bruker konstant/korrekt ID
+          const isRoot = item.id === FORMAAL_COLLECTION_ID;
           const goal = item as Goal;
           const children = isRoot ? (item as ObjectiveRootItem).goals : [];
           const isLiveGoal = !isRoot;
-          const primaryLabel = isRoot ? "Formål" : goal.key || goal.id;
+          const primaryLabel = isRoot
+            ? t("objective_table.root_name")
+            : goal.key || goal.id;
 
           return (
             <Row
@@ -86,14 +92,12 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
               hasChildren={isRoot}
               isDefaultExpanded
             >
-              {/* KOLONNE 1: Formål Navn / Nøkkel */}
               <Cell>
-                <Tooltip content="Objective i OKR">
+                <Tooltip content={t("objective_table.tooltip")}>
                   <strong>{primaryLabel}</strong>
                 </Tooltip>
               </Cell>
 
-              {/* KOLONNE 2: Beskrivelse */}
               <Cell>
                 {isRoot && (
                   <InlineEdit
@@ -105,7 +109,9 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                         isCompact={false}
                         minimumRows={2}
                         resize="horizontal"
-                        placeholder="Skriv inn beskrivelse her..."
+                        placeholder={t(
+                          "objective_table.inline_edit.placeholder"
+                        )}
                       />
                     )}
                     readView={() => (
@@ -118,7 +124,7 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                           }}
                         >
                           {(item as ObjectiveRootItem).description ||
-                            "Legg til en beskrivelse her"}
+                            t("objective_table.inline_edit.empty_state")}
                         </div>
                       </SpotlightTarget>
                     )}
@@ -130,7 +136,7 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
                     }
                     editButtonLabel={
                       (item as ObjectiveRootItem).description ||
-                      "Legg til beskrivelse"
+                      t("objective_table.inline_edit.edit_button")
                     }
                     keepEditViewOpenOnBlur
                     readViewFitContainerWidth
@@ -144,50 +150,63 @@ export const ObjectiveTableTree: React.FC<ObjectiveTableTreeProps> = ({
               <Cell></Cell>
 
               <Cell>
-                {" "}
                 <Lozenge appearance="new" isBold>
-                  {!isRoot && goal.balancedPoints?.value}{" "}
+                  {!isRoot && goal.balancedPoints?.value}
                 </Lozenge>
               </Cell>
 
-              {/* KOLONNE 5: Handlinger */}
               <Cell>
                 {isRoot && (
-                  <Button
-                    appearance="subtle"
-                    iconBefore={
-                      <AddIcon size="small" label="Legg til Formål" />
-                    }
-                    onClick={() =>
-                      onAddGoal(OBJECTIVE_ROOT_ITEM.id, FORMAAL_COLLECTION_ID)
-                    }
-                  />
-                )}
-
-                {isRoot && (
-                  <SpotlightTarget name="formaal-weight">
+                  <>
                     <Button
                       appearance="subtle"
                       iconBefore={
-                        <BitbucketCompareIcon size="small" label="" />
+                        <AddIcon
+                          size="small"
+                          label={t("objective_table.buttons.add")}
+                        />
                       }
                       onClick={() =>
-                        onSetValues(formaalGoals, FORMAAL_COLLECTION_ID)
+                        onAddGoal(OBJECTIVE_ROOT_ITEM.id, FORMAAL_COLLECTION_ID)
                       }
-                    ></Button>
-                  </SpotlightTarget>
+                    />
+                    <SpotlightTarget name="formaal-weight">
+                      <Button
+                        appearance="subtle"
+                        iconBefore={
+                          <BitbucketCompareIcon
+                            size="small"
+                            label={t("objective_table.buttons.set_values")}
+                          />
+                        }
+                        onClick={() =>
+                          onSetValues(formaalGoals, FORMAAL_COLLECTION_ID)
+                        }
+                      />
+                    </SpotlightTarget>
+                  </>
                 )}
 
                 {isLiveGoal && (
                   <>
                     <Button
                       appearance="subtle"
-                      iconBefore={<EditIcon size="small" label="Rediger Mål" />}
+                      iconBefore={
+                        <EditIcon
+                          size="small"
+                          label={t("objective_table.buttons.edit")}
+                        />
+                      }
                       onClick={() => onEditGoal(goal)}
                     />
                     <Button
                       appearance="subtle"
-                      iconBefore={<TrashIcon size="small" label="Slett Mål" />}
+                      iconBefore={
+                        <TrashIcon
+                          size="small"
+                          label={t("objective_table.buttons.delete")}
+                        />
+                      }
                       onClick={() => onDeleteGoal(goal)}
                     />
                   </>

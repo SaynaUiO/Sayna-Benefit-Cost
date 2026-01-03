@@ -1,6 +1,9 @@
 import { Box, xcss } from "@atlaskit/primitives";
+import { useTranslation } from "@forge/react";
 
 export const Introduction = () => {
+  const { t } = useTranslation();
+
   const boxStyles = xcss({
     borderColor: "color.border.accent.gray",
     borderStyle: "solid",
@@ -12,74 +15,43 @@ export const Introduction = () => {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h1 style={{ paddingBottom: "1rem" }}>Velkommen til BenefitOKR</h1>
-      BenefitOKR management er en strategisk tilnærming for å vurdere om
-      investeringene i et prosjekt kan rettferdiggjøres ut fra nytten det gir.
-      Mer informasjon om BenefitOKR management finner du nedenfor.
-      <h2 style={{ paddingBottom: "1rem" }}>Forstå BenefitOKR Management</h2>
+      <h1 style={{ paddingBottom: "1rem" }}>{t("introduction_page.title")}</h1>
+      {t("introduction_page.intro_text")}
+
+      <h2 style={{ paddingBottom: "1rem" }}>
+        {t("introduction_page.understand_title")}
+      </h2>
       <section>
         <Box xcss={boxStyles}>
-          <p>Innebærer:</p>
+          <p>{t("introduction_page.understand_box.subtitle")}</p>
           <ul>
-            <li>
-              Å vurdere hvilken nytte et prosjekt forventes å levere, for
-              eksempel forbedrede tjenester eller økt salg.
-            </li>
-            <li>
-              Å sammenligne denne nytten med de tilhørende livssykluskostnadene.
-            </li>
-            <li>
-              Å kontinuerlig overvåke og evaluere utviklingsaktiviteter for å
-              sikre at produkter med høy nytte-kostnadsverdi leveres.
-            </li>
+            <li>{t("introduction_page.understand_box.bullet_1")}</li>
+            <li>{t("introduction_page.understand_box.bullet_2")}</li>
+            <li>{t("introduction_page.understand_box.bullet_3")}</li>
           </ul>
-          <p>
-            Dette gir deg et mål for å estimere verdien av
-            utviklingsaktiviteter, i tillegg til de tradisjonelle målene for
-            tid, kostnad og omfang.
-          </p>
+          <p>{t("introduction_page.understand_box.footer")}</p>
         </Box>
       </section>
-      <h2 style={{ paddingBottom: "1rem" }}>Vanlige fremgangsmåte</h2>
+
+      <h2 style={{ paddingBottom: "1rem" }}>
+        {t("introduction_page.procedure_title")}
+      </h2>
       <Box xcss={boxStyles}>
-        <p>
-          Dette er noen av de typiske trinnene i BenefitOKR-prosessen som du vil
-          utføre i denne appen:
-        </p>
+        <p>{t("introduction_page.procedure_box.subtitle")}</p>
         <ol>
-          <li>
-            Opprette en målsamling og legge til mål for prosjektet
-            (Målstruktur-siden)
-          </li>
-          <li>
-            Tilordne verdier – enten vekting eller pengeverdi (verdi­poeng) –
-            til alle målene (Målstruktur-siden)
-          </li>
-          <li>Tilordne kostnad og tid til hver epic (Målstruktur-siden)</li>
-          <li>
-            Tilordne nyttepoeng for å estimere hvor mye hver epic forventes å
-            bidra (nytte) til målene (Estimerings-siden)
-          </li>
-          <li>
-            Se og evaluere rekkefølgen for hvordan epics bør fullføres
-            (Periodiserings-siden)
-          </li>
+          <li>{t("introduction_page.procedure_box.step_1")}</li>
+          <li>{t("introduction_page.procedure_box.step_2")}</li>
+          <li>{t("introduction_page.procedure_box.step_3")}</li>
+          <li>{t("introduction_page.procedure_box.step_4")}</li>
+          <li>{t("introduction_page.procedure_box.step_5")}</li>
         </ol>
       </Box>
-      <h2 style={{ paddingBottom: "1rem" }}>Periodisering</h2>
+
+      <h2 style={{ paddingBottom: "1rem" }}>
+        {t("introduction_page.analysis_title")}
+      </h2>
       <Box xcss={boxStyles}>
-        <p>
-          Periodisering handler om å fordele nytte (BP) og kostnad (SP) over tid
-          for å gi et mer realistisk bilde av et prosjekts økonomiske utvikling.
-          I stedet for å anta at gevinster og kostnader oppstår umiddelbart,
-          benyttes forhåndsdefinerte periodiseringsprofiler som viser hvordan
-          verdiskapning og utgifter fordeler seg gjennom prosjektets levetid.
-          Ved å bruke slike profiler kan man estimere den totale nytten og
-          kostnaden for hver Epic, og deretter beregne indikatorer som netto
-          nåverdi (NPV) og akkumulert netto nåverdi (Accumulated NPV). Dette gir
-          et helhetlig grunnlag for å vurdere økonomisk verdi og risiko over
-          tid.
-        </p>
+        <p>{t("introduction_page.analysis_box")}</p>
       </Box>
     </div>
   );

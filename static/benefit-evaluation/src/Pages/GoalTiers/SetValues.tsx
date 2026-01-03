@@ -1,5 +1,5 @@
 import Button, { LoadingButton } from "@atlaskit/button";
-import { HelperMessage, Label } from "@atlaskit/form";
+import { HelperMessage } from "@atlaskit/form";
 import Modal, {
   ModalTransition,
   ModalHeader,
@@ -15,13 +15,16 @@ import { useAppContext } from "../../Contexts/AppContext";
 
 import { Inline } from "@atlaskit/primitives";
 import { Flex, Stack, xcss } from "@atlaskit/primitives";
-import Tooltip, { TooltipPrimitive } from "@atlaskit/tooltip";
+import Tooltip from "@atlaskit/tooltip";
 import { WeightField } from "../../Components/GoalStructure/WeightField";
 import { TotalPointsUI } from "../../Components/Estimation/TotalPointsUI";
 import { Loading } from "../../Components/Common/Loading";
 
 import QuestionCircleIcon from "@atlaskit/icon/glyph/question-circle";
 import { Box } from "@atlaskit/primitives";
+
+// Import the translation hook
+import { useTranslation } from "@forge/react";
 
 type SetValuesProps = {
   goal_tier_id: string;
@@ -30,20 +33,16 @@ type SetValuesProps = {
   refresh: () => void;
 };
 
-const MAX_MONETARY_VALUE = 7; // Beholdes for WeightField prop, selv om den ikke brukes
+const MAX_MONETARY_VALUE = 7;
 
 export const SetValues = (props: SetValuesProps) => {
-  const { goal_tier_id, goals, close, refresh } = props;
+  const { goals, close } = props;
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [weights, setWeights] = useState<{ [goalId: string]: number }>({});
 
-  const [scope] = useAppContext();
+  const { t } = useTranslation();
   const api = useAPI();
-
-  // Hardkode Method til WEIGHT
-  const method = `${balancedPointsEnum.WEIGHT}`;
-  const postfix = "%"; // Hardkode Postfix
 
   const onClose = (shouldRefresh: boolean) => {
     if (shouldRefresh) props.refresh();
@@ -52,7 +51,7 @@ export const SetValues = (props: SetValuesProps) => {
 
   const updateValues = (
     value: number,
-    _method: balancedPointsEnum, // 'method' ignoreres, da den alltid er WEIGHT
+    _method: balancedPointsEnum,
     goal: Goal
   ) => {
     setWeights((prevWeights) => ({
@@ -64,18 +63,14 @@ export const SetValues = (props: SetValuesProps) => {
   useEffect(() => {
     if (goals.length > 0) {
       const initialWeights: { [goalId: string]: number } = {};
-
       goals.forEach((goal) => {
         const bp = goal.balancedPoints;
-
-        // Håndterer kun eksisterende Balanced Points av typen WEIGHT, ellers 0
         if (bp && bp.type === balancedPointsEnum.WEIGHT) {
           initialWeights[goal.id] = bp.value || 0;
         } else {
           initialWeights[goal.id] = 0;
         }
       });
-
       setWeights(initialWeights);
     }
     setLoading(false);
@@ -87,9 +82,9 @@ export const SetValues = (props: SetValuesProps) => {
       (goal): Goal => ({
         ...goal,
         balancedPoints: {
-          type: balancedPointsEnum.WEIGHT, // Hardkodet
-          value: weights[goal.id] || 0, // Bruker kun weights
-          postFix: "%", // Hardkodet
+          type: balancedPointsEnum.WEIGHT,
+          value: weights[goal.id] || 0,
+          postFix: "%",
         } as balancedPoints,
       })
     );
@@ -99,13 +94,12 @@ export const SetValues = (props: SetValuesProps) => {
       setSubmitting(false);
       onClose(true);
     } catch (error) {
-      console.error("Error setting goal points", error); // Oppdatert melding
+      console.error(t("set_values.error_submit"), error);
       setSubmitting(false);
     }
   };
 
   const validate = (): boolean => {
-    // Sjekker kun for total weight
     const totalValues = goals.reduce(
       (sum, goal) => sum + (weights[goal.id] || 0),
       0
@@ -120,14 +114,14 @@ export const SetValues = (props: SetValuesProps) => {
       total += weights?.[goal.id] || 0;
     });
     return total;
-  }, [weights]);
+  }, [weights, isLoading, goals]);
 
   return (
     <ModalTransition>
       <Modal onClose={() => onClose(false)}>
         <ModalHeader>
-          <ModalTitle>Set poeng for formål (strukturerte mål)</ModalTitle>
-          <Tooltip content="Du kan angi verdiberegninger for formål ved å gi dem relative vekter («målpoeng»).">
+          <ModalTitle>{t("set_values.title")}</ModalTitle>
+          <Tooltip content={t("set_values.help_tooltip")}>
             <Box
               style={{
                 cursor: "pointer",
@@ -142,13 +136,11 @@ export const SetValues = (props: SetValuesProps) => {
         </ModalHeader>
         <ModalBody>
           <Stack space="space.100">
-            {/* Fjernet: Inline med Method RadioGroup og Postfix TextField */}
-
             {!isLoading ? (
               <>
                 <Inline space="space.050">
-                  {`Total vekt:`}
-                  <Tooltip content={"Total weight"}>
+                  {t("set_values.total_weight_label")}
+                  <Tooltip content={t("set_values.total_weight_tooltip")}>
                     <TotalPointsUI
                       totalPoints={getTotal}
                       pointsToDistribute={100}
@@ -182,8 +174,10 @@ export const SetValues = (props: SetValuesProps) => {
                       />
                     ))}
                   </Flex>
-                  <HelperMessage>Total vekt må være 100 %</HelperMessage>
-                  <HelperMessage>Alle felt må fylles ut</HelperMessage>
+                  <HelperMessage>{t("set_values.helper_total")}</HelperMessage>
+                  <HelperMessage>
+                    {t("set_values.helper_required")}
+                  </HelperMessage>
                 </div>
               </>
             ) : (
@@ -193,7 +187,7 @@ export const SetValues = (props: SetValuesProps) => {
         </ModalBody>
         <ModalFooter>
           <Button appearance="subtle" onClick={() => onClose(false)}>
-            Avbryt
+            {t("set_values.cancel")}
           </Button>
           <LoadingButton
             appearance="primary"
@@ -201,7 +195,7 @@ export const SetValues = (props: SetValuesProps) => {
             isDisabled={!validate()}
             onClick={() => submit()}
           >
-            Lagre
+            {t("set_values.save")}
           </LoadingButton>
         </ModalFooter>
       </Modal>

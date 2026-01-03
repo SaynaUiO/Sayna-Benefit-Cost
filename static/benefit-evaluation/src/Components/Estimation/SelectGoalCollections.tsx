@@ -14,14 +14,14 @@ import { GoalTier } from "../../Models/GoalTierModel";
 import { GoalTierTypeEnum } from "../../Models";
 import { SpotlightTarget } from "@atlaskit/onboarding";
 
-//Denne filen er for nedtrekkslista i Estimates.
+// Import the translation hook
+import { useTranslation } from "@forge/react";
 
 export type GoalTierOption = {
-  //Et enkelt valg i nedtrakningslista skal ha relasjon GoalTier - UpperGoalTier (Epic-Effect)
   label: string;
   value: {
-    goalTier: GoalTier; //Hele verdien til GoalTier
-    upperGoalTier: GoalTier; //Hele verdien til GoalTier
+    goalTier: GoalTier;
+    upperGoalTier: GoalTier;
   };
 };
 
@@ -34,18 +34,17 @@ export const SelectGoalCollections = ({
   onChange,
   isDisabled,
 }: SelectGoalCollectionsProps) => {
+  const { t } = useTranslation();
   const [options, setOptions] = useState<GoalTierOption[]>();
-  const [isLoading, setLoading] = useState<boolean>(true); //Om data fortsatt hentes
-  const [selectedOption, setSelectedOption] = useState<GoalTierOption>(); //Det alternativet som har blitt valgt, f.eks Epic-Eff
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const [selectedOption, setSelectedOption] = useState<GoalTierOption>();
 
-  const { goal_tier_type, goal_tier_id, upper_goal_tier_id } = useParams(); //Henter parameterne fra URL-en (Se mer på dette)
-  const location = useLocation(); //Gir tilgang til nåværende url
-  const navigate = useNavigate(); //Brukes til å endre URLen (navigere til en side)
+  const { goal_tier_type, goal_tier_id, upper_goal_tier_id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const api = useAPI();
   const [scope] = useAppContext();
 
-  //Denne funksjonen tar to GoalTier objekter og nruker Maps til å sende brukeren til en nyURL.
-  // Dette er den primære måten å bytte valgt estimering på. type: 0 for all relevant data
   const ChooseGoalTier = (goalTier: GoalTier, upperGoalTier: GoalTier) => {
     navigate(
       `../estimation/${goalTier.type}/${goalTier.id}/${upperGoalTier.id}`,
@@ -57,8 +56,6 @@ export const SelectGoalCollections = ({
     return await api.goalCollection
       .getAll(scope.id)
       .then((goalTiers) => {
-        console.log("Rådata fra getAll:", goalTiers);
-
         const cleanedGoalTiers = goalTiers.map((tier) => {
           if (tier.id === "root-formaal" && (tier as any).goals) {
             const cleanTier = { ...tier, scopeId: tier.scopeId || scope.id };
@@ -68,14 +65,12 @@ export const SelectGoalCollections = ({
           if (!tier.scopeId) {
             return { ...tier, scopeId: scope.id } as GoalTier;
           }
-
           return tier;
         });
 
-        //Sorter i riktig girarkisk rekkefølge:
+        // Note: Keeping HIERARCHY_ORDER strings as they match your database/API tier names
         const HIERARCHY_ORDER = ["Formål", "Planlagte Nyttevirkninger", "Epic"];
 
-        // 3. Sorter validGoalTiers: Formål (0) -> Nytte (1) -> Epic (2)
         cleanedGoalTiers.sort((a, b) => {
           const aIndex = HIERARCHY_ORDER.indexOf(a.name);
           const bIndex = HIERARCHY_ORDER.indexOf(b.name);
@@ -83,13 +78,10 @@ export const SelectGoalCollections = ({
         });
 
         const estimationOptions: GoalTierOption[] = [];
-
-        // 🎯 FIX: BRUK cleanedGoalTiers HER!
         for (let index = 0; index < cleanedGoalTiers.length - 1; index++) {
           const lowerGoalTier = cleanedGoalTiers[index + 1];
           const upperGoalTier = cleanedGoalTiers[index];
 
-          // Sørg for at ingen navn er tomme (den defensive fiksingen fra sist)
           const lowerGoalTierName = lowerGoalTier.name || lowerGoalTier.id;
           const upperGoalTierName = upperGoalTier.name || upperGoalTier.id;
           estimationOptions.push({
@@ -100,7 +92,6 @@ export const SelectGoalCollections = ({
             },
           });
         }
-        console.debug(estimationOptions);
         return estimationOptions;
       })
       .catch((error) => {
@@ -109,12 +100,9 @@ export const SelectGoalCollections = ({
       });
   };
 
-  //Denne hooken kjøres en gnag for å hente datene med fetch
   useEffect(() => {
-    console.debug("useEffect");
     let isMounted = true;
     fetch().then((options) => {
-      console.debug("awaiting results");
       if (isMounted) setOptions(options);
     });
     return () => {
@@ -122,46 +110,35 @@ export const SelectGoalCollections = ({
     };
   }, []);
 
-  //Denne useEffekten prøver å finne et alternativ i options i komponenten selectedOption
   useEffect(() => {
-    if (options) {
-      if (options.length > 0) {
-        const option = options.find(
-          //Pørver å finne et alternatv i options som samsvarer med de tre URL-parameterne
-          (option) =>
-            `${option.value.goalTier.type}` === goal_tier_type &&
-            `${option.value.goalTier.id}` === goal_tier_id &&
-            `${option.value.upperGoalTier.id}` === upper_goal_tier_id
-        );
-        //Hvis et treff blir funnet, settes selectedOption, og onChange kalles for å varsle foreldrekomponenten om valget
-        if (option) {
-          console.debug("Select option with parameters");
-          setSelectedOption(option);
-          setLoading(false);
-          onChange(option);
-          //HVis det bare er et alternativ totalt, velges det automatisk, og nvigatsjon startes til den tilhørende urlen vis ChooseGoalTier
-        } else if (options.length === 1) {
-          console.debug("Selecting only option");
-          const { goalTier, upperGoalTier: upperGoalTier } = options[0].value;
-          ChooseGoalTier(goalTier, upperGoalTier);
-          setLoading(false);
-        } else if (options.length > 1) {
-          const defaultOption = options[options.length - 1];
-          const { goalTier, upperGoalTier } = defaultOption.value;
-          ChooseGoalTier(goalTier, upperGoalTier);
-          setLoading(false);
-        } else {
-          console.debug("No option selected");
-          setLoading(false);
-        }
+    if (options && options.length > 0) {
+      const option = options.find(
+        (option) =>
+          `${option.value.goalTier.type}` === goal_tier_type &&
+          `${option.value.goalTier.id}` === goal_tier_id &&
+          `${option.value.upperGoalTier.id}` === upper_goal_tier_id
+      );
+      if (option) {
+        setSelectedOption(option);
+        setLoading(false);
+        onChange(option);
+      } else if (options.length === 1) {
+        const { goalTier, upperGoalTier: upperGoalTier } = options[0].value;
+        ChooseGoalTier(goalTier, upperGoalTier);
+        setLoading(false);
+      } else if (options.length > 1) {
+        const defaultOption = options[options.length - 1];
+        const { goalTier, upperGoalTier } = defaultOption.value;
+        ChooseGoalTier(goalTier, upperGoalTier);
+        setLoading(false);
       } else {
-        console.debug("No options");
         setLoading(false);
       }
+    } else if (options) {
+      setLoading(false);
     }
   }, [options, location.pathname]);
 
-  //Navigasjonsfunksjon:  (kanskje fjerne dette)
   const selectRankAboveCurrent = () => {
     if (options && selectedOption) {
       const index = options.findIndex((option) => option === selectedOption);
@@ -188,7 +165,13 @@ export const SelectGoalCollections = ({
     }
   };
 
-  //Brukergrensesnitt:
+  const getPlaceholder = () => {
+    if (isLoading) return t("estimation.select.placeholder_loading");
+    if (options && options.length > 0)
+      return t("estimation.select.placeholder_select");
+    return t("estimation.select.placeholder_empty");
+  };
+
   return (
     <>
       <Stack
@@ -201,14 +184,14 @@ export const SelectGoalCollections = ({
         })}
         alignInline="center"
       >
-        <Label htmlFor="">Velg hvilke målnivåer du vil evaluere</Label>
+        <Label htmlFor="">{t("estimation.select.label")}</Label>
         <Grid
           xcss={xcss({ width: "100%" })}
           templateColumns="32px 1fr 32px"
           alignItems="center"
           columnGap="space.400"
         >
-          <Tooltip content="Evaluate One Rank Down">
+          <Tooltip content={t("estimation.select.tooltip_down")}>
             <Button
               onClick={() => selectRankBelowCurrent()}
               iconBefore={<HipchatChevronDoubleDownIcon label="Rank down" />}
@@ -236,16 +219,10 @@ export const SelectGoalCollections = ({
               }}
               isDisabled={isLoading || isDisabled}
               options={options}
-              placeholder={
-                isLoading
-                  ? "Loading..."
-                  : options && options.length > 0
-                  ? "Select which tiers to evaluate"
-                  : "No goal collections found"
-              }
+              placeholder={getPlaceholder()}
             />
           </SpotlightTarget>
-          <Tooltip content="Evaluate One Rank Up">
+          <Tooltip content={t("estimation.select.tooltip_up")}>
             <Button
               onClick={() => selectRankAboveCurrent()}
               iconBefore={<HipchatChevronDoubleUpIcon label="Rank up" />}
@@ -261,32 +238,17 @@ export const SelectGoalCollections = ({
         </Grid>
         {selectedOption && (
           <p>
-            {/* Sjekker om det er Epic-nivået (enten via TYPE eller via navnet) */}
             {Number(goal_tier_type) === GoalTierTypeEnum.ISSUE_TYPE ||
-            selectedOption?.value.goalTier.name
-              .toLowerCase()
-              .includes("epic") ? (
-              // TEKST FOR EPIC
-              <>
-                Fordel nyttepoeng blant epicene, for å anslå hvor mye hvert epic
-                bidrar til hver planlagte nyttevirkning. Ta for deg en
-                nyttevirkning om gangen og fordel 100 poeng blant epicene.
-              </>
-            ) : (
-              // TEKST FOR PLANLAGTE NYTTEVIRKNINGER (PN)
-              <>
-                Fordel nyttepoeng blant de planlagte nyttevirkningnene for å
-                anslå hvor mye hver planlagte nyttevirkning bidrar til de
-                overordnede Formålene.
-              </>
-            )}
+            selectedOption?.value.goalTier.name.toLowerCase().includes("epic")
+              ? t("estimation.select.desc_epic")
+              : t("estimation.select.desc_benefit")}
           </p>
         )}
       </Stack>
       {options && options.length === 0 && (
         <EmptyState
-          header="Could not find any goal collections"
-          description="You can create goals collections by clicking the button below"
+          header={t("estimation.empty_state.header")}
+          description={t("estimation.empty_state.description")}
           headingLevel={2}
           primaryAction={
             <Button
@@ -295,7 +257,7 @@ export const SelectGoalCollections = ({
                 navigate("../goal-structure/create-goal-collection")
               }
             >
-              Create Goal Collections
+              {t("estimation.empty_state.button")}
             </Button>
           }
         />

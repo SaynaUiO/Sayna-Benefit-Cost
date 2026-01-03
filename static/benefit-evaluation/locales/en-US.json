@@ -1,0 +1,275 @@
+{
+  "app": { "title": "BenefitOKR" },
+  "structure": {
+    "loading": "Loading goal structure...",
+    "edit_goal_prefix": "Edit",
+    "new_goal": "New Goal",
+    "debug_title": "All Fetched Goals (DEBUG)"
+  },
+  "delete_modal": {
+    "title_prefix": "Delete Goal:",
+    "warning_start": "Are you sure you want to delete the goal",
+    "warning_end": "permanently? This action cannot be undone.",
+    "impact_notice": "Deletion will affect related estimates and hierarchy.",
+    "cancel": "Cancel",
+    "confirm": "Delete permanently"
+  },
+  "drawer": {
+    "edit_prefix": "Edit",
+    "create_prefix": "Create",
+    "save_changes": "Save changes",
+    "description_label": "Description",
+    "description_placeholder": "Detailed description...",
+    "types": {
+      "Product": "Epic",
+      "Objective": "Objective",
+      "Benefit": "Benefit"
+    }
+  },
+  "benefit_table": {
+    "headers": {
+      "name": "Planned Benefits",
+      "description": "Description",
+      "points": "Benefit Points",
+      "actions": "Actions"
+    },
+    "root_name": "Planned Benefits",
+    "tooltip": "Key Results in OKR",
+    "buttons": {
+      "add": "Add Benefit",
+      "edit": "Edit Goal",
+      "delete": "Delete Goal"
+    }
+  },
+  "objective_table": {
+    "headers": {
+      "name": "Purpose",
+      "description": "Description",
+      "points": "Benefit Points",
+      "actions": "Actions"
+    },
+    "root_name": "Purpose",
+    "tooltip": "Objective in OKR",
+    "inline_edit": {
+      "placeholder": "Enter description here...",
+      "empty_state": "Add a description here",
+      "edit_button": "Add description"
+    },
+    "buttons": {
+      "add": "Add Purpose",
+      "set_values": "Compare/Set Values",
+      "edit": "Edit Goal",
+      "delete": "Delete Goal"
+    }
+  },
+  "epic_table": {
+    "headers": {
+      "name": "Product Goals",
+      "description": "Description",
+      "time": "Time",
+      "cost": "Cost",
+      "points": "Benefit Points",
+      "actions": "Actions"
+    },
+    "root_name": "Product",
+    "tooltip": "Initiatives in OKR",
+    "buttons": {
+      "add": "Add Epic",
+      "set_cost_time": "Compare Cost/Time",
+      "edit": "Edit Goal",
+      "delete": "Delete Goal"
+    }
+  },
+  "set_values": {
+    "title": "Set points for purpose",
+    "help_tooltip": "You can assign value calculations for objectives by giving them relative weights ('goal points').",
+    "total_weight_label": "Total weight:",
+    "total_weight_tooltip": "Total weight distribution",
+    "helper_total": "Total weight must be 100 %",
+    "helper_required": "All fields must be filled out",
+    "cancel": "Cancel",
+    "save": "Save",
+    "error_submit": "Error setting goal points"
+  },
+  "cost_time": {
+    "title": "Set costs and time",
+    "desc_monetary": "The cost represents the expected lifecycle costs for each individual epic.",
+    "desc_relative": "The cost represents the expected lifecycle cost points for each epic, specified in relative points.",
+    "desc_time": "Time is the expected relative time to complete each epic. This is a relative value and is therefore not measured in hours or days.",
+    "total_cost": "Total cost:",
+    "total_time": "Total time:",
+    "postfix_label": "Postfix Monetary Measurement",
+    "helper_all_fields": "All fields must be filled out.",
+    "cancel": "Cancel",
+    "save": "Set costs and time"
+  },
+  "nav": {
+    "goal_structure": "Goal Structure",
+    "estimation": "Estimation",
+    "analysis": "Analysis",
+    "settings": "Settings",
+    "help_tooltip": "Restart onboarding",
+    "settings_tooltip": "Settings",
+    "language_tooltip": "Change language"
+  },
+  "estimation": {
+    "select": {
+      "label": "Choose which goal levels you want to evaluate",
+      "tooltip_down": "Evaluate One Rank Down",
+      "tooltip_up": "Evaluate One Rank Up",
+      "placeholder_loading": "Loading...",
+      "placeholder_select": "Select which tiers to evaluate",
+      "placeholder_empty": "No goal collections found",
+      "desc_epic": "Distribute benefit points among epics to estimate how much each epic contributes to each planned benefit. Take one benefit at a time and distribute 100 points among the epics.",
+      "desc_benefit": "Distribute benefit points among planned benefits to estimate how much each planned benefit contributes to the overall Objectives."
+    },
+    "empty_state": {
+      "header": "Something went wrong, or there are no goals here",
+      "no_goals_header": "{{name}} has no goals",
+      "description": "You can add goals by clicking the button below",
+      "button": "Go to Goal Structure"
+    }
+  },
+  "estimation_container": {
+    "assessment_goal": "Goal for assessment:",
+    "back": "Back",
+    "next": "Next",
+    "stepwise_tooltip": "Assign benefit points one goal at a time",
+    "stepwise_button": "Distribute stepwise",
+    "save": "Save"
+  },
+  "analysis": {
+    "title": "Periodization",
+    "description": "This page provides an overview of the estimation of benefits and costs over time. By selecting profiles for each epic below, you can see how the financial plan develops and changes based on the distribution.",
+    "loading": "Loading Epics or no Epics found...",
+    "table": {
+      "title": "List of Epics and Profile Selections",
+      "epic": "Epic",
+      "bp": "Benefit Points (BP)",
+      "bp_nok": "Benefit Value (Mill. NOK)",
+      "sp": "Cost Points (SP)",
+      "sp_nok": "Cost Value (Mill. NOK)",
+      "select_bp": "Select BP Profile",
+      "select_sp": "Select SP Profile",
+      "config_tooltip": "Convert points to NOK",
+      "placeholder_bp": "Select BP profile...",
+      "placeholder_sp": "Select SP profile...",
+      "discount": "Discount Factor",
+      "npv": "Net Present Value (NPV)",
+      "financial_plan_title": "Financial plan over {{years}} years (million NOK)",
+      "increase_years": "Increase years",
+      "decrease_years": "Decrease years"
+    },
+    "modal": {
+      "title": "Convert Points to NOK (Millions)",
+      "description": "Enter the conversion factors to transform Benefit Points (BP) and Cost Points (SP) into a calculated value in Million NOK. Changes update the financial plan immediately.",
+      "bp_rate": "1 BP = {{value}} million NOK",
+      "sp_rate": "1 SP = {{value}} million NOK",
+      "save": "Save"
+    }
+  },
+  "chart": {
+    "title": "Financial Plan (Benefit, Cost, Net) Over Time",
+    "description": "The chart combines Gross Benefit (BP), Gross Cost (SP), Net Value (bars), and Accumulated NPV (line, right axis). Break-even is marked where the accumulated NPV line crosses the zero line.",
+    "total_bp": "Total BP",
+    "total_sp": "Total SP",
+    "net_value": "Net Value (BP - SP)",
+    "acc_npv": "Accumulated NPV",
+    "year_label": "Year"
+  },
+  "profiles": {
+    "benefit": {
+      "delay_uniform": "Uniform, with startup delay",
+      "delay_plateau": "Gradual increase to stable level (Plateau)",
+      "delay_peak_det": "Delay with peak effect and gradual deterioration",
+      "imm_increase": "Immediate effect with steady increase to stable level",
+      "beginners_det": "Rapid increase, peak and rapid deterioration (Beginner enthusiasm)",
+      "uniform": "Uniform (without delay/change)"
+    },
+    "cost": {
+      "dev1_uniform": "High development (1 period) with uniform subsequent operation",
+      "dev1_decreasing": "High development (1 period) with decreasing subsequent operation",
+      "high_dev_low_dec": "Very high dev (1 period) with low, decreasing subsequent operation",
+      "low_dev_increasing": "Low development (1 period) with increasing subsequent operation",
+      "high_dev_decreasing": "High development (1 period) with decreasing subsequent operation"
+    }
+  },
+  "onboarding": {
+    "common": {
+      "next": "Next",
+      "back": "Back",
+      "dismiss": "Dismiss",
+      "finish_estimation": "Continue to estimation ->",
+      "finish_analysis": "Continue to analysis ->"
+    },
+    "structure": {
+      "welcome": { "title": "BenefitOKR", "body": "Thank you for using BenefitOKR – a tool for Benefits Management with OKR. Here is a brief introduction to the project page." },
+      "intro": { "title": "Introduction and Help", "body": "More information on how to use BenefitOKR can be found under Introduction." },
+      "structure_info": { "title": "Goal Structure", "body": "This page allows you to manage all goal collections. The structure follows the OKR framework: Objectives, Key Results, and Initiatives (Epics)." },
+      "purpose_input": { "title": "Purpose", "body": "Enter the project purpose directly in the field and press '✓' when finished." },
+      "add_goal": { "title": "Create Goal", "body": "Under Actions, you'll find a plus sign. Use it to create goals for that specific table. Try it now!" },
+      "edit_delete": { "title": "Edit/Delete", "body": "Here you can edit or delete goals you have created." },
+      "cost_time": { "title": "Cost/Time", "body": "For each Epic, you can distribute costs and add time usage." },
+      "objective_weight": { "title": "Objective Weight", "body": "Here you can distribute benefit points directly, as Objectives represent the highest level in the hierarchy." },
+      "estimation_nav": { "title": "Estimation", "body": "The remaining benefit points are distributed in the Estimation tab." }
+    },
+    "estimation": {
+      "relation": { "title": "Relation Evaluation", "body": "Select which relationship you want to evaluate to assign benefit points." },
+      "distribute": { "title": "Distribute Points", "body": "In this table, distribute benefit points to each task to assess its contribution to the goals." },
+      "analysis_nav": { "title": "Periodization", "body": "Next is periodization, used to distribute benefit points over time." }
+    }
+  }, 
+  "estimation_labels": {
+  "weight_tooltip": "Relative weight of the goal",
+  "monetary_tooltip": "Monetary value of the goal",
+  "distributed_points_tooltip": "Points distributed / Total to distribute",
+  "portfolio_contribution": "Portfolio Item Contribution",
+  "even_benefit_points": "Even Benefit Points",
+  "benefit_points": "Benefit Points",
+  "benefit_cost_ratio": "Benefit/Cost Ratio",
+  "points_distributed": "Points distributed", 
+  "balanced_points": "Balanced Points", 
+  "distributed_all": "Distributed points to each upper goals",
+  "not_submitted": "Will not be submitted",
+  "clear_or_distribute": "Clear or distribute points to all upper goals",
+  "clear_points": "Clear distributed points",
+  "toggle_collection": "Open/close Collection",
+  "total_points_distributed": "Total points distributed",
+  "portfolio_item_weight": "Portfolio Item Weight"
+},
+"clear_points_modal": {
+  "title": "Warning: Clear Points",
+  "body": "This action will clear all distributed points. Are you sure you want to continue?",
+  "cancel": "Cancel",
+  "confirm": "Clear Points"
+}, 
+"nav_sidebar": {
+  "header_description": "Benefit point distribution",
+  "project_section": "Project",
+  "introduction_section": "Introduction",
+  "introduction_item": "Introduction"
+}, 
+"introduction_page": {
+  "title": "Welcome to BenefitOKR",
+  "intro_text": "BenefitOKR management is a strategic approach to assess whether project investments can be justified based on the value they provide. More information about BenefitOKR management can be found below.",
+  "understand_title": "Understand BenefitOKR Management",
+  "understand_box": {
+    "subtitle": "Involves:",
+    "bullet_1": "Assessing what benefits a project is expected to deliver, such as improved services or increased sales.",
+    "bullet_2": "Comparing these benefits with the associated life-cycle costs.",
+    "bullet_3": "Continuously monitoring and evaluating development activities to ensure products with high benefit-cost value are delivered.",
+    "footer": "This gives you a metric to estimate the value of development activities, in addition to traditional goals for time, cost, and scope."
+  },
+  "procedure_title": "Common Procedure",
+  "procedure_box": {
+    "subtitle": "These are some of the typical steps in the BenefitOKR process you will perform in this app:",
+    "step_1": "Create a goal collection and add goals for the project (Goal Structure page)",
+    "step_2": "Assign values – either weighting or monetary value – to all goals (Goal Structure page)",
+    "step_3": "Assign cost and time to each epic (Goal Structure page)",
+    "step_4": "Assign benefit points to estimate how much each epic is expected to contribute (benefit) to the goals (Estimation page)",
+    "step_5": "View and evaluate the order in which epics should be completed (Analysis page)"
+  },
+  "analysis_title": "Analysis",
+  "analysis_box": "Analysis is about distributing benefit (BP) and cost (SP) over time to provide a more realistic picture of a project's financial development. Instead of assuming that gains and costs occur immediately, predefined distribution profiles are used to show how value creation and expenses are distributed throughout the project's lifetime. By using such profiles, one can estimate the total benefit and cost for each Epic, and then calculate indicators such as Net Present Value (NPV) and Accumulated NPV. This provides a holistic basis for assessing economic value and risk over time."
+}
+}

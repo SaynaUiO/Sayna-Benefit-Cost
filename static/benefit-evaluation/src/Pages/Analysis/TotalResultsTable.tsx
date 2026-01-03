@@ -5,11 +5,10 @@ import Button from "@atlaskit/button";
 import HipchatChevronDoubleUpIcon from "@atlaskit/icon/glyph/hipchat/chevron-double-up";
 import HipchatChevronDoubleDownIcon from "@atlaskit/icon/glyph/hipchat/chevron-double-down";
 
-// Importer typen for periodiseringsresultatene
-import { PeriodizationPeriodResult } from "./periodizationCalculations"; // Antar at stien er riktig
-import { Spotlight, SpotlightTarget } from "@atlaskit/onboarding";
+import { PeriodizationPeriodResult } from "./periodizationCalculations";
+import { SpotlightTarget } from "@atlaskit/onboarding";
+import { useTranslation } from "@forge/react";
 
-// Definerer props for denne komponenten
 interface TotalResultsTableProps {
   periodizationResults: PeriodizationPeriodResult[];
   numberOfPeriods: number;
@@ -19,19 +18,6 @@ interface TotalResultsTableProps {
   MAX_YEARS: number;
 }
 
-// Definisjon av head for totaltabellen (Flyttet fra Analysis.tsx)
-const totalTableHead = {
-  cells: [
-    { key: "period", content: "År" },
-    { key: "grossBenefit", content: " Total BP" },
-    { key: "grossCost", content: "Total SP" },
-    { key: "netPoints", content: "Nettoverdi" },
-    { key: "discount", content: "Diskonteringsfaktor" },
-    { key: "netNPV", content: "Netto Nåverdi (NPV)" },
-    { key: "accumulatedNPV", content: "Akkumulert NPV" },
-  ],
-};
-
 export const TotalResultsTable: React.FC<TotalResultsTableProps> = ({
   periodizationResults,
   numberOfPeriods,
@@ -40,26 +26,50 @@ export const TotalResultsTable: React.FC<TotalResultsTableProps> = ({
   MIN_YEARS,
   MAX_YEARS,
 }) => {
-  // Lager rader for totaltabellen basert på periodizationResults (Flyttet fra Analysis.tsx)
+  const { t } = useTranslation();
+
+  // Hjelpefunksjon for å formatere tall pent basert på språkvalg
+  const formatNum = (val: number, decimals: number = 2) => {
+    return val.toLocaleString(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+  };
+
+  // Flytter head-definisjon inn i useMemo for å støtte i18n
+  const totalTableHead = useMemo(
+    () => ({
+      cells: [
+        { key: "period", content: t("chart.year_label") },
+        { key: "grossBenefit", content: t("chart.total_bp") },
+        { key: "grossCost", content: t("chart.total_sp") },
+        { key: "netPoints", content: t("chart.net_value") },
+        { key: "discount", content: t("analysis.table.discount") },
+        { key: "netNPV", content: t("analysis.table.npv") },
+        { key: "accumulatedNPV", content: t("chart.acc_npv") },
+      ],
+    }),
+    [t]
+  );
+
   const totalTableRows = useMemo(() => {
     return periodizationResults.map((result) => ({
       key: `p-${result.period}`,
       cells: [
         { key: "period", content: `${result.period}` },
-        { key: "grossBenefit", content: String(result.grossBenefit) },
-        { key: "grossCost", content: String(result.grossCost) },
-        { key: "netPoints", content: String(result.netPoints) },
-        { key: "discount", content: String(result.discountFactor) },
-        { key: "netNPV", content: String(result.netPresentValue) },
-        { key: "accumulatedNPV", content: String(result.accumulatedNPV) },
+        { key: "grossBenefit", content: formatNum(result.grossBenefit) },
+        { key: "grossCost", content: formatNum(result.grossCost) },
+        { key: "netPoints", content: formatNum(result.netPoints) },
+        { key: "discount", content: formatNum(result.discountFactor, 4) }, // 4 desimaler for faktorer
+        { key: "netNPV", content: formatNum(result.netPresentValue) },
+        { key: "accumulatedNPV", content: formatNum(result.accumulatedNPV) },
       ],
     }));
   }, [periodizationResults]);
 
   return (
     <>
-      <div>
-        {/* KONTROLL FOR TIDSRAMME (KNAPPER) - Flyttet fra Analysis.tsx */}
+      <div style={{ marginTop: "30px" }}>
         <div
           style={{
             marginBottom: "20px",
@@ -68,26 +78,35 @@ export const TotalResultsTable: React.FC<TotalResultsTableProps> = ({
           }}
         >
           <h3 style={{ marginRight: "10px" }}>
-            Finansiell plan over {numberOfPeriods} år (millioner NOK)
+            {t("analysis.table.financial_plan_title").replace(
+              "{{years}}",
+              String(numberOfPeriods)
+            )}
           </h3>
 
-          {/* Knapp for å redusere år */}
           <SpotlightTarget name="year-tooltip">
-            <Tooltip content={"Reduser antall år"}>
+            <Tooltip content={t("analysis.table.decrease_years")}>
               <Button
                 onClick={decrementYears}
                 isDisabled={numberOfPeriods <= MIN_YEARS}
-                iconBefore={<HipchatChevronDoubleDownIcon label="Reduser år" />}
+                iconBefore={
+                  <HipchatChevronDoubleDownIcon
+                    label={t("analysis.table.decrease_years")}
+                  />
+                }
               />
             </Tooltip>
           </SpotlightTarget>
 
-          {/* Knapp for å øke år */}
-          <Tooltip content={"Øk antall år"}>
+          <Tooltip content={t("analysis.table.increase_years")}>
             <Button
               onClick={incrementYears}
               isDisabled={numberOfPeriods >= MAX_YEARS}
-              iconBefore={<HipchatChevronDoubleUpIcon label="Øk år" />}
+              iconBefore={
+                <HipchatChevronDoubleUpIcon
+                  label={t("analysis.table.increase_years")}
+                />
+              }
             />
           </Tooltip>
         </div>
@@ -95,12 +114,12 @@ export const TotalResultsTable: React.FC<TotalResultsTableProps> = ({
         <DynamicTable
           head={totalTableHead}
           rows={totalTableRows}
-          rowsPerPage={4}
+          rowsPerPage={5}
           defaultPage={1}
         />
       </div>
       <SpotlightTarget name="second-table">
-        <div></div>
+        <div />
       </SpotlightTarget>
     </>
   );

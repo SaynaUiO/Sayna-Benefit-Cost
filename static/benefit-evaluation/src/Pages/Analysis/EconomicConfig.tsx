@@ -2,20 +2,18 @@ import React, { FormEvent } from "react";
 import TextField from "@atlaskit/textfield";
 import Lozenge from "@atlaskit/lozenge";
 import { Grid, xcss, Box, Stack, Text } from "@atlaskit/primitives";
+import { useTranslation } from "@forge/react";
 
 // --- STYLING ---
 
-// Styles for den forklarende teksten
 const explainerTextStyles = xcss({
   color: "color.text.subtle",
   fontSize: "0.9em",
   marginBottom: "space.300",
-  paddingBottom: "none", // Sikrer at det ikke er dobbel padding i bunn
+  paddingBottom: "none",
 });
 
-// Styles for den dynamiske teksten (1 BP = X millioner NOK)
 const dynamicTextContainerStyles = xcss({
-  // Sikrer at innholdet vises på én linje og justeres vertikalt
   display: "flex",
   alignItems: "center",
   whiteSpace: "nowrap",
@@ -40,40 +38,39 @@ export const EconomicConfig: React.FC<EconomicConfigProps> = ({
   spNokFactor,
   onFactorChange,
 }) => {
+  const { t } = useTranslation();
+
   const handleChange = (e: FormEvent<HTMLInputElement>, type: "bp" | "sp") => {
     const target = e.target as HTMLInputElement;
     const rawValue = target.value;
-
-    // Bruker type="number" og standard parsing med punktum.
-    // parseFloat garanterer at hvis feltet er tomt, blir det 0.
     const numericValue = parseFloat(rawValue) || 0;
-
     onFactorChange(type, numericValue);
   };
 
-  // Formaterer tallet til 3 desimaler med KOMMA for visning i den dynamiske teksten
+  // Bruker toLocaleString for å få riktig skilletegn (komma på norsk, punktum på engelsk)
   const formatForDisplay = (value: number) =>
-    value.toFixed(3).replace(".", ",");
+    value.toLocaleString(undefined, {
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3,
+    });
 
-  // Returnerer tallet som STRING uten å endre til komma (TextField type="number" krever punktum)
   const formatForInput = (value: number) => value.toString();
 
+  // Hjelpefunksjon for å håndtere placeholders i teksten (Option 1 fix for TS)
+  const getDynamicText = (key: string, val: number) => {
+    return t(key).replace("{{value}}", formatForDisplay(val));
+  };
+
   return (
-    // Fjerner unødvendig padding nederst da Modalen har sin egen struktur
     <Box xcss={xcss({ padding: "space.300", paddingBottom: "none" })}>
-      {/* NYTT: Forklarende tekst over inputfeltene */}
-      <Box xcss={explainerTextStyles}>
-        Angi konverteringsfaktorene for å omgjøre Nyttepoeng (BP) og Kostnad
-        (SP) til en beregnet verdi i Millioner NOK. Endringer oppdaterer den
-        finansielle planen umiddelbart.
-      </Box>
+      <Box xcss={explainerTextStyles}>{t("analysis.modal.description")}</Box>
 
       <Grid
         gap="space.800"
         xcss={xcss({
           gridTemplateColumns: "1fr",
           "@media (min-width: 30rem)": {
-            gridTemplateColumns: "150px 150px", // To smale, elegante felt
+            gridTemplateColumns: "150px 150px",
           },
         })}
       >
@@ -84,17 +81,17 @@ export const EconomicConfig: React.FC<EconomicConfigProps> = ({
               <Lozenge appearance="new" isBold>
                 BP
               </Lozenge>
-              1 BP = {formatForDisplay(bpNokFactor)} millioner NOK
+              {getDynamicText("analysis.modal.bp_rate", bpNokFactor)}
             </Text>
           </Box>
           <div data-testid="bp-factor">
             <TextField
               value={formatForInput(bpNokFactor)}
               onChange={(e) => handleChange(e, "bp")}
-              placeholder="0.225" // Bruker punktum i placeholder
+              placeholder="0.225"
               isCompact
               type="number"
-              step="0.001" // Tillater 3 desimaler
+              step="0.001"
             />
           </div>
         </Stack>
@@ -106,14 +103,14 @@ export const EconomicConfig: React.FC<EconomicConfigProps> = ({
               <Lozenge appearance="success" isBold>
                 SP
               </Lozenge>
-              1 SP = {formatForDisplay(spNokFactor)} millioner NOK
+              {getDynamicText("analysis.modal.sp_rate", spNokFactor)}
             </Text>
           </Box>
           <div data-testid="sp-factor">
             <TextField
               value={formatForInput(spNokFactor)}
               onChange={(e) => handleChange(e, "sp")}
-              placeholder="0.6" // Bruker punktum i placeholder
+              placeholder="0.6"
               isCompact
               type="number"
               step="0.001"

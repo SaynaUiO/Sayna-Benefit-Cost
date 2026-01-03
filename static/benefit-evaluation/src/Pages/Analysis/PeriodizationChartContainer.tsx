@@ -1,31 +1,25 @@
 import React, { useMemo } from "react";
-// Antar at du har denne komponenten for Chart.js
 import { PeriodizationChart } from "./Charts";
-
-// Importer nødvendige typer for Chart.js
-// ChartData og ChartOptions er ikke strengt nødvendig hvis du ikke bruker dem,
-// men vi beholder dem i tilfelle du har dem i din faktiske fil.
-import { ChartData, ChartOptions } from "chart.js";
-
-// Importer typen for periodiseringsresultatene, for å definere props
 import { PeriodizationPeriodResult } from "./periodizationCalculations";
 import { SpotlightTarget } from "@atlaskit/onboarding";
+import { useTranslation } from "@forge/react";
 
-// Definerer props for denne komponenten
 interface PeriodizationChartContainerProps {
   periodizationResults: PeriodizationPeriodResult[];
 }
 
-// ** chartOptions er FJERNEDE her **
-
 export const PeriodizationChartContainer: React.FC<
   PeriodizationChartContainerProps
 > = ({ periodizationResults }) => {
-  // Merk: Ingen eksplisitt type casting her, som er grunnen til at den kompilerte lokalt.
+  const { t } = useTranslation();
+
   const chartDataJs = useMemo(() => {
     if (periodizationResults.length === 0) return { labels: [], datasets: [] };
 
-    const labels = periodizationResults.map((r) => `År ${r.period}`);
+    // Localize the X-axis labels (e.g., "Year 1", "År 1")
+    const labels = periodizationResults.map(
+      (r) => `${t("chart.year_label")} ${r.period}`
+    );
     const grossBenefitData = periodizationResults.map((r) => r.grossBenefit);
     const grossCostData = periodizationResults.map((r) => r.grossCost);
     const netPointsData = periodizationResults.map((r) => r.netPoints);
@@ -36,10 +30,10 @@ export const PeriodizationChartContainer: React.FC<
     return {
       labels: labels,
       datasets: [
-        // BRUTTO GEVINST (BP) - LINJE
+        // TOTAL BP - LINE
         {
           type: "line" as const,
-          label: "Total BP",
+          label: t("chart.total_bp"),
           borderColor: "rgba(44, 154, 44, 1)",
           backgroundColor: "rgba(0, 150, 0, 0.1)",
           data: grossBenefitData,
@@ -48,10 +42,10 @@ export const PeriodizationChartContainer: React.FC<
           pointRadius: 2,
           borderWidth: 3,
         },
-        // BRUTTO KOSTNAD (SP) - LINJE
+        // TOTAL SP - LINE
         {
           type: "line" as const,
-          label: "Total SP",
+          label: t("chart.total_sp"),
           borderColor: "rgba(204, 78, 78, 1)",
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           data: grossCostData,
@@ -60,10 +54,10 @@ export const PeriodizationChartContainer: React.FC<
           pointRadius: 2,
           borderWidth: 3,
         },
-        // STOLPER (Netto Poeng)
+        // BARS (Net Value)
         {
           type: "bar" as const,
-          label: "Nettoverdi (BP - SP)",
+          label: t("chart.net_value"),
           backgroundColor: (context: any) => {
             const value = context.raw;
             return value >= 0
@@ -75,10 +69,10 @@ export const PeriodizationChartContainer: React.FC<
           data: netPointsData,
           yAxisID: "yNetPoints",
         },
-        // LINJE (Akkumulert NPV)
+        // LINE (Accumulated NPV)
         {
           type: "line" as const,
-          label: "Akkumulert NPV",
+          label: t("chart.acc_npv"),
           borderColor: "rgb(53, 162, 235)",
           backgroundColor: "rgba(53, 162, 235, 0.2)",
           data: accumulatedNPVData,
@@ -88,7 +82,7 @@ export const PeriodizationChartContainer: React.FC<
         },
       ],
     };
-  }, [periodizationResults]);
+  }, [periodizationResults, t]); // Added t to dependencies
 
   if (periodizationResults.length === 0) {
     return null;
@@ -96,21 +90,13 @@ export const PeriodizationChartContainer: React.FC<
 
   return (
     <div style={{ marginTop: "40px" }}>
-      {/* NY TITTEL - Flyttet fra Analysis.tsx */}
+      <h3>{t("chart.title")}</h3>
 
-      <h3>Finansiell Plan (Gevinst, Kostnad, Netto) Over Tid </h3>
+      <p>{t("chart.description")}</p>
 
-      <p>
-        Diagrammet kombinerer Brutto Gevinst (BP), Brutto Kostnad (SP),
-        Nettoverdi (stolper) og Akkumulert NPV (tynn linje, høyre akse).
-        Nullpunktet (breakeven) markeres der den akkumulerte NPV-linjen krysser
-        null-linjen.
-      </p>
-
-      {/* Ingen options prop sendes inn */}
       <PeriodizationChart chartData={chartDataJs} />
       <SpotlightTarget name="third-table">
-        <div></div>
+        <div />
       </SpotlightTarget>
     </div>
   );

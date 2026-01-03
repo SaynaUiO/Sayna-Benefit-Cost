@@ -3,10 +3,7 @@ import { Grid, Box, Inline, xcss } from "@atlaskit/primitives";
 import Tooltip from "@atlaskit/tooltip";
 import { CGCLabelContainer } from "./CGCLabelContainer";
 import { useEstimationTarget } from "../../../Pages/Estimation/EstimationTargetContext";
-import {
-  EstimationContext,
-  useEstimation,
-} from "../../../Pages/Estimation/EstimationContext";
+import { useEstimation } from "../../../Pages/Estimation/EstimationContext";
 import Button from "@atlaskit/button";
 import RefreshIcon from "@atlaskit/icon/glyph/refresh";
 import Lozenge from "@atlaskit/lozenge";
@@ -17,8 +14,10 @@ import Modal, {
   ModalTitle,
   ModalTransition,
 } from "@atlaskit/modal-dialog";
+import { useTranslation } from "@forge/react";
 
 export const GoalCollectionLabelContainer = () => {
+  const { t } = useTranslation();
   const { mode, upperGoals, pointsToDistribute } = useEstimation();
   const { goalTier, clearGoals, getTotalDPPoints } = useEstimationTarget();
   const [
@@ -34,7 +33,7 @@ export const GoalCollectionLabelContainer = () => {
       points += getTotalDPPoints(upperGoal.id);
     }
     return points;
-  }, [getTotalDPPoints]);
+  }, [getTotalDPPoints, upperGoals]);
 
   return (
     <CGCLabelContainer mode={mode}>
@@ -70,7 +69,7 @@ export const GoalCollectionLabelContainer = () => {
               {goalTier.name.toUpperCase()}
             </Box>
           </Tooltip>
-          <Tooltip content={"Clear distributed points"}>
+          <Tooltip content={t("estimation_labels.clear_points")}>
             <Button
               appearance="subtle"
               iconBefore={<RefreshIcon size="small" label="refresh" />}
@@ -80,7 +79,7 @@ export const GoalCollectionLabelContainer = () => {
         </Grid>
         <Inline alignBlock="center" alignInline="end" space="space.100">
           <Box xcss={xcss({ justifySelf: "end" })}>
-            <Tooltip content={"Totalt antall poeng fordelt"}>
+            <Tooltip content={t("estimation_labels.total_points_distributed")}>
               <Lozenge
                 appearance={
                   totalPoints < totalDP
@@ -91,7 +90,7 @@ export const GoalCollectionLabelContainer = () => {
                 }
                 isBold
               >
-                {totalPoints}
+                {totalPoints.toLocaleString()}
               </Lozenge>
             </Tooltip>
           </Box>
@@ -101,18 +100,15 @@ export const GoalCollectionLabelContainer = () => {
         {isClearDistributedPointsModalOpen && (
           <Modal onClose={() => setIsClearDistributedPointsModalOpen(false)}>
             <ModalHeader>
-              <ModalTitle>Warning: Clear Points</ModalTitle>
+              <ModalTitle>{t("clear_points_modal.title")}</ModalTitle>
             </ModalHeader>
-            <ModalBody>
-              This action will clear all distributed points. Are you sure you
-              want to continue?
-            </ModalBody>
+            <ModalBody>{t("clear_points_modal.body")}</ModalBody>
             <ModalFooter>
               <Button
                 appearance="subtle"
                 onClick={() => setIsClearDistributedPointsModalOpen(false)}
               >
-                Cancel
+                {t("clear_points_modal.cancel")}
               </Button>
               <Button
                 appearance="danger"
@@ -121,7 +117,7 @@ export const GoalCollectionLabelContainer = () => {
                   setIsClearDistributedPointsModalOpen(false);
                 }}
               >
-                Clear Points
+                {t("clear_points_modal.confirm")}
               </Button>
             </ModalFooter>
           </Modal>

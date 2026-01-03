@@ -10,81 +10,115 @@ import {
 import { Box, Flex, xcss } from "@atlaskit/primitives";
 import { useAPI } from "../../Contexts/ApiContext";
 import { SpotlightTarget } from "@atlaskit/onboarding";
+import { useTranslation } from "@forge/react";
+import { view } from "@forge/bridge";
+import GlobeIcon from "@atlaskit/icon/core/globe";
+import Button from "@atlaskit/button";
+import Tooltip from "@atlaskit/tooltip";
+import Popup from "@atlaskit/popup";
+import { MenuGroup, Section, ButtonItem } from "@atlaskit/menu";
 
-type TabLink = {
-  name: string;
-  src: string;
-  id: string;
-};
+type ForgeSupportedLocaleCode = "no-NO" | "en-US" | string;
 
 export const HeaderNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedTab, setSelectedTab] = useState<string>();
+  const [isLangPopupOpen, setIsLangPopupOpen] = useState(false);
   const [scope] = useAppContext();
   const api = useAPI();
 
+  const { t } = useTranslation();
+  const [currentLocale, setCurrentLocale] =
+    useState<ForgeSupportedLocaleCode>("no-NO");
+
+  useEffect(() => {
+    view.getContext().then((context) => {
+      if (context.locale) {
+        setCurrentLocale(context.locale as ForgeSupportedLocaleCode);
+      }
+    });
+  }, []);
+
+  const handleLanguageChange = (newLocale: ForgeSupportedLocaleCode) => {
+    setCurrentLocale(newLocale);
+    setIsLangPopupOpen(false);
+    const event = new CustomEvent("languageChange", { detail: newLocale });
+    window.dispatchEvent(event);
+  };
+
   useEffect(() => {
     const scopeLocation = location.pathname.replaceAll("/", "");
-    const index = tabLinks.find((tabLink) => {
-      return scopeLocation.includes(tabLink.src);
-    });
-    setSelectedTab(index?.name);
-  }, [location]);
+    const index = tabLinks.find((tabLink) =>
+      scopeLocation.includes(tabLink.src)
+    );
+    setSelectedTab(index?.id);
+  }, [location, t]);
 
-  const tabLinks: TabLink[] = [
+  // FJERN_INSTILLINGER_HER: Vi har fjernet settings fra denne listen
+  const tabLinks = [
     {
-      name: "Målstruktur",
+      name: t("nav.goal_structure"),
       src: "goal-structure",
       id: "goal-structure",
     },
     {
-      name: "Estimering",
+      name: t("nav.estimation"),
       src: "estimation",
       id: "estimation",
     },
-    ...(location.pathname.includes("portfolio/pf")
-      ? []
-      : [
-          {
-            name: "Periodisering",
-            src: "analysis",
-            id: "analysis",
-          },
-        ]),
-    {
-      name: "Settings",
-      src: "settings",
-      id: "settings",
-    },
+    ...(!location.pathname.includes("portfolio/pf")
+      ? [{ name: t("nav.analysis"), src: "analysis", id: "analysis" }]
+      : []),
   ];
 
-  const ScopeHeader = () => {
-    const headerStyle = xcss({
-      color: "color.text.accent.blue",
-      fontWeight: "bold",
-      textOverflow: "ellipsis",
-      overflow: "hidden",
-      whiteSpace: "nowrap",
-      width: "100%",
-      textAlign: "left",
-    });
-
-    return (
-      <Box as="h5" xcss={headerStyle}>
-        {scope.name.toUpperCase()}
-      </Box>
-    );
-  };
-
-  const DefaultSettings = () => (
-    <SpotlightTarget name="settings">
-      <Settings
-        tooltip="Innsitillinger"
-        isSelected={selectedTab === "Settings"}
-        onClick={() => navigate("settings")}
-      />
-    </SpotlightTarget>
+  const LanguageDropdown = () => (
+    <Popup
+      isOpen={isLangPopupOpen}
+      onClose={() => setIsLangPopupOpen(false)}
+      placement="bottom-end"
+      content={() => (
+        <Box xcss={xcss({ minWidth: "150px", padding: "space.100" })}>
+          <MenuGroup>
+            <Section title={t("nav.language_tooltip")}>
+              <ButtonItem
+                isSelected={currentLocale === "no-NO"}
+                onClick={() => handleLanguageChange("no-NO")}
+              >
+                Norsk
+              </ButtonItem>
+              <ButtonItem
+                isSelected={currentLocale === "en-US"}
+                onClick={() => handleLanguageChange("en-US")}
+              >
+                English
+              </ButtonItem>
+            </Section>
+          </MenuGroup>
+        </Box>
+      )}
+      trigger={(triggerProps) => (
+        <Box
+          xcss={xcss({
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "32px",
+            height: "32px",
+          })}
+        >
+          <Tooltip content={t("nav.language_tooltip")}>
+            <Button
+              {...triggerProps}
+              appearance="subtle"
+              spacing="none"
+              onClick={() => setIsLangPopupOpen(!isLangPopupOpen)}
+              iconBefore={<GlobeIcon label={t("nav.language_tooltip")} />}
+            />
+          </Tooltip>
+        </Box>
+      )}
+    />
   );
 
   return (
@@ -92,49 +126,62 @@ export const HeaderNavigation = () => {
       label="site"
       renderProductHome={() => null}
       renderHelp={() => (
-        <SpotlightTarget name="restart-onboarding">
-          <Help
-            tooltip="Start onboardingen på nytt"
-            onClick={() => {
-              api.onboarding.setOnboardingComplete(false).then(() => {
-                navigate("/goal-structure");
-              });
-            }}
+        <Flex alignItems="center" gap="space.050">
+          <LanguageDropdown />
+          <SpotlightTarget name="restart-onboarding">
+            <Help
+              tooltip={t("nav.help_tooltip")}
+              onClick={() => {
+                api.onboarding.setOnboardingComplete(false).then(() => {
+                  navigate("/goal-structure");
+                });
+              }}
+            />
+          </SpotlightTarget>
+        </Flex>
+      )}
+      // IKONET_BLIR_RENDRET_HER: Dette holder for innstillinger
+      renderSettings={() => (
+        <SpotlightTarget name="settings">
+          <Settings
+            tooltip={t("nav.settings_tooltip")}
+            isSelected={
+              selectedTab === "settings" ||
+              location.pathname.includes("settings")
+            }
+            onClick={() => navigate("settings")}
           />
         </SpotlightTarget>
       )}
-      renderSettings={DefaultSettings}
       primaryItems={[
         <Flex
+          key="scope"
           alignItems="center"
-          justifyContent="center"
           xcss={xcss({
-            height: "100%",
             marginLeft: "4px",
             marginRight: "16px",
-            maxWidth: "150px",
-            overflow: "hidden",
             color: "color.text.subtle",
           })}
         >
-          <ScopeHeader />
+          <Box
+            as="h5"
+            xcss={xcss({ color: "color.text.accent.blue", fontWeight: "bold" })}
+          >
+            {scope.name.toUpperCase()}
+          </Box>
         </Flex>,
-        ...tabLinks.map((tabLink: TabLink, index) => {
-          if (tabLink.name !== "Settings") {
-            return (
-              <div key={index} id={tabLink.id}>
-                <SpotlightTarget name={tabLink.id}>
-                  <PrimaryButton
-                    isSelected={selectedTab === tabLink.name}
-                    onClick={() => navigate(tabLink.src)}
-                  >
-                    {tabLink.name}
-                  </PrimaryButton>
-                </SpotlightTarget>
-              </div>
-            );
-          }
-        }),
+        ...tabLinks.map((tabLink) => (
+          <div key={tabLink.id}>
+            <SpotlightTarget name={tabLink.id}>
+              <PrimaryButton
+                isSelected={selectedTab === tabLink.id}
+                onClick={() => navigate(tabLink.src)}
+              >
+                {tabLink.name}
+              </PrimaryButton>
+            </SpotlightTarget>
+          </div>
+        )),
       ]}
     />
   );

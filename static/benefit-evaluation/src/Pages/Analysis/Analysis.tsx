@@ -10,26 +10,31 @@ import {
 import Button from "@atlaskit/button";
 import CrossIcon from "@atlaskit/icon/glyph/cross";
 
-// Importer periodiseringslogikk og typer
+// Updated imports
 import {
-  benefitProfiles,
-  costProfiles,
   EpicProfileSelections,
   ProfileOption,
+  usePeriodizationProfiles,
 } from "./periodizationTypes";
 
-// Importer de separerte komponentene
 import { EpicSelectionTable } from "./EpicSelectionTable";
 import { TotalResultsTable } from "./TotalResultsTable";
-// VIKTIG: Importerer den nye containeren
 import { PeriodizationChartContainer } from "./PeriodizationChartContainer";
 import { Spotlight, SpotlightTransition } from "@atlaskit/onboarding";
 
+// Import translation hook
+import { useTranslation } from "@forge/react";
+
 export const Analysis = () => {
+  const { t } = useTranslation();
   const [scope] = useAppContext();
   const api = useAPI();
 
-  // --- STATS OG KONTROLL ---
+  // 1. Hook call moved inside the component
+  const { benefitProfiles, costProfiles, benefitProfileMap, costProfileMap } =
+    usePeriodizationProfiles();
+
+  // --- STATS AND CONTROL ---
   const [epicGoals, setEpicGoals] = useState<Goal[] | null>(null);
   const [profileSelections, setProfileSelections] =
     useState<EpicProfileSelections>({});
@@ -37,27 +42,23 @@ export const Analysis = () => {
     PeriodizationPeriodResult[]
   >([]);
   const [numberOfPeriods, setNumberOfPeriods] = useState<number>(10);
-  const [inputError, setInputError] = useState<string | null>(null); // beholdes for funksjoner
+  const [inputError, setInputError] = useState<string | null>(null);
 
-  const [bpNokFactor, setBpNokFactor] = useState<number>(0.225); // Standardverdi for BP (millioner NOK)
-  const [spNokFactor, setSpNokFactor] = useState<number>(0.6); // Standardverdi for SP (millioner NOK)
+  const [bpNokFactor, setBpNokFactor] = useState<number>(0.225);
+  const [spNokFactor, setSpNokFactor] = useState<number>(0.6);
 
   const MIN_YEARS = 10;
   const MAX_YEARS = 20;
 
-  //Onboarding:
-  const [isOnboardingCompleted, setOnboardingCompleted] =
-    useState<boolean>(true);
+  // Onboarding control
   const [activeSpotlight, setActiveSpotlight] = useState<null | number>(null);
   const next = () => setActiveSpotlight((activeSpotlight || 0) + 1);
   const back = () => setActiveSpotlight((activeSpotlight || 1) - 1);
   const end = () => {
     api.onboarding.setOnboardingComplete(true);
     setActiveSpotlight(null);
-    setOnboardingCompleted(true);
   };
 
-  // KONTROLLFUNKSJONER (BEHOLDES HER da de endrer STATE)
   const incrementYears = useCallback(() => {
     setInputError(null);
     setNumberOfPeriods((prevYears) => Math.min(prevYears + 1, MAX_YEARS));
@@ -68,7 +69,6 @@ export const Analysis = () => {
     setNumberOfPeriods((prevYears) => Math.max(prevYears - 1, MIN_YEARS));
   }, []);
 
-  // Håndterer endring i NOK-faktor*
   const handleFactorChange = useCallback(
     (factorType: "bp" | "sp", newValue: number) => {
       if (factorType === "bp") {
@@ -80,9 +80,9 @@ export const Analysis = () => {
     []
   );
 
-  // --- EFFEKTER OG BEREGNINGER ---
+  // --- EFFECTS AND CALCULATIONS ---
 
-  // 1. Beregn periodisering
+  // 1. Calculate periodization
   useEffect(() => {
     if (
       epicGoals &&
@@ -101,7 +101,7 @@ export const Analysis = () => {
     }
   }, [epicGoals, profileSelections, numberOfPeriods, bpNokFactor, spNokFactor]);
 
-  // 2. Fetch epic data fra goal funksjonen
+  // 2. Fetch epic data
   const fetchEpicGoals = useCallback(async () => {
     try {
       const allCollections = await api.goalCollection.getAll(scope.id);
@@ -109,10 +109,10 @@ export const Analysis = () => {
 
       for (const collection of allCollections) {
         const epics = await api.goal.getAll(scope.id, collection.id);
-        const epicGoals = epics.filter(
+        const filtered = epics.filter(
           (goal) => goal.goalCollectionId === "root-epic"
         );
-        allEpics = allEpics.concat(epicGoals);
+        allEpics = allEpics.concat(filtered);
       }
       setEpicGoals(allEpics);
     } catch (error) {
@@ -124,7 +124,7 @@ export const Analysis = () => {
     fetchEpicGoals();
   }, [fetchEpicGoals]);
 
-  // 3. Håndterer profil dropdown (BEHOLDES HER da den endrer STATE)
+  // 3. Handle profile dropdown changes
   const handleProfileChange = useCallback(
     (
       epicId: string,
@@ -133,11 +133,13 @@ export const Analysis = () => {
     ) => {
       const keyToUpdate =
         type === "bp" ? "benefitProfileKey" : "costProfileKey";
+
+      // Use localized profiles from the hook
       const value =
         selectedOption?.value ||
         (keyToUpdate === "benefitProfileKey"
-          ? benefitProfiles[0].value
-          : costProfiles[0].value);
+          ? benefitProfiles[0]?.value
+          : costProfiles[0]?.value);
 
       setProfileSelections((prevSelections) => ({
         ...prevSelections,
@@ -147,14 +149,17 @@ export const Analysis = () => {
         },
       }));
     },
-    []
+    [benefitProfiles, costProfiles] // Added dependencies
   );
 
-  // 4. Sett default profiler
+  // 4. Set default profiles
   useEffect(() => {
-    if (epicGoals && Object.keys(profileSelections).length === 0) {
+    if (
+      epicGoals &&
+      Object.keys(profileSelections).length === 0 &&
+      benefitProfiles.length > 0
+    ) {
       const defaultSelections: EpicProfileSelections = {};
-
       const defaultBPKey = benefitProfiles[0].value;
       const defaultSPKey = costProfiles[0].value;
 
@@ -166,14 +171,12 @@ export const Analysis = () => {
       });
       setProfileSelections(defaultSelections);
     }
-  }, [epicGoals, profileSelections]);
+  }, [epicGoals, profileSelections, benefitProfiles, costProfiles]);
 
-  //Fortsetter Onboarding:
+  // 5. Onboarding initialization
   useEffect(() => {
-    // Sjekk om onboardingen er fullført
     api.onboarding.isOnboardingComplete().then((completed: boolean) => {
       if (!completed) {
-        // Hvis IKKE fullført, start Estimation-spesifikke spotlights her
         setActiveSpotlight(0);
       }
     });
@@ -187,26 +190,22 @@ export const Analysis = () => {
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
             appearance="subtle"
-            onClick={() => end()}
+            onClick={end}
           />
         }
         actions={[
+          { onClick: next, text: t("analysis.onboarding.next") },
           {
-            onClick: () => next(),
-            text: "Neste",
-          },
-          {
-            onClick: () => back(),
-            text: "Back",
+            onClick: back,
+            text: t("analysis.onboarding.back"),
             appearance: "subtle",
           },
         ]}
-        heading="Epics tabell"
+        heading={t("analysis.onboarding.epics_table.title")}
         target="first-table"
         key="first-table"
       >
-        Her ser du en tabell over alle epics, med tilhørende nyttepoeng- og
-        kostnadsverdier som ble fordelt tidligere.
+        {t("analysis.onboarding.epics_table.body")}
       </Spotlight>,
       <Spotlight
         actionsBeforeElement="14/20"
@@ -214,26 +213,22 @@ export const Analysis = () => {
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
             appearance="subtle"
-            onClick={() => end()}
+            onClick={end}
           />
         }
         actions={[
+          { onClick: next, text: t("analysis.onboarding.next") },
           {
-            onClick: () => next(),
-            text: "Neste",
-          },
-          {
-            onClick: () => back(),
-            text: "Back",
+            onClick: back,
+            text: t("analysis.onboarding.back"),
             appearance: "subtle",
           },
         ]}
-        heading="Endre profil"
+        heading={t("analysis.onboarding.change_profile.title")}
         target="profile"
         key="profile"
       >
-        Profilene fungerer som maler for hvordan poengene fordeles over tid. Når
-        du endrer en profil, oppdateres tabellen og grafen under automatisk.
+        {t("analysis.onboarding.change_profile.body")}
       </Spotlight>,
       <Spotlight
         actionsBeforeElement="15/20"
@@ -241,56 +236,45 @@ export const Analysis = () => {
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
             appearance="subtle"
-            onClick={() => end()}
+            onClick={end}
           />
         }
         actions={[
+          { onClick: next, text: t("analysis.onboarding.next") },
           {
-            onClick: () => next(),
-            text: "Neste",
-          },
-          {
-            onClick: () => back(),
-            text: "Back",
+            onClick: back,
+            text: t("analysis.onboarding.back"),
             appearance: "subtle",
           },
         ]}
-        heading="Poeng til NOK"
+        heading={t("analysis.onboarding.points_to_nok.title")}
         target="pointsToNok"
         key="pointsToNok"
       >
-        Ved å trykke på dette ikonet kan du tilordne en monetær verdi til både 1
-        Benefit Point (BP) og 1 Size Point (SP) i NOK. Du definerer deretter
-        selv verdien for å muliggjøre konvertering av de estimerte
-        poengverdiene.
+        {t("analysis.onboarding.points_to_nok.body")}
       </Spotlight>,
-
       <Spotlight
         actionsBeforeElement="16/20"
         headingAfterElement={
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
             appearance="subtle"
-            onClick={() => end()}
+            onClick={end}
           />
         }
         actions={[
+          { onClick: next, text: t("analysis.onboarding.next") },
           {
-            onClick: () => next(),
-            text: "Neste",
-          },
-          {
-            onClick: () => back(),
-            text: "Back",
+            onClick: back,
+            text: t("analysis.onboarding.back"),
             appearance: "subtle",
           },
         ]}
-        heading="Finansiell plan tabell"
+        heading={t("analysis.onboarding.financial_plan.title")}
         target="second-table"
         key="second-table"
       >
-        Tabellen viser den finansielle planen over en periode på 10–20 år, med
-        samlet nytte (BP) og kostnad (SP) for alle epics.
+        {t("analysis.onboarding.financial_plan.body")}
       </Spotlight>,
       <Spotlight
         actionsBeforeElement="17/20"
@@ -298,26 +282,22 @@ export const Analysis = () => {
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
             appearance="subtle"
-            onClick={() => end()}
+            onClick={end}
           />
         }
         actions={[
+          { onClick: next, text: t("analysis.onboarding.next") },
           {
-            onClick: () => next(),
-            text: "Neste",
-          },
-          {
-            onClick: () => back(),
-            text: "Back",
+            onClick: back,
+            text: t("analysis.onboarding.back"),
             appearance: "subtle",
           },
         ]}
-        heading="Juster år"
+        heading={t("analysis.onboarding.adjust_years.title")}
         target="year-tooltip"
         key="year-tooltip"
       >
-        Med disse pilene kan du justere hvor mange år den finansielle planen
-        skal dekke.
+        {t("analysis.onboarding.adjust_years.body")}
       </Spotlight>,
       <Spotlight
         actionsBeforeElement="18/20"
@@ -325,28 +305,22 @@ export const Analysis = () => {
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
             appearance="subtle"
-            onClick={() => end()}
+            onClick={end}
           />
         }
         actions={[
+          { onClick: next, text: t("analysis.onboarding.next") },
           {
-            onClick: () => next(),
-            text: "Neste",
-          },
-          {
-            onClick: () => back(),
-            text: "Back",
+            onClick: back,
+            text: t("analysis.onboarding.back"),
             appearance: "subtle",
           },
         ]}
-        heading="Graf"
+        heading={t("analysis.onboarding.chart.title")}
         target="third-table"
         key="third-table"
       >
-        Dette er en dynamisk graf som oppdateres når du endrer på profilene.
-        Grafen lar deg enkelt analysere de ulike verdiene i forhold til
-        hverandre. Du kan også trykke på de fire boksene øverst, som
-        representerer hver verdi, for å skjule dem i grafen.
+        {t("analysis.onboarding.chart.body")}
       </Spotlight>,
       <Spotlight
         actionsBeforeElement="19/20"
@@ -354,25 +328,22 @@ export const Analysis = () => {
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
             appearance="subtle"
-            onClick={() => end()}
+            onClick={end}
           />
         }
         actions={[
+          { onClick: next, text: t("analysis.onboarding.next") },
           {
-            onClick: () => next(),
-            text: "Next",
-          },
-          {
-            onClick: () => back(),
-            text: "Back",
+            onClick: back,
+            text: t("analysis.onboarding.back"),
             appearance: "subtle",
           },
         ]}
-        heading="Innstillinger"
+        heading={t("analysis.onboarding.settings.title")}
         target="settings"
         key="settings"
       >
-        Under Innstillinger kan du starte prosjektet på nytt om ønskelig.
+        {t("analysis.onboarding.settings.body")}
       </Spotlight>,
       <Spotlight
         actionsBeforeElement="20/20"
@@ -380,30 +351,26 @@ export const Analysis = () => {
           <Button
             iconBefore={<CrossIcon size="small" label="end" />}
             appearance="subtle"
-            onClick={() => end()}
+            onClick={end}
           />
         }
         actions={[
-          { onClick: () => end(), text: "OK" },
+          { onClick: end, text: t("analysis.onboarding.ok") },
           {
-            onClick: () => back(),
-            text: "Go back",
+            onClick: back,
+            text: t("analysis.onboarding.go_back"),
             appearance: "subtle",
           },
         ]}
-        heading="Start onboardingen på nytt"
+        heading={t("analysis.onboarding.restart.title")}
         target="restart-onboarding"
         key="restart-onboarding"
       >
-        Du kan starte denne onboardingen på nytt når som helst ved å trykke på
-        dette hjelpeikonet.
+        {t("analysis.onboarding.restart.body")}
       </Spotlight>,
     ];
 
-    if (activeSpotlight === null) {
-      return null;
-    }
-
+    if (activeSpotlight === null) return null;
     return spotlights[activeSpotlight];
   };
 
@@ -412,27 +379,25 @@ export const Analysis = () => {
       {activeSpotlight !== null && (
         <SpotlightTransition>{renderActiveSpotlight()}</SpotlightTransition>
       )}
-      <PageHeader>Periodisering</PageHeader>
-      <p>
-        På denne siden får du en oversikt over estimeringen av nytte og kostnad
-        over tid. Ved å velge profiler for hver epic nedenfor, kan du se hvordan
-        den finansielle planen utvikler seg og endres basert på fordelingen.
-      </p>
+      <PageHeader>{t("analysis.title")}</PageHeader>
+      <p>{t("analysis.description")}</p>
 
       <div>
-        {/* 1. EPIC SELECTION TABLE (OPPDATERT MED NYE PROPS) */}
         <EpicSelectionTable
           epicGoals={epicGoals}
           profileSelections={profileSelections}
           handleProfileChange={handleProfileChange}
           bpNokFactor={bpNokFactor}
           spNokFactor={spNokFactor}
-          // *NY PROP*: Sender funksjonen som håndterer endringen i staten
           handleFactorChange={handleFactorChange}
+          // Pass down localized data from the hook
+          benefitProfiles={benefitProfiles}
+          costProfiles={costProfiles}
+          benefitProfileMap={benefitProfileMap}
+          costProfileMap={costProfileMap}
         />
       </div>
 
-      {/* 2. TOTAL BEREGNINGSTABELL */}
       {periodizationResults.length > 0 && (
         <TotalResultsTable
           periodizationResults={periodizationResults}
@@ -444,8 +409,6 @@ export const Analysis = () => {
         />
       )}
 
-      {/* 3. VISUALISERING AV FINANSIELL PLAN */}
-      {/* Bruker PeriodizationChartContainer for all Chart-logikk og rendering */}
       {periodizationResults.length > 0 && (
         <PeriodizationChartContainer
           periodizationResults={periodizationResults}

@@ -14,23 +14,24 @@ import {
 } from "../../Models";
 import Lozenge from "@atlaskit/lozenge";
 import { useEstimation } from "../../Pages/Estimation/EstimationContext";
+import { useTranslation } from "@forge/react";
 
 type GoalPopupProps = {
-  goal: Goal | Goal | PortfolioItemGoal;
+  goal: Goal | PortfolioItemGoal;
   isUpperGoal?: true;
 };
 
 export const GoalPopup = ({ goal, isUpperGoal }: GoalPopupProps) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
   const { upperGoals, relation } = useEstimation();
 
   const totalPoints = useMemo(() => {
-    let totalPoints = 0;
+    let sum = 0;
     for (const upperGoal of upperGoals) {
-      totalPoints += goal.distributedPoints?.[upperGoal.id] || 0;
+      sum += goal.distributedPoints?.[upperGoal.id] || 0;
     }
-    return totalPoints;
+    return sum;
   }, [goal.distributedPoints, upperGoals]);
 
   const contentStyles: React.CSSProperties = {
@@ -38,55 +39,74 @@ export const GoalPopup = ({ goal, isUpperGoal }: GoalPopupProps) => {
     maxWidth: "200px",
   };
 
-  const PropertyStack = ({ children }: { children: ReactNode }) => (
+  const PropertyStack = ({
+    title,
+    children,
+  }: {
+    title: string;
+    children: ReactNode;
+  }) => (
     <Stack space="space.050" alignInline="start">
+      <h5>{title}</h5>
       {children}
     </Stack>
   );
 
   const properties = () => {
-    const properties = [];
+    const props = [];
+
+    // Poeng fordelt
     if (!isUpperGoal) {
-      properties.push(
-        <PropertyStack key={goal.scopeId + goal.id + "pd"}>
-          <h5>Poeng fordelt</h5>
+      props.push(
+        <PropertyStack
+          key="pd"
+          title={t("estimation_labels.points_distributed")}
+        >
           <Lozenge appearance="inprogress" isBold>
-            {totalPoints}
+            {totalPoints.toLocaleString()}
           </Lozenge>
         </PropertyStack>
       );
     }
+
+    // Portfolio Contribution
     if ("portfolioItemPoints" in goal) {
-      properties.push(
-        <PropertyStack key={goal.scopeId + goal.id + "pip"}>
-          <h5>Portfolio Item Contribution</h5>
+      props.push(
+        <PropertyStack
+          key="pip"
+          title={t("estimation_labels.portfolio_contribution")}
+        >
           <Lozenge isBold>{goal.portfolioItemPoints.toFixed(2)}%</Lozenge>
         </PropertyStack>
       );
     }
 
+    // Balanced / Benefit Points / Weight
     if (
       goal.balancedPoints &&
       ((isUpperGoal && relation.balance) || !isUpperGoal)
     ) {
-      properties.push(
-        <PropertyStack key={goal.scopeId + goal.id + "bp"}>
-          <h5>
-            {relation.balance && relation.method === balancedPointsEnum.WEIGHT
-              ? "Weight"
-              : goal.type === GoalTypeEnum.ISSUE
-              ? "Benefit Points"
-              : "Balanced Points"}
-          </h5>
+      const getTitle = () => {
+        if (relation.balance && relation.method === balancedPointsEnum.WEIGHT) {
+          return t("set_values.total_weight_tooltip"); // Reusing "Weight"
+        }
+        if (goal.type === GoalTypeEnum.ISSUE) {
+          return t("estimation_labels.benefit_points");
+        }
+        return t("estimation_labels.balanced_points");
+      };
+
+      props.push(
+        <PropertyStack key="bp" title={getTitle()}>
           <Lozenge appearance="new" isBold>
-            {`${Number(goal.balancedPoints!.value).toLocaleString("en-US")} ${
+            {`${Number(goal.balancedPoints!.value).toLocaleString()} ${
               isUpperGoal ? goal.balancedPoints!.postFix : ""
             }`}
           </Lozenge>
         </PropertyStack>
       );
     }
-    return properties;
+    return props;
   };
 
   return (

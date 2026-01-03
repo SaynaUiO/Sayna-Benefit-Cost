@@ -8,10 +8,8 @@ import Modal, {
   ModalFooter,
 } from "@atlaskit/modal-dialog";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Goal, CostTime, GoalTableItem } from "../../Models";
 import { useAPI } from "../../Contexts/ApiContext";
-import { useAppContext } from "../../Contexts/AppContext";
 import { Inline } from "@atlaskit/primitives";
 import { Flex, Stack, xcss } from "@atlaskit/primitives";
 import Tooltip from "@atlaskit/tooltip";
@@ -21,6 +19,9 @@ import Textfield from "@atlaskit/textfield";
 import { Loading } from "../../Components/Common/Loading";
 import { CostField } from "../../Components/GoalStructure/CostField";
 import { CostTimeTableHeader } from "./CostTimeTableHeader";
+
+// Import the translation hook
+import { useTranslation } from "@forge/react";
 
 type EpicCostTimeProps = {
   items: GoalTableItem[];
@@ -33,20 +34,19 @@ type EpicCostTimeProps = {
 };
 
 export const SetEpicCostTime = (props: EpicCostTimeProps) => {
-  const { items, scopeId, scopeType, close, refresh } = props;
+  const { items, scopeId, scopeType, close } = props;
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [values, setValues] = useState<{ [goalId: string]: CostTime }>({});
-  const [balancedCosts, setBalancedCosts] = useState<{
-    [id: string]: number;
-  }>({});
+  const [balancedCosts, setBalancedCosts] = useState<{ [id: string]: number }>(
+    {}
+  );
   const [total, setTotal] = useState<number>(0);
   const [total_time, setTotalTime] = useState<number>(0);
   const [validate, setValidate] = useState<boolean>(false);
 
-  const navigate = useNavigate();
-  const [scope] = useAppContext();
+  const { t } = useTranslation();
   const api = useAPI();
 
   const onClose = (refresh: boolean) => {
@@ -69,27 +69,20 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
     setLoading(true);
     setGoals(
       items
-        .map(
-          (item) =>
-            ({
-              ...item,
-              scopeId: scopeId,
-              type: scopeType,
-            } as Goal)
-        )
+        .map((item) => ({ ...item, scopeId: scopeId, type: scopeType } as Goal))
         .reverse()
     );
-    const values: { [goalId: string]: CostTime } = {};
+    const initialValues: { [goalId: string]: CostTime } = {};
     items.forEach((item) => {
-      values[item.id] = {
+      initialValues[item.id] = {
         cost: item.issueCost?.cost || 1,
         time: item.issueCost?.time || 0,
         balanced_points: item.issueCost?.balanced_points || 1,
       };
     });
-    setValues(values);
+    setValues(initialValues);
     setLoading(false);
-  }, [items]);
+  }, [items, scopeId, scopeType]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -103,9 +96,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
     setValidate(
       Object.values(values)
         .map((item) => item.cost)
-        .every((value: number) => {
-          return value >= 1;
-        })
+        .every((value: number) => value >= 1)
     );
 
     const balanced_costs: { [id: string]: number } = {};
@@ -113,52 +104,40 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
       balanced_costs[goalId] = values[goalId].cost / totalCosts;
     });
 
-    // Update states
     setBalancedCosts(balanced_costs);
     setTotal(totalCosts);
     setTotalTime(totalTime);
-  }, [values, items]);
+  }, [values, isLoading]);
 
   const submit = async () => {
     setSubmitting(true);
-    const updatedValues = { ...values };
-    Object.keys(updatedValues).forEach((goalId) => {
-      updatedValues[goalId].balanced_points = balancedCosts[goalId];
-    });
-
     const goalsToUpdate: Goal[] = goals.map((goal) => {
-      // Henter de nye verdiene fra state
       const newCostTime = values[goal.id];
-
-      // Oppdaterer issueCost på det originale Goal-objektet
       return {
         ...goal,
         issueCost: {
           cost: newCostTime.cost,
           time: newCostTime.time,
-          // Serveren må kanskje beregne balanced_points, så vi setter den til 0
           balanced_points: 0,
         },
       };
     });
 
-    await api.goal
-      .setAllCosts(goalsToUpdate)
-      .then(() => {
-        setSubmitting(false);
-        onClose(true);
-      })
-      .catch((error) => {
-        console.error(error);
-        setSubmitting(false);
-      });
+    try {
+      await api.goal.setAllCosts(goalsToUpdate);
+      setSubmitting(false);
+      onClose(true);
+    } catch (error) {
+      console.error(error);
+      setSubmitting(false);
+    }
   };
 
   return (
     <ModalTransition>
       <Modal onClose={() => onClose(false)}>
         <ModalHeader>
-          <ModalTitle>Angi kostnader og tid</ModalTitle>
+          <ModalTitle>{t("cost_time.title")}</ModalTitle>
         </ModalHeader>
         <ModalBody>
           <Stack space="space.100">
@@ -166,25 +145,21 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
               <>
                 <Inline space="space.050">
                   {props.upperIsMonetary
-                    ? "Kostnaden er de forventede livssykluskostnadene for hver enkelt epic."
-                    : "Kostnaden er de forventede livssykluskostnadspoengene for hver epic, angitt i relative poeng."}{" "}
+                    ? t("cost_time.desc_monetary")
+                    : t("cost_time.desc_relative")}
                 </Inline>
+                <Inline space="space.050">{t("cost_time.desc_time")}</Inline>
                 <Inline space="space.050">
-                  Tiden er den forventede relative tiden det tar å fullføre hver
-                  epic. Dette er en relativ verdi, og måles derfor ikke i timer
-                  eller dager.
-                </Inline>
-                <Inline space="space.050">
-                  {"Total kostnad:"}
-                  <Tooltip content={"Total costs"}>
+                  {t("cost_time.total_cost")}
+                  <Tooltip content="Total costs">
                     <Lozenge appearance="new" isBold>
                       {total}
                     </Lozenge>
                   </Tooltip>
                 </Inline>
                 <Inline space="space.050">
-                  {"Total tid:"}
-                  <Tooltip content={"Total time"}>
+                  {t("cost_time.total_time")}
+                  <Tooltip content="Total time">
                     <Lozenge appearance="new" isBold>
                       {total_time}
                     </Lozenge>
@@ -194,7 +169,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
                 {props.upperIsMonetary && (
                   <>
                     <Label htmlFor="postfix">
-                      Postfix Monetary Measurement
+                      {t("cost_time.postfix_label")}
                     </Label>
                     <div style={{ width: "5rem" }}>
                       <Textfield
@@ -232,7 +207,9 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
                       />
                     ))}
                   </Flex>
-                  <HelperMessage>Alle felt må fylles ut.</HelperMessage>
+                  <HelperMessage>
+                    {t("cost_time.helper_all_fields")}
+                  </HelperMessage>
                 </div>
               </>
             ) : (
@@ -242,7 +219,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
         </ModalBody>
         <ModalFooter>
           <Button appearance="subtle" onClick={() => onClose(false)}>
-            Avbryt
+            {t("cost_time.cancel")}
           </Button>
           <LoadingButton
             appearance="primary"
@@ -250,7 +227,7 @@ export const SetEpicCostTime = (props: EpicCostTimeProps) => {
             isDisabled={!validate}
             onClick={() => submit()}
           >
-            Angi kostnader og tid
+            {t("cost_time.save")}
           </LoadingButton>
         </ModalFooter>
       </Modal>

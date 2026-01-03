@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo } from "react";
-import { Inline } from "@atlaskit/primitives";
+import React, { useMemo } from "react";
+import { Inline, Flex, xcss } from "@atlaskit/primitives";
 import Lozenge from "@atlaskit/lozenge";
 import Tooltip from "@atlaskit/tooltip";
-import { Flex, xcss } from "@atlaskit/primitives";
 import { GoalPopup } from "./GoalPopup";
 import { useEstimation } from "../../Pages/Estimation/EstimationContext";
 import { PortfolioItemGoal, Goal, GoalTypeEnum } from "../../Models";
 import { useEstimationTarget } from "../../Pages/Estimation/EstimationTargetContext";
+import { useTranslation } from "@forge/react";
 
 type EstimationPopupProps = {
   goal: Goal | PortfolioItemGoal;
@@ -14,16 +14,17 @@ type EstimationPopupProps = {
 };
 
 export const GoalLabel = ({ goal, simplified }: EstimationPopupProps) => {
+  const { t } = useTranslation();
   const { upperGoals } = useEstimation();
   const { goals } = useEstimationTarget();
 
   const totalPoints = useMemo(() => {
-    let totalPoints = 0;
+    let sum = 0;
     for (const upperGoal of upperGoals) {
-      totalPoints += goal.distributedPoints?.[upperGoal.id] || 0;
+      sum += goal.distributedPoints?.[upperGoal.id] || 0;
     }
-    return totalPoints;
-  }, [goals]);
+    return sum;
+  }, [upperGoals, goal.distributedPoints]); // Justert dependencies for bedre ytelse
 
   const calcTopCellStyle = xcss({
     height: simplified ? "94px" : "57px",
@@ -65,23 +66,25 @@ export const GoalLabel = ({ goal, simplified }: EstimationPopupProps) => {
           xcss={xcss({ overflow: "hidden" })}
         >
           {"portfolioItemPoints" in goal && (
-            <Tooltip content="Portfolio Item Contribution">
+            <Tooltip content={t("estimation_labels.portfolio_contribution")}>
               <Lozenge isBold>{goal.portfolioItemPoints}</Lozenge>
             </Tooltip>
           )}
+
           <Tooltip
             content={
               goal.type === GoalTypeEnum.GOAL
-                ? "Jevne nyttepoeng"
-                : "Benefit Points"
+                ? t("estimation_labels.even_benefit_points")
+                : t("estimation_labels.benefit_points")
             }
           >
             <Lozenge appearance="new" isBold>
-              {goal.balancedPoints!.value.toLocaleString("en-US")}
+              {goal.balancedPoints!.value.toLocaleString()}
             </Lozenge>
           </Tooltip>
+
           {goal.issueCost && (
-            <Tooltip content="Nytte/Kostnad">
+            <Tooltip content={t("estimation_labels.benefit_cost_ratio")}>
               <Lozenge appearance="inprogress" isBold>
                 {(
                   Math.round(
@@ -92,13 +95,14 @@ export const GoalLabel = ({ goal, simplified }: EstimationPopupProps) => {
                       )) *
                       100
                   ) / 100
-                ).toLocaleString("en-US")}
+                ).toLocaleString()}
               </Lozenge>
             </Tooltip>
           )}
-          <Tooltip content="Poeng fordelt">
+
+          <Tooltip content={t("estimation_labels.points_distributed")}>
             <Lozenge appearance="success" isBold>
-              {totalPoints.toLocaleString("en-US")}
+              {totalPoints.toLocaleString()}
             </Lozenge>
           </Tooltip>
         </Inline>

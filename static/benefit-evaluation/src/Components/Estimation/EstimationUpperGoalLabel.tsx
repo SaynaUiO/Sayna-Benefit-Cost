@@ -5,6 +5,7 @@ import { Grid, xcss } from "@atlaskit/primitives";
 import { GoalPopup } from "./GoalPopup";
 import { useEstimation } from "../../Pages/Estimation/EstimationContext";
 import { Goal, balancedPointsEnum } from "../../Models";
+import { useTranslation } from "@forge/react";
 
 type EstimationPopupProps = {
   upperGoal: Goal;
@@ -13,17 +14,20 @@ type EstimationPopupProps = {
 export const EstimationUpperGoalLabel = ({
   upperGoal,
 }: EstimationPopupProps) => {
+  const { t } = useTranslation();
   const { relation, pointsToDistribute, getUpperGoalDP } = useEstimation();
 
   let appearance: ThemeAppearance = "success";
+  const distributedPoints = getUpperGoalDP(upperGoal.id);
+
   switch (true) {
-    case getUpperGoalDP(upperGoal.id) === pointsToDistribute:
+    case distributedPoints === pointsToDistribute:
       appearance = "success";
       break;
-    case getUpperGoalDP(upperGoal.id) < pointsToDistribute:
+    case distributedPoints < pointsToDistribute:
       appearance = "inprogress";
       break;
-    case getUpperGoalDP(upperGoal.id) > pointsToDistribute:
+    case distributedPoints > pointsToDistribute:
       appearance = "removed";
       break;
   }
@@ -47,20 +51,18 @@ export const EstimationUpperGoalLabel = ({
           <Tooltip
             content={
               relation.method === balancedPointsEnum.WEIGHT
-                ? "Weight"
-                : "Monetary Value"
+                ? t("estimation_labels.weight_tooltip")
+                : t("estimation_labels.monetary_tooltip")
             }
           >
             <Lozenge appearance="new" isBold>{`${Number(
               upperGoal.balancedPoints!.value
-            ).toLocaleString("en-US")} ${
-              upperGoal.balancedPoints!.postFix
-            }`}</Lozenge>
+            ).toLocaleString()} ${upperGoal.balancedPoints!.postFix}`}</Lozenge>
           </Tooltip>
         )}
-        <Tooltip content="Poeng fordelt">
+        <Tooltip content={t("estimation_labels.distributed_points_tooltip")}>
           <Lozenge appearance={appearance} isBold>
-            {getUpperGoalDP(upperGoal.id)} / {pointsToDistribute}
+            {distributedPoints} / {pointsToDistribute}
           </Lozenge>
         </Tooltip>
       </Inline>

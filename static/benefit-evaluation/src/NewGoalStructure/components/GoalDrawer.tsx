@@ -1,38 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Drawer,
   DrawerSidebar,
   DrawerContent,
   DrawerCloseButton,
 } from "@atlaskit/drawer/compiled";
-import TextField from "@atlaskit/textfield";
 import Button from "@atlaskit/button";
-import {} from "react";
 import { Goal } from "../../Models";
 import { useGoalForm } from "../hooks/useGoalDrawer";
-import {
-  NYTTE_COLLECTION_ID,
-  ROOT_COLLECTION_DATA,
-} from "../constants/goalConstants";
+import { ROOT_COLLECTION_DATA } from "../constants/goalConstants";
 import TextArea from "@atlaskit/textarea";
 import { Field } from "@atlaskit/form";
+import { useTranslation } from "@forge/react";
 
-//This component is a dynamic drawer for addinf tier, adding subtask, and editing a goal
-
-const getGoalCategoryDisplayName = (categoryId: string): string => {
-  const data = ROOT_COLLECTION_DATA.find((d) => d.id === categoryId);
-  if (data) {
-    return data.name;
-  }
-  return categoryId
-    .replace("root-", "")
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-};
-
-// --- Props (Beholdt) ---
-
+// --- Props ---
 type Props = {
   title: string;
   goalType: "Objective" | "Benefit" | "Product" | string;
@@ -42,34 +23,42 @@ type Props = {
   goalToEdit?: Goal | null;
 };
 
-// --- Component ---
 const GoalDrawer = (props: Props) => {
   const { goalType, goalCategory, isOpen, onClose, goalToEdit } = props;
+  const { t } = useTranslation();
 
-  // Bruker hooken for all logikk og state!
   const { formData, isSubmitting, handleChange, handleSave } =
     useGoalForm(props);
 
-  // --- UI Tekst Logikk (Rensket og Konsistent) ---
+  // --- Translation Logic ---
 
-  const categoryDisplayName = goalCategory
-    ? getGoalCategoryDisplayName(goalCategory)
-    : goalType === "Benefit"
-    ? "Nyttevirkning"
-    : goalType;
+  // 1. Get the display name for the type/category
+  const getDisplayName = () => {
+    // If it's a specific category from ROOT_COLLECTION_DATA
+    if (goalCategory) {
+      const data = ROOT_COLLECTION_DATA.find((d) => d.id === goalCategory);
+      if (data) return data.name; // Note: You might want to translate these names too later
+    }
 
-  // Bruker en replace-kjede for å sikre korrekte visningsnavn for typene
-  const finalDisplayName = categoryDisplayName
-    .replace("Product", "Epic")
-    .replace("Objective", "Formål");
+    // Fallback to standard types
+    if (goalType === "Product") return t("drawer.types.Product");
+    if (goalType === "Objective") return t("drawer.types.Objective");
+    if (goalType === "Benefit") return t("drawer.types.Benefit");
 
+    return goalType;
+  };
+
+  const finalDisplayName = getDisplayName();
+
+  // 2. Dynamic Titles and Button labels using Option 2 (Manual Concatenation)
   const drawerTitle = goalToEdit
-    ? `Endre ${goalToEdit.key || goalToEdit.id}`
-    : `Opprett ${finalDisplayName}`;
+    ? `${t("drawer.edit_prefix")} ${goalToEdit.key || goalToEdit.id}`
+    : `${t("drawer.create_prefix")} ${finalDisplayName}`;
 
-  const buttonText = goalToEdit ? "Lagre endringer" : `Opprett `;
+  const buttonText = goalToEdit
+    ? t("drawer.save_changes")
+    : t("drawer.create_prefix");
 
-  // --- Hoved Render Funksjon ---
   return (
     <Drawer isOpen={isOpen} onClose={() => onClose(false)} label={drawerTitle}>
       <DrawerSidebar>
@@ -86,15 +75,18 @@ const GoalDrawer = (props: Props) => {
         >
           <h2>{drawerTitle}</h2>
 
-          {/* DESCRIPTION FIELD */}
-          <Field name="description" label="Beskrivelse" isRequired>
+          <Field
+            name="description"
+            label={t("drawer.description_label")}
+            isRequired
+          >
             {({ fieldProps }) => (
               // @ts-ignore
               <TextArea
                 {...fieldProps}
                 value={formData.description}
                 onChange={(e) => handleChange("description", e.target.value)}
-                placeholder="Detaljert beskrivelse...."
+                placeholder={t("drawer.description_placeholder")}
                 minimumRows={4}
                 resize="vertical"
               />

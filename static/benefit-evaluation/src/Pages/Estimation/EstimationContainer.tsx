@@ -6,37 +6,34 @@ import { useEstimation } from "./EstimationContext";
 import { EstimationUpperGoalLabel } from "../../Components/Estimation/EstimationUpperGoalLabel";
 import { LoadingButton } from "@atlaskit/button";
 import Button, { ButtonGroup } from "@atlaskit/button";
-import Modal, {
-  ModalHeader,
-  ModalTitle,
-  ModalTransition,
-} from "@atlaskit/modal-dialog";
 import PageHeader from "@atlaskit/page-header";
 import Tooltip from "@atlaskit/tooltip";
-import Lozenge, { ThemeAppearance } from "@atlaskit/lozenge";
 import { ProgressIndicator } from "@atlaskit/progress-indicator";
 import { SpotlightTarget } from "@atlaskit/onboarding";
 
+// Import the translation hook
+import { useTranslation } from "@forge/react";
+
 export const EstimationContainer = () => {
+  const { t } = useTranslation();
   const {
     estimationTargets,
     upperGoals,
     readyToSubmit,
     isSubmitting,
     onSubmit,
+    pointsToDistribute,
+    getUpperGoalDP,
   } = useEstimation();
 
   const [stepwiseTabOpen, setStepwiseTabOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
-  const [stages, setStages] = useState<String[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [stages, setStages] = useState<string[]>([]);
 
   useEffect(() => {
-    const stages = upperGoals.map(
-      (upperGoal: any, index: number) => upperGoal.key
-    );
-    setStages(stages);
-  }, [upperGoals, activeStep]);
+    const stagesList = upperGoals.map((upperGoal: any) => upperGoal.key);
+    setStages(stagesList);
+  }, [upperGoals]);
 
   const containerStyle = xcss({
     display: "grid",
@@ -60,27 +57,25 @@ export const EstimationContainer = () => {
     gridRow: "1",
   });
 
-  const { relation, pointsToDistribute, getUpperGoalDP } = useEstimation();
-
   let appearance: "danger" | "primary" | "warning" = "danger";
-  switch (true) {
-    case getUpperGoalDP(upperGoals[activeStep].id) === pointsToDistribute:
-      appearance = "primary";
-      break;
-    case getUpperGoalDP(upperGoals[activeStep].id) < pointsToDistribute:
-      appearance = "warning";
-      break;
-    case getUpperGoalDP(upperGoals[activeStep].id) > pointsToDistribute:
-      appearance = "danger";
-      break;
+  const currentGoalId = upperGoals[activeStep]?.id;
+  const currentPoints = currentGoalId ? getUpperGoalDP(currentGoalId) : 0;
+
+  if (currentPoints === pointsToDistribute) {
+    appearance = "primary";
+  } else if (currentPoints < pointsToDistribute) {
+    appearance = "warning";
+  } else {
+    appearance = "danger";
   }
 
   return (
     <>
-      {stepwiseTabOpen && (
+      {stepwiseTabOpen && upperGoals[activeStep] && (
         <>
           <PageHeader>
-            <b>Goal for assessment:</b> {upperGoals[activeStep].description}
+            <b>{t("estimation_container.assessment_goal")}</b>{" "}
+            {upperGoals[activeStep].description}
           </PageHeader>
           <div className="noMarginTop">
             <ProgressIndicator
@@ -96,30 +91,27 @@ export const EstimationContainer = () => {
           {!stepwiseTabOpen && (
             <Box xcss={HeaderGridStyle}>
               <UpperGoalContainer>
-                {upperGoals.map((upperGoal) => {
-                  return (
-                    <EstimationUpperGoalLabel
-                      key={`${upperGoal.id}-label`}
-                      upperGoal={upperGoal}
-                    />
-                  );
-                })}
+                {upperGoals.map((upperGoal) => (
+                  <EstimationUpperGoalLabel
+                    key={`${upperGoal.id}-label`}
+                    upperGoal={upperGoal}
+                  />
+                ))}
               </UpperGoalContainer>
             </Box>
           )}
-          {/* ContentGrid */}
+
           <Box xcss={ContentGridStyle}>
-            {estimationTargets.map((target, index) => {
-              return (
-                <EstimationTargetContextProvider
-                  key={target.scope.id}
-                  index={index}
-                  simplified={stepwiseTabOpen}
-                  currentStep={activeStep}
-                />
-              );
-            })}
+            {estimationTargets.map((target, index) => (
+              <EstimationTargetContextProvider
+                key={target.scope.id}
+                index={index}
+                simplified={stepwiseTabOpen}
+                currentStep={activeStep}
+              />
+            ))}
           </Box>
+
           {stepwiseTabOpen && (
             <Flex
               xcss={xcss({
@@ -136,31 +128,28 @@ export const EstimationContainer = () => {
               <ButtonGroup>
                 <Button
                   appearance={appearance}
-                  isDisabled={
-                    getUpperGoalDP(upperGoals[activeStep].id) ===
-                    pointsToDistribute
-                  }
+                  isDisabled={currentPoints === pointsToDistribute}
                 >
-                  {getUpperGoalDP(upperGoals[activeStep].id)} /{" "}
-                  {pointsToDistribute}
+                  {currentPoints} / {pointsToDistribute}
                 </Button>
                 <Button
                   onClick={() => setActiveStep((active) => active - 1)}
                   appearance="danger"
                   isDisabled={activeStep === 0}
                 >
-                  Tilbake
+                  {t("estimation_container.back")}
                 </Button>
                 <Button
                   onClick={() => setActiveStep((active) => active + 1)}
                   appearance="primary"
                   isDisabled={activeStep === stages.length - 1}
                 >
-                  Neste
+                  {t("estimation_container.next")}
                 </Button>
               </ButtonGroup>
             </Flex>
           )}
+
           <Flex
             xcss={xcss({
               position: "sticky",
@@ -174,13 +163,13 @@ export const EstimationContainer = () => {
             })}
           >
             <ButtonGroup>
-              <Tooltip content="Assign benefit points one goal at a time">
+              <Tooltip content={t("estimation_container.stepwise_tooltip")}>
                 <Button
                   onClick={() =>
                     setStepwiseTabOpen((currentValue) => !currentValue)
                   }
                 >
-                  Fordel trinnvis
+                  {t("estimation_container.stepwise_button")}
                 </Button>
               </Tooltip>
               <LoadingButton
@@ -191,7 +180,7 @@ export const EstimationContainer = () => {
                   onSubmit();
                 }}
               >
-                Lagre
+                {t("estimation_container.save")}
               </LoadingButton>
             </ButtonGroup>
           </Flex>

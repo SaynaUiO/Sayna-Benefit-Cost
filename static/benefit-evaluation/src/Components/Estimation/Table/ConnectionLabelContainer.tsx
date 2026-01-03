@@ -14,8 +14,10 @@ import { CGCLabelContainer } from "./CGCLabelContainer";
 import { useEstimationTarget } from "../../../Pages/Estimation/EstimationTargetContext";
 import { token } from "@atlaskit/tokens";
 import { PortfolioItemGoal } from "../../../Models/EstimationModel";
+import { useTranslation } from "@forge/react";
 
 export const TargetLabelContainer = () => {
+  const { t } = useTranslation();
   const {
     mode,
     estimationTargets,
@@ -23,6 +25,7 @@ export const TargetLabelContainer = () => {
     pointsToDistribute,
     readyToSubmit,
   } = useEstimation();
+
   const {
     scope,
     goalTier,
@@ -48,45 +51,49 @@ export const TargetLabelContainer = () => {
       points += getTotalDPPoints(upperGoal.id);
     }
     return points;
-  }, [getTotalDPPoints]);
+  }, [getTotalDPPoints, upperGoals]);
 
-  let dpTooltip = "";
-  let appearance: ThemeAppearance = "success";
-  switch (true) {
-    case distributedPoints === upperGoals.length:
-      appearance = "success";
-      dpTooltip = "Distributed points to each upper goals";
-      break;
-    case distributedPoints === 0:
-      appearance = "moved";
-      dpTooltip = "Will not be submitted";
-      break;
-    case distributedPoints < upperGoals.length:
-      appearance = "removed";
-      dpTooltip = "Clear or distribute points to all upper goals";
-      break;
-  }
+  // Dynamisk tooltip og utseende basert på status
+  const getDPStatus = () => {
+    if (distributedPoints === upperGoals.length) {
+      return {
+        appearance: "success" as ThemeAppearance,
+        tooltip: t("estimation_labels.distributed_all"),
+      };
+    }
+    if (distributedPoints === 0) {
+      return {
+        appearance: "moved" as ThemeAppearance,
+        tooltip: t("estimation_labels.not_submitted"),
+      };
+    }
+    return {
+      appearance: "removed" as ThemeAppearance,
+      tooltip: t("estimation_labels.clear_or_distribute"),
+    };
+  };
+
+  const status = getDPStatus();
 
   useEffect(() => {
     if (goals) {
-      let totalPoints = 0;
+      let count = 0;
       upperGoals.forEach((upperGoal) => {
         if (getTotalDPPoints(upperGoal.id) > 0) {
-          totalPoints += 1;
+          count += 1;
         }
       });
-      setDistributedPoints(totalPoints);
+      setDistributedPoints(count);
     }
-  }),
-    [estimationTargets];
+  }, [getTotalDPPoints, upperGoals, goals]); // Fikset dependency array
 
   useEffect(() => {
-    let totalPoints = 0;
+    let total = 0;
     goals.forEach((goal) => {
-      totalPoints += +goal.portfolioItemPoints.toFixed(2);
+      total += +goal.portfolioItemPoints.toFixed(2);
     });
-    setPortfolioItemPoints(totalPoints);
-  }, [estimationTargets]);
+    setPortfolioItemPoints(total);
+  }, [goals]);
 
   return (
     <CGCLabelContainer mode={mode}>
@@ -123,14 +130,14 @@ export const TargetLabelContainer = () => {
                 {scope.name.toUpperCase()}
               </Box>
             </Tooltip>
-            <Tooltip content={"Clear distributed points"}>
+            <Tooltip content={t("estimation_labels.clear_points")}>
               <Button
                 appearance="subtle"
                 iconBefore={<RefreshIcon size="small" label="refresh" />}
                 onClick={() => clearGoals()}
               />
             </Tooltip>
-            <Tooltip content={"Open/close Collection"}>
+            <Tooltip content={t("estimation_labels.toggle_collection")}>
               <Button
                 appearance="subtle"
                 iconBefore={
@@ -144,14 +151,7 @@ export const TargetLabelContainer = () => {
               />
             </Tooltip>
           </Grid>
-          <Box
-            xcss={xcss({
-              marginTop: "none",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-            })}
-          >
+          <Box xcss={xcss({ overflow: "hidden" })}>
             <Tooltip content={goalTier.name}>
               <Box
                 xcss={xcss({
@@ -171,8 +171,8 @@ export const TargetLabelContainer = () => {
             <Tooltip
               content={
                 totalPoints === 0
-                  ? "Will not be submitted"
-                  : "Totalt antall poeng fordelt"
+                  ? t("estimation_labels.not_submitted")
+                  : t("estimation_labels.total_points_distributed")
               }
             >
               <Lozenge
@@ -187,12 +187,12 @@ export const TargetLabelContainer = () => {
                 }
                 isBold
               >
-                {totalPoints}
+                {totalPoints.toLocaleString()}
               </Lozenge>
             </Tooltip>
           </Box>
           <Box xcss={xcss({ justifySelf: "end" })}>
-            <Tooltip content={"Portfolio Item Weight"}>
+            <Tooltip content={t("estimation_labels.portfolio_item_weight")}>
               <Lozenge appearance="new" isBold>
                 {portfolioItemPoints.toFixed(0)}
               </Lozenge>
@@ -218,14 +218,12 @@ export const TargetLabelContainer = () => {
         }}
         onScroll={onScroll}
       >
-        {upperGoals.map((upperGoal) => {
-          return (
-            <UpperTargetLabel
-              key={`${upperGoal.id}-connection-label`}
-              upperGoal={upperGoal}
-            />
-          );
-        })}
+        {upperGoals.map((upperGoal) => (
+          <UpperTargetLabel
+            key={`${upperGoal.id}-connection-label`}
+            upperGoal={upperGoal}
+          />
+        ))}
       </HideScrollBar>
     </CGCLabelContainer>
   );

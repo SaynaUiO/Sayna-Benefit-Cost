@@ -5,7 +5,8 @@ modules:
       queue: queue-name
       resolver:
         function: resolver
-      title: BenefitOKR
+      title:
+        i18n: app.title
       layout: blank
   function:
     - key: resolver
@@ -28,3 +29,11 @@ app:
   id: ari:cloud:ecosystem::app/4217fcbb-b604-4772-9c01-2f603e0a7712 # Own Atlassian App ID
   runtime:
     name: nodejs20.x
+translations:
+  resources:
+    - key: en-US
+      path: static/benefit-evaluation/locales/en-US.json
+    - key: no-NO
+      path: static/benefit-evaluation/locales/no-NO.json
+  fallback:
+    default: en-US

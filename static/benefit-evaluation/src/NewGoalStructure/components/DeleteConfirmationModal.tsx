@@ -8,16 +8,22 @@ import Modal, {
 import Button, { LoadingButton } from "@atlaskit/button";
 import React, { useState, useCallback } from "react";
 
+// Import the translation hook
+import { useTranslation } from "@forge/react";
+
 interface DeleteConfirmationModalProps {
-  itemName: string; // F.eks. "Målet G-123"
-  onClose: () => void; // Funksjon for å lukke (tilknyttet "Avbryt")
-  onConfirm: () => Promise<void>; // Funksjonen som utfører slettingen (asynkron)
+  itemName: string;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
 }
 
 export const DeleteConfirmationModal: React.FC<
   DeleteConfirmationModalProps
 > = ({ itemName, onClose, onConfirm }) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Initialize translation
+  const { t } = useTranslation();
 
   const handleConfirm = useCallback(async () => {
     setIsSubmitting(true);
@@ -28,21 +34,24 @@ export const DeleteConfirmationModal: React.FC<
     } finally {
       setIsSubmitting(false);
     }
-  }, [onConfirm, onClose]);
+  }, [onConfirm]);
 
   return (
     <ModalTransition>
       <Modal onClose={onClose}>
         <ModalHeader>
-          <ModalTitle appearance="danger">Slett Målet: {itemName}</ModalTitle>
+          <ModalTitle appearance="danger">
+            {`${t("delete_modal.title_prefix")} ${itemName}`}
+          </ModalTitle>
         </ModalHeader>
         <ModalBody>
           <p>
-            Er du sikker på at du vil slette målet `{itemName}` permanent? Denne
-            handlingen kan ikke angres.
+            {`${t("delete_modal.warning_start")} '${itemName}' ${t(
+              "delete_modal.warning_end"
+            )}`}
           </p>
           <ul>
-            <li>Sletting vil påvirke relaterte estimeringer og hierarki.</li>
+            <li>{t("delete_modal.impact_notice")}</li>
           </ul>
         </ModalBody>
         <ModalFooter>
@@ -51,15 +60,15 @@ export const DeleteConfirmationModal: React.FC<
             onClick={onClose}
             isDisabled={isSubmitting}
           >
-            Avbryt
+            {t("delete_modal.cancel")}
           </Button>
           <LoadingButton
             appearance="danger"
-            onClick={handleConfirm} // Bruker den lokale bekreftelsesfunksjonen
+            onClick={handleConfirm}
             isLoading={isSubmitting}
             autoFocus
           >
-            Slett permanent
+            {t("delete_modal.confirm")}
           </LoadingButton>
         </ModalFooter>
       </Modal>

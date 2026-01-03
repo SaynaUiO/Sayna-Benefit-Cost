@@ -20,8 +20,10 @@ import { AdminPortfolio } from "../../Pages/Portfolio/AdminPortfolio";
 import { Box, xcss } from "@atlaskit/primitives";
 import { LeftSidebar } from "@atlaskit/page-layout";
 import { SpotlightTarget } from "@atlaskit/onboarding";
+import { useTranslation } from "@forge/react";
 
 export const Nav = () => {
+  const { t } = useTranslation();
   const [project, setProject] = useState<ScopeType>();
   const [portfolios, setPortfolios] = useState<Portfolio[]>();
   const [createPortfolioOpen, setCreatePortfolioOpen] =
@@ -69,37 +71,36 @@ export const Nav = () => {
 
   const portfolioButtons = () => {
     if (portfolios) {
-      const returnItems: JSX.Element[] = [];
-      portfolios.map((portfolio) => {
-        returnItems.push(
-          <ButtonItem
-            iconBefore={<QueuesIcon label="" />}
-            isSelected={scopeId === portfolio.id && endpoint !== "introduction"}
-            key={portfolio.id}
-            description={portfolio.description}
-            onClick={() => {
-              navigation(`../portfolio/${portfolio.id}/`);
-            }}
-          >
-            {portfolio.name}
-          </ButtonItem>
-        );
-      });
-      return returnItems;
+      return portfolios.map((portfolio) => (
+        <ButtonItem
+          iconBefore={<QueuesIcon label="" />}
+          isSelected={scopeId === portfolio.id && endpoint !== "introduction"}
+          key={portfolio.id}
+          description={portfolio.description}
+          onClick={() => {
+            navigation(`../portfolio/${portfolio.id}/`);
+          }}
+        >
+          {portfolio.name}
+        </ButtonItem>
+      ));
     } else {
       return <SkeletonItem hasIcon isShimmering />;
     }
   };
+
   return (
     <Box xcss={xcss({ zIndex: "layer", height: "100%" })}>
       <LeftSidebar isFixed={true}>
         <SideNavigation label="project">
           <NavigationHeader>
-            <Header description="Fordeling av nyttepoeng">BenefitOKR</Header>
+            <Header description={t("nav_sidebar.header_description")}>
+              BenefitOKR
+            </Header>
           </NavigationHeader>
           <NestableNavigationContent>
             <SpotlightTarget name="project">
-              <Section hasSeparator title="Prosjekt">
+              <Section hasSeparator title={t("nav_sidebar.project_section")}>
                 {project ? (
                   <ButtonItem
                     iconBefore={<PageIcon label="" />}
@@ -118,14 +119,14 @@ export const Nav = () => {
               </Section>
             </SpotlightTarget>
             <SpotlightTarget name="introduction-and-help">
-              <Section title="Introduksjon">
+              <Section title={t("nav_sidebar.introduction_section")}>
                 <ButtonItem
                   isSelected={endpoint === "introduction"}
                   onClick={() => {
                     navigation("introduction");
                   }}
                 >
-                  Introduksjon
+                  {t("nav_sidebar.introduction_item")}
                 </ButtonItem>
               </Section>
             </SpotlightTarget>

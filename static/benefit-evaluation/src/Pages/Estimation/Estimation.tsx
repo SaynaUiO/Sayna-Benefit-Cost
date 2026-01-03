@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { SelectGoalCollections } from "../../Components/Estimation/SelectGoalCollections";
 import { Loading } from "../../Components/Common/Loading";
 import Button from "@atlaskit/button";
@@ -12,8 +12,10 @@ import { EstimationContextProvider } from "./EstimationContext";
 import { GoalTier, EstimationMode, EstimationProps } from "../../Models";
 import { Spotlight, SpotlightTransition } from "@atlaskit/onboarding";
 import CrossIcon from "@atlaskit/icon/glyph/cross";
+import { useTranslation } from "@forge/react";
 
 export const Estimation = () => {
+  const { t } = useTranslation();
   const [isLoading, setLoading] = useState<boolean>(false);
   const [goalTier, setGoalTier] = useState<GoalTier>();
   const [upperGoalTier, setUpperGoalTier] = useState<GoalTier>();
@@ -24,20 +26,9 @@ export const Estimation = () => {
   const navigate = useNavigate();
   const [scope] = useAppContext();
   const api = useAPI();
-  const [isOnboardingCompleted, setOnboardingCompleted] =
-    useState<boolean>(true);
-  const [activeSpotlight, setActiveSpotlight] = useState<null | number>(null);
-  const next = () => setActiveSpotlight((activeSpotlight || 0) + 1);
-  const back = () => setActiveSpotlight((activeSpotlight || 1) - 1);
-  const end = () => {
-    api.onboarding.setOnboardingComplete(true);
-    setActiveSpotlight(0);
-    setOnboardingCompleted(true);
-  };
-  const navToAnalysis = () => {
-    // Hvis dette er siste spotlight
-    navigate("../analysis");
-  };
+
+  // Onboarding State
+  const [activeSpotlight, setActiveSpotlight] = useState<number | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -47,17 +38,14 @@ export const Estimation = () => {
       api.estimation
         .getEstimationProps(goalTier, upperGoalTier)
         .then((response) => {
-          if (isMounted) {
-            setEstimationProps(response);
-          }
+          if (isMounted) setEstimationProps(response);
           setLoading(false);
         })
-        .catch((error) => {
-          if (error.message === "string") {
-            setError(error.message);
-          } else {
-            setError("Something went wrong, please try again later");
-          }
+        .catch((err) => {
+          setError(
+            typeof err.message === "string" ? err.message : "generic_error"
+          );
+          setLoading(false);
         });
     }
     return () => {
@@ -65,163 +53,115 @@ export const Estimation = () => {
     };
   }, [goalTier, upperGoalTier]);
 
+  // Onboarding Logic
+  useEffect(() => {
+    api.onboarding.isOnboardingComplete().then((completed: boolean) => {
+      if (!completed) setActiveSpotlight(0);
+    });
+  }, [api]);
+
+  const next = () =>
+    setActiveSpotlight((prev) => (prev !== null ? prev + 1 : null));
+  const back = () =>
+    setActiveSpotlight((prev) => (prev !== null ? prev - 1 : null));
+  const end = () => {
+    api.onboarding.setOnboardingComplete(true);
+    setActiveSpotlight(null);
+  };
+
+  const navToAnalysis = () => {
+    end();
+    navigate("../analysis");
+  };
+
   const displayError = useMemo(() => {
     if (error && goalTier && upperGoalTier) {
-      if (error.includes(upperGoalTier.name)) {
+      const missingTierName = error.includes(upperGoalTier.name)
+        ? upperGoalTier.name
+        : error.includes(goalTier.name)
+        ? goalTier.name
+        : null;
+
+      if (missingTierName) {
         return (
           <EmptyState
-            header={`${upperGoalTier.name} has no goals`}
-            description="You can add goals by clicking the button below"
+            header={t("estimation.empty_state.no_goals_header").replace(
+              "{{name}}",
+              missingTierName
+            )}
+            description={t("estimation.empty_state.description")}
             headingLevel={2}
             primaryAction={
               <Button
                 appearance="primary"
-                onClick={() => navigate(`..//${upperGoalTier.id}/create-goal`)}
+                onClick={() => navigate("../goal-structure")}
               >
-                Add Goals
+                {t("estimation.empty_state.button")}
               </Button>
             }
           />
         );
-      } else if (error.includes(goalTier.name)) {
-        if (goalTier.scopeId === scope.id) {
-          return (
-            <EmptyState
-              header={`${goalTier.name} has no goals`}
-              description="You can add goals by clicking the button below"
-              headingLevel={2}
-              primaryAction={
-                <Button
-                  appearance="primary"
-                  onClick={() => navigate(`../goal-structure`)}
-                >
-                  Add Goals
-                </Button>
+      }
+    }
+    return <EmptyState header={t("estimation.empty_state.header")} />;
+  }, [error, goalTier, upperGoalTier, t, navigate]);
+
+  // Spotlight Helper
+  const createSpotlight = (
+    key: string,
+    target: string,
+    index: number,
+    total: number,
+    isLast = false
+  ) => (
+    <Spotlight
+      key={target}
+      target={target}
+      actionsBeforeElement={`${index}/${total}`}
+      heading={t(`onboarding.estimation.${key}.title`)}
+      headingAfterElement={
+        <Button
+          iconBefore={<CrossIcon size="small" label="close" />}
+          appearance="subtle"
+          onClick={end}
+        />
+      }
+      actions={
+        [
+          {
+            text: isLast
+              ? t("onboarding.common.finish_analysis")
+              : t("onboarding.common.next"),
+            onClick: isLast ? navToAnalysis : next,
+          },
+          index > 10
+            ? {
+                text: t("onboarding.common.back"),
+                onClick: back,
+                appearance: "subtle" as const,
               }
-            />
-          );
-        } else {
-          return (
-            <EmptyState
-              header={`${goalTier.name} has no goals`}
-              description="To evaluate this goal collection, you need to add goals to it"
-            />
-          );
-        }
+            : {
+                text: t("onboarding.common.dismiss"),
+                onClick: end,
+                appearance: "subtle" as const,
+              },
+        ].filter(Boolean) as any
       }
-    }
-    return (
-      <EmptyState header={`Something went wrong, or there are ny goals`} />
-    );
-  }, [error]);
+    >
+      {t(`onboarding.estimation.${key}.body`)}
+    </Spotlight>
+  );
 
-  //Fortsetter Onboarding:
-  useEffect(() => {
-    // Sjekk om onboardingen er fullført
-    api.onboarding.isOnboardingComplete().then((completed: boolean) => {
-      if (!completed) {
-        // Hvis IKKE fullført, start Estimation-spesifikke spotlights her
-        setActiveSpotlight(0);
-      }
-    });
-  }, [api]);
-
-  const renderActiveSpotlight = () => {
-    const spotlights = [
-      <Spotlight
-        actionsBeforeElement="10/120"
-        headingAfterElement={
-          <Button
-            iconBefore={<CrossIcon size="small" label="end" />}
-            appearance="subtle"
-            onClick={() => end()}
-          />
-        }
-        actions={[
-          {
-            onClick: () => next(),
-            text: "Next",
-          },
-          {
-            onClick: () => next(),
-            text: "neste",
-            appearance: "subtle",
-          },
-        ]}
-        heading="Relasjon evaluering"
-        target="relation"
-        key="relation"
-      >
-        Her velger du hvilken relasjon du ønsker å evaluere for å legge til
-        nyttepoeng.
-      </Spotlight>,
-      <Spotlight
-        actionsBeforeElement="11/20"
-        headingAfterElement={
-          <Button
-            iconBefore={<CrossIcon size="small" label="end" />}
-            appearance="subtle"
-            onClick={() => end()}
-          />
-        }
-        actions={[
-          {
-            onClick: () => next(),
-            text: "Next",
-          },
-          {
-            onClick: () => next(),
-            text: "neste",
-            appearance: "subtle",
-          },
-        ]}
-        heading="Fordel nyttepoeng"
-        target="estimation-table"
-        key="estimation-table"
-      >
-        I denne tabellen fordeler du nyttepoeng til hver oppgave for å vurdere
-        hvor mye den bidrar til oppnåelsen av målene.
-      </Spotlight>,
-      <Spotlight
-        actionsBeforeElement="12/20"
-        headingAfterElement={
-          <Button
-            iconBefore={<CrossIcon size="small" label="end" />}
-            appearance="subtle"
-            onClick={() => end()}
-          />
-        }
-        actions={[
-          {
-            onClick: () => navToAnalysis(),
-            text: "Fortsett i periodisering ->",
-          },
-          {
-            onClick: () => back(),
-            text: "Back",
-            appearance: "subtle",
-          },
-        ]}
-        heading="Periodisering"
-        target="analysis"
-        key="analysis"
-      >
-        Videre har vi periodisering, som brukes til å fordele nyttepoengene over
-        tid for å vise når verdien forventes realisert.
-      </Spotlight>,
-    ];
-
-    if (activeSpotlight === null) {
-      return null;
-    }
-
-    return spotlights[activeSpotlight];
-  };
+  const spotlights = [
+    createSpotlight("relation", "relation", 10, 12),
+    createSpotlight("distribute", "estimation-table", 11, 12),
+    createSpotlight("analysis_nav", "analysis", 12, 12, true),
+  ];
 
   return (
     <>
       {activeSpotlight !== null && (
-        <SpotlightTransition>{renderActiveSpotlight()}</SpotlightTransition>
+        <SpotlightTransition>{spotlights[activeSpotlight]}</SpotlightTransition>
       )}
       <PageHeader
         bottomBar={
@@ -235,8 +175,9 @@ export const Estimation = () => {
           />
         }
       >
-        Estimering
+        {t("nav.estimation")}
       </PageHeader>
+
       {error ? (
         displayError
       ) : (
@@ -249,14 +190,6 @@ export const Estimation = () => {
           {isLoading && <Loading />}
         </>
       )}
-
-      {/* <pre className="text-xs mt-4 bg-gray-100 p-2">
-        {JSON.stringify(upperGoalTier, null, 3)}
-      </pre>
-
-      <pre className="text-xs mt-4 bg-gray-100 p-2">
-        {JSON.stringify(goalTier, null, 3)}
-      </pre> */}
     </>
   );
 };

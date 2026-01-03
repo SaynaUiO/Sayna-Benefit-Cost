@@ -1,7 +1,4 @@
-//Filen som samler alt sammen og brukes i GoalStructure.tsx for å få det opp på skjermen
-
 import { GoalTypeEnum } from "../../Models";
-
 import { EpicTableTree } from "./Tables/ProductTableTree";
 import { ObjectiveTableTree } from "./Tables/ObjectiveTableTree";
 import { BenefitTableTree } from "./Tables/BenefitTableTree";
@@ -11,7 +8,13 @@ import { useGoalStructure } from "../hooks/useGoalStructure";
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 import { SetValues } from "../../Pages/GoalTiers/SetValues";
 
+import React from "react";
+import { useTranslation } from "@forge/react";
+
 export const GoalStructureContainer = () => {
+  // Initialize the translation hook
+  const { t } = useTranslation();
+
   const {
     loading,
     epicGoals,
@@ -26,7 +29,6 @@ export const GoalStructureContainer = () => {
     deleteModal,
   } = useGoalStructure();
 
-  // Destrukturer handlers for renere bruk
   const {
     handleAddGoal,
     handleEditGoal,
@@ -39,15 +41,13 @@ export const GoalStructureContainer = () => {
     handleOpenSetValuesModal,
   } = handlers;
 
-  // --- RENDERING ---
-
   if (loading) {
-    return <div>Laster målstruktur...</div>;
+    // FIX: Call t() directly
+    return <div>{t("structure.loading")}</div>;
   }
 
   return (
     <div style={{ padding: "2px" }}>
-      {/* Mål Tabell (Objective) */}
       <ObjectiveTableTree
         data={formaalGoals}
         onAddGoal={(_parentId, goalCollectionId) =>
@@ -59,27 +59,20 @@ export const GoalStructureContainer = () => {
       />
       <br />
 
-      {/* (Benefit) */}
       <BenefitTableTree
         data={benefitGoals}
-        onAddGoal={
-          (
-            _parentId,
-            goalCollectionId // Tar nå imot to argumenter
-          ) => handleAddGoal("Benefit", goalCollectionId) // Bruker den faktiske Collection ID'en
+        onAddGoal={(_parentId, goalCollectionId) =>
+          handleAddGoal("Benefit", goalCollectionId)
         }
         onEditGoal={handleEditGoal}
         onDeleteGoal={onDeleteGoal}
       />
       <br />
 
-      {/* Produkt/Epic Tabell */}
       <div style={{ marginBottom: "40px" }}>
         <EpicTableTree
           data={epicGoals}
           onAddGoal={(_parentId, goalCollectionId) =>
-            // Bruk gjerne den mottatte ID'en (goalCollectionId) for bedre praksis,
-            // men hardkodingen din fungerer også her:
             handleAddGoal("Product", goalCollectionId)
           }
           onEditGoal={handleEditGoal}
@@ -88,13 +81,14 @@ export const GoalStructureContainer = () => {
         />
       </div>
 
-      {/* Drawer */}
       {drawer.isDrawerOpen && drawer.context && (
         <GoalDrawer
           title={
             drawer.context.goalToEdit
-              ? `Rediger ${drawer.context.goalToEdit.id}`
-              : `Nytt Mål`
+              ? `${t("structure.edit_goal_prefix")} ${
+                  drawer.context.goalToEdit.id
+                }`
+              : t("structure.new_goal")
           }
           goalType={drawer.context.goalType}
           goalCategory={drawer.context.goalCategory}
@@ -104,7 +98,6 @@ export const GoalStructureContainer = () => {
         />
       )}
 
-      {/* Cost/Time Modal */}
       {costTimeModal && costTimeModal.isOpen && (
         <SetEpicCostTime
           items={costTimeModal.goals}
@@ -117,29 +110,25 @@ export const GoalStructureContainer = () => {
         />
       )}
 
-      {/* Delete Modal */}
       {deleteModal.isOpen && deleteModal.goalToDelete && (
         <DeleteConfirmationModal
           itemName={deleteModal.goalToDelete.key || deleteModal.goalToDelete.id}
-          onClose={deleteModal.onClose} // closeDeleteModal (Lukker modalen)
-          onConfirm={deleteModal.onConfirm} // handleDeleteGoalConfirm (Utfører sletting)
+          onClose={deleteModal.onClose}
+          onConfirm={deleteModal.onConfirm}
         />
       )}
 
-      {/* 🌟 SetValues Modal (NY OG KORRIGERT IMPLEMENTASJON) 🌟 */}
       {setValuesModal && setValuesModal.isOpen && (
         <SetValues
           goal_tier_id={setValuesModal.goal_tier_id}
           goals={setValuesModal.goals}
-          // Synkron lukking: Kaller bare setSetValuesModal(null)
           close={handleCloseSetValuesModal}
-          // Synkron refresh: Kaller fetchAndOrganizeGoals()
           refresh={handleRefreshData}
         />
       )}
 
-      {/* Debug Output */}
-      {/* <h2 style={{ marginTop: "30px" }}>Alle Hentede Goals (DEBUG)</h2>
+      {/* Translated Debug Title */}
+      {/* <h2 style={{ marginTop: "30px" }}>{t("structure.debug_title")}</h2>
       <pre style={{ backgroundColor: "#f4f4f4", padding: "10px" }}>
         {JSON.stringify(allGoals, null, 2)}
       </pre> */}
