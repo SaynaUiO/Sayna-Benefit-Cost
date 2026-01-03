@@ -4,6 +4,7 @@
     "loading": "Loading goal structure...",
     "edit_goal_prefix": "Edit",
     "new_goal": "New Goal",
+    "show_helper_text": "Show explanation",
     "debug_title": "All Fetched Goals (DEBUG)", 
   "purpose": {
     "description": "The purpose explains why the initiative is undertaken and the vision it seeks to realise. It provides direction and motivation throughout the project duration.",

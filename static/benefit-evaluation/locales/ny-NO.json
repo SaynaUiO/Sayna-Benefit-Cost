@@ -4,6 +4,7 @@
     "loading": "Lastar målstruktur...",
     "edit_goal_prefix": "Rediger",
     "new_goal": "Nytt mål",
+    "show_helper_text": "Vis forklaring",
     "debug_title": "Alle henta mål (DEBUG)", 
    "purpose": {
     "description": "Føremålet forklarer kvifor initiativet vert gjennomført og kva visjon det skal realisere. Det gjev retning og motivasjon gjennom heile prosjektløpet.",

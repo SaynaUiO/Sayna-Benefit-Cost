@@ -38,4 +38,4 @@ translations:
     - key: da-DK
       path: static/benefit-evaluation/locales/ny-NO.json
   fallback:
-    default: en-US
+    default: no-NO

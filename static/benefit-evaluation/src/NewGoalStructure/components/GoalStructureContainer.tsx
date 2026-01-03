@@ -80,7 +80,7 @@ export const GoalStructureContainer = () => {
               htmlFor="toggle-helper-text"
               style={{ fontSize: "12px", color: "#44546F", fontWeight: 500 }}
             >
-              Vis forklaring
+              {t("structure.show_helper_text")}
             </label>
           </Box>
           <Toggle
