@@ -7,7 +7,7 @@ import "@atlaskit/css-reset";
 import { I18nProvider } from "@forge/react";
 
 // Definerer typen manuelt siden eksporten fra @forge/react varierer mellom versjoner
-type ForgeSupportedLocaleCode = "no-NO" | "en-US" | string;
+type ForgeSupportedLocaleCode = "no-NO" | "en-US" | "da-DK" | string;
 
 const Root = () => {
   const [locale, setLocale] = useState<ForgeSupportedLocaleCode>("no-NO");

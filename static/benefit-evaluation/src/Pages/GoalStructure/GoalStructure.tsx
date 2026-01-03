@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useAppContext } from "../../Contexts/AppContext";
 import { useAPI } from "../../Contexts/ApiContext";
-import PageHeader from "@atlaskit/page-header";
 import { GoalTier } from "../../Models";
 import Button from "@atlaskit/button";
 import CrossIcon from "@atlaskit/icon/glyph/cross";
@@ -130,7 +129,6 @@ export const GoalStructure = () => {
       {!isOnboardingCompleted && (
         <SpotlightTransition>{spotlights[activeSpotlight]}</SpotlightTransition>
       )}
-      <PageHeader>{t("nav.goal_structure")}</PageHeader>
       <GoalStructureContainer />
     </>
   );

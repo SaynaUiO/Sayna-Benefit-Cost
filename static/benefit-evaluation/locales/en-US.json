@@ -4,7 +4,35 @@
     "loading": "Loading goal structure...",
     "edit_goal_prefix": "Edit",
     "new_goal": "New Goal",
-    "debug_title": "All Fetched Goals (DEBUG)"
+    "debug_title": "All Fetched Goals (DEBUG)", 
+  "purpose": {
+    "description": "The purpose explains why the initiative is undertaken and the vision it seeks to realise. It provides direction and motivation throughout the project duration.",
+    "parts_title": "The purpose consists of two parts:",
+    "part_1": "1. Narrative part (unstructured): A descriptive text that paints the big picture and the vision of the project.",
+    "part_2": "2. Objectives (structured): Underlying objectives that concretise the ambition (FORM-1, FORM-2 ...)",
+    "example_title": "Example:",
+    "example_narrative_label": "Narrative description:",
+    "example_narrative_text": "The project will develop a service that gives sole proprietorship owners full oversight and control over their own finances. By offering guidance on reporting obligations and risks, we will create security and reduce the likelihood of financial problems in the startup phase.",
+    "example_objectives_label": "Objectives:",
+    "example_objective_1": "FORM-1: Provide new entrepreneurs with better conditions for effective resource use and prevent financial distress.",
+    "example_objective_2": "FORM-2: Contribute to making the support system for financial questions more efficient and user-friendly for the target group."
+}, 
+"benefits": {
+  "description": "Benefits (Key Results) are the concrete and measurable outcomes that must be achieved to realise the purpose. They serve as milestones that guide progress.",
+  "smarc_title": "Good benefits should follow the SMARC principles:",
+  "smarc_list": "Specific, Measurable, Accountable, Realistic, and Comprehensive (SMARC).",
+  "example_title": "Example:",
+  "example_benefit_1": "PLAN-1: 20% reduction in bankruptcies among sole proprietorships within the first two years.",
+  "example_benefit_2": "PLAN-2: Achieve a user satisfaction score of over 80% for the new guidance service."
+}, 
+"products": {
+  "description": "Products and initiatives describe the actual effort and deliverables of the project. These are the concrete activities carried out to achieve the planned benefits.",
+  "focus_title": "Focus for products:",
+  "focus_text": "Define what is to be developed (e.g., software, processes, or physical deliverables) and estimate resource usage in terms of time and cost.",
+  "example_title": "Example:",
+  "example_product_1": "EPIC-1: Develop an automated notification service for important tax deadlines.",
+  "example_product_2": "EPIC-2: Establish a knowledge portal with interactive guides for financial management."
+}
   },
   "delete_modal": {
     "title_prefix": "Delete Goal:",

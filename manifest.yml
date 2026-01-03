@@ -35,5 +35,7 @@ translations:
       path: static/benefit-evaluation/locales/en-US.json
     - key: no-NO
       path: static/benefit-evaluation/locales/no-NO.json
+    - key: da-DK
+      path: static/benefit-evaluation/locales/ny-NO.json
   fallback:
     default: en-US

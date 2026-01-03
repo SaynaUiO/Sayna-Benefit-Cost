@@ -1,0 +1,303 @@
+{
+  "app": { "title": "NytteOKR" },
+  "structure": {
+    "loading": "Lastar målstruktur...",
+    "edit_goal_prefix": "Rediger",
+    "new_goal": "Nytt mål",
+    "debug_title": "Alle henta mål (DEBUG)", 
+   "purpose": {
+    "description": "Føremålet forklarer kvifor initiativet vert gjennomført og kva visjon det skal realisere. Det gjev retning og motivasjon gjennom heile prosjektløpet.",
+    "parts_title": "Føremålet består av to delar:",
+    "part_1": "1. Narrativ del (ustrukturert): Ein beskrivande tekst som målar det store biletet og visjonen til prosjektet.",
+    "part_2": "2. Objektiv (strukturert): Underliggjande objektiv som konkretiserer ambisjonen (FORM-1, FORM-2 ...)",
+    "example_title": "Døme:",
+    "example_narrative_label": "Narrativ skildring:",
+    "example_narrative_text": "Prosjektet skal utvikle ei teneste som gjev innehavarar av enkeltpersonføretak full oversikt og kontroll over eigen økonomi. Ved å tilby rettleiing om rapporteringsplikter og risiko, skal vi skape tryggleik og redusere sjansen for økonomiske problem i oppstartsfasen.",
+    "example_objectives_label": "Objektiv:",
+    "example_objective_1": "FORM-1: Gje nyetablerte betre føresetnader for effektiv ressursbruk og hindre økonomisk uføre.",
+    "example_objective_2": "FORM-2: Bidra til at støttesystemet for økonomiske spørsmål vert meir effektivt og brukarvenleg for målgruppa."
+}, 
+"benefits": {
+  "description": "Nyttevirkningar (Key Results) er dei konkrete og målbare resultata som må oppnåast for å realisere føremålet. Dei fungerer som milesteinar som viser veg mot målet.",
+  "smarc_title": "Gode nyttevirkningar bør følgje SMARC-prinsippa:",
+  "smarc_list": "Spesifikke, Målbare, Ansvarleggjorde, Realistiske og Omfattande (SMARC).",
+  "example_title": "Døme:",
+  "example_benefit_1": "PLAN-1: 20% reduksjon i talet på konkursar blant enkeltpersonføretak i løpet av dei første to åra.",
+  "example_benefit_2": "PLAN-2: Oppnå ein brukartilfredsheit på over 80% for den nye rettleiingstenesta."
+}, 
+"products": {
+  "description": "Produkt og tiltak (Initiatives) skildrar sjølve innsatsen og leveransane i prosjektet. Dette er dei konkrete aktivitetane som skal gjennomførast for å oppnå dei planlagde nyttevirkningane.",
+  "focus_title": "Fokus for produkt:",
+  "focus_text": "Her definerer du kva som skal utviklast (t.d. programvare, prosessar eller fysiske leveransar) og estimerer ressursbruk i form av tid og kostnad.",
+  "example_title": "Døme:",
+  "example_product_1": "EPIC-1: Utvikle ei automatisert varslingsteneste for viktige skattefristar.",
+  "example_product_2": "EPIC-2: Etablere ein kunnskapsportal med interaktive vegvisarar for økonomistyring."
+}
+  },
+  "delete_modal": {
+    "title_prefix": "Slett målet:",
+    "warning_start": "Er du sikker på at du vil slette målet",
+    "warning_end": "permanent? Denne handlinga kan ikkje angrast.",
+    "impact_notice": "Sletting vil påverke relaterte estimeringar og hierarki.",
+    "cancel": "Avbryt",
+    "confirm": "Slett permanent"
+  },
+  "drawer": {
+    "edit_prefix": "Endre",
+    "create_prefix": "Opprett",
+    "save_changes": "Lagre endringar",
+    "description_label": "Skildring",
+    "description_placeholder": "Detaljert skildring...",
+    "types": {
+      "Product": "Epic",
+      "Objective": "Formål",
+      "Benefit": "Nytteverknad"
+    }
+  },
+  "benefit_table": {
+    "headers": {
+      "name": "Planlagde nytteverknader",
+      "description": "Skildring",
+      "points": "Nyttepoeng",
+      "actions": "Handlingar"
+    },
+    "root_name": "Planlagde nytteverknader",
+    "tooltip": "Key Results i OKR",
+    "buttons": {
+      "add": "Legg til nytteverknad",
+      "edit": "Rediger mål",
+      "delete": "Slett mål"
+    }
+  },
+  "objective_table": {
+    "headers": {
+      "name": "Formål",
+      "description": "Skildring",
+      "points": "Nyttepoeng",
+      "actions": "Handlingar"
+    },
+    "root_name": "Formål",
+    "tooltip": "Objective i OKR",
+    "inline_edit": {
+      "placeholder": "Skriv inn skildring her...",
+      "empty_state": "Legg til ei skildring her",
+      "edit_button": "Legg til skildring"
+    },
+    "buttons": {
+      "add": "Legg til formål",
+      "set_values": "Samanlikn / set verdiar",
+      "edit": "Rediger mål",
+      "delete": "Slett mål"
+    }
+  },
+  "epic_table": {
+    "headers": {
+      "name": "Produktmål",
+      "description": "Skildring",
+      "time": "Tid",
+      "cost": "Kostnad",
+      "points": "Nyttepoeng",
+      "actions": "Handlingar"
+    },
+    "root_name": "Produkt",
+    "tooltip": "Initiatives i OKR",
+    "buttons": {
+      "add": "Legg til epic",
+      "set_cost_time": "Samanlikn kostnad / tid",
+      "edit": "Rediger mål",
+      "delete": "Slett mål"
+    }
+  },
+  "set_values": {
+    "title": "Set poeng for formål (strukturerte mål)",
+    "help_tooltip": "Du kan angi verdiberekningar for formål ved å gi dei relative vekter («målpoeng»).",
+    "total_weight_label": "Total vekt:",
+    "total_weight_tooltip": "Total vektfordeling",
+    "helper_total": "Total vekt må vere 100 %",
+    "helper_required": "Alle felt må fyllast ut",
+    "cancel": "Avbryt",
+    "save": "Lagre",
+    "error_submit": "Feil ved lagring av målpoeng"
+  },
+  "cost_time": {
+    "title": "Set kostnader og tid",
+    "desc_monetary": "Kostnaden er dei forventa livssykluskostnadene for kvar epic.",
+    "desc_relative": "Kostnaden er dei forventa livssykluskostnadspoenga for kvar epic, oppgjevne i relative poeng.",
+    "desc_time": "Tida er den forventa relative tida det tek å fullføre kvar epic. Dette er ein relativ verdi og blir derfor ikkje målt i timar eller dagar.",
+    "total_cost": "Total kostnad:",
+    "total_time": "Total tid:",
+    "postfix_label": "Postfiks for monetær måleeining",
+    "helper_all_fields": "Alle felt må fyllast ut.",
+    "cancel": "Avbryt",
+    "save": "Set kostnader og tid"
+  },
+  "nav": {
+    "goal_structure": "Målstruktur",
+    "estimation": "Estimering",
+    "analysis": "Periodisering",
+    "settings": "Innstillingar",
+    "help_tooltip": "Start onboarding på nytt",
+    "settings_tooltip": "Innstillingar",
+    "language_tooltip": "Byt språk"
+  },
+  "estimation": {
+    "select": {
+      "label": "Vel kva målnivå du vil evaluere",
+      "tooltip_down": "Evaluer eitt nivå ned",
+      "tooltip_up": "Evaluer eitt nivå opp",
+      "placeholder_loading": "Lastar...",
+      "placeholder_select": "Vel nivå for evaluering",
+      "placeholder_empty": "Ingen målsamlingar funne",
+      "desc_epic": "Fordel nyttepoeng mellom epicane for å anslå kor mykje kvar epic bidreg til kvar planlagd nytteverknad.",
+      "desc_benefit": "Fordel nyttepoeng mellom dei planlagde nytteverknadene for å anslå kor mykje kvar nytteverknad bidreg til dei overordna formåla."
+    },
+    "empty_state": {
+      "header": "Noko gjekk gale, eller det finst ingen mål her",
+      "no_goals_header": "{{name}} har ingen mål",
+      "description": "Du kan leggje til mål ved å trykkje på knappen under",
+      "button": "Gå til målstruktur"
+    }
+  },
+  "estimation_container": {
+    "assessment_goal": "Mål for vurdering:",
+    "back": "Tilbake",
+    "next": "Neste",
+    "stepwise_tooltip": "Fordel nyttepoeng for eitt mål om gongen",
+    "stepwise_button": "Fordel stegvis",
+    "save": "Lagre"
+  },
+  "analysis": {
+    "title": "Periodisering",
+    "description": "På denne sida får du oversikt over estimering av nytte og kostnad over tid. Ved å velje profilar for kvar epic nedanfor, kan du sjå korleis den finansielle planen utviklar og endrar seg basert på fordelinga.",
+    "loading": "Lastar epics, eller ingen epics funne...",
+    "table": {
+      "title": "Liste over epics og profilval",
+      "epic": "Epic",
+      "bp": "Nyttepoeng (BP)",
+      "bp_nok": "Nytteverdi (mill. NOK)",
+      "sp": "Kostnad (SP)",
+      "sp_nok": "Kostnad (mill. NOK)",
+      "select_bp": "Vel BP-profil",
+      "select_sp": "Vel SP-profil",
+      "config_tooltip": "Konverter poeng til NOK",
+      "placeholder_bp": "Vel BP-profil...",
+      "placeholder_sp": "Vel SP-profil...",
+      "discount": "Diskonteringsfaktor",
+      "npv": "Netto noverdi (NPV)",
+      "financial_plan_title": "Finansiell plan over {{years}} år (millionar NOK)",
+      "increase_years": "Auk talet på år",
+      "decrease_years": "Reduser talet på år"
+    },
+    "modal": {
+      "title": "Konverter poeng til NOK (millionar)",
+      "description": "Set konverteringsfaktorane for å gjere om nyttepoeng (BP) og kostnad (SP) til berekna verdi i millionar NOK. Endringar oppdaterer den finansielle planen med ein gong.",
+      "bp_rate": "1 BP = {{value}} millionar NOK",
+      "sp_rate": "1 SP = {{value}} millionar NOK",
+      "save": "Lagre"
+    }
+  },
+  "chart": {
+    "title": "Finansiell plan (gevinst, kostnad, netto) over tid",
+    "description": "Diagrammet kombinerer brutto gevinst (BP), brutto kostnad (SP), nettoverdi (stolpar) og akkumulert NPV (tynn linje, høgre akse). Nullpunktet (balansepunkt) blir markert der den akkumulerte NPV-linja kryssar nullinja.",
+    "total_bp": "Total BP",
+    "total_sp": "Total SP",
+    "net_value": "Nettoverdi (BP − SP)",
+    "acc_npv": "Akkumulert NPV",
+    "year_label": "År"
+  },
+  "profiles": {
+    "benefit": {
+      "delay_uniform": "Jamnt, med oppstartsforsinking",
+      "delay_plateau": "Gradvis auke til stabilt nivå (platå)",
+      "delay_peak_det": "Forsinking med toppeffekt og gradvis forringing",
+      "imm_increase": "Umiddelbar effekt med jamn auke til stabilt nivå",
+      "beginners_det": "Rask auke, topp og rask forringing (nybyrjarentusiasme)",
+      "uniform": "Jamnt (utan forsinking/endring)"
+    },
+    "cost": {
+      "dev1_uniform": "Høg utvikling (1 periode) med jamn etterfølgjande drift",
+      "dev1_decreasing": "Høg utvikling (1 periode) med avtakande etterfølgjande drift",
+      "high_dev_low_dec": "Svært høg utvikling (1 periode) med låg, avtakande etterfølgjande drift",
+      "low_dev_increasing": "Låg utvikling (1 periode) med aukande etterfølgjande drift",
+      "high_dev_decreasing": "Høg utvikling (1 periode) med avtakande etterfølgjande drift"
+    }
+  },
+  "onboarding": {
+    "common": {
+      "next": "Neste",
+      "back": "Tilbake",
+      "dismiss": "Avvis",
+      "finish_estimation": "Gå vidare til estimering →",
+      "finish_analysis": "Gå vidare til periodisering →"
+    },
+    "structure": {
+      "welcome": { "title": "BenefitOKR", "body": "Takk for at du brukar BenefitOKR – eit verktøy for Benefits Management med OKR. Her får du ei kort innføring i prosjektsida." },
+      "intro": { "title": "Introduksjon og hjelp", "body": "Meir informasjon om korleis du brukar BenefitOKR finn du under Introduksjon." },
+      "structure_info": { "title": "Målstruktur", "body": "Denne sida let deg administrere alle målsamlingar. Strukturen følgjer OKR-rammeverket: Formål (Objectives), nytteverknader (Key Results) og epics (Initiatives)." },
+      "purpose_input": { "title": "Formål", "body": "Skriv formålet med prosjektet direkte i feltet, og trykk på «✓» når du er ferdig." },
+      "add_goal": { "title": "Opprette mål", "body": "Under Handlingar finn du eit plussteikn. Her kan du opprette mål som høyrer til den aktuelle tabellen. Prøv no!" },
+      "edit_delete": { "title": "Rediger / slett", "body": "Her kan du redigere eller slette eit mål du har oppretta." },
+      "cost_time": { "title": "Kostnad / tid", "body": "For kvar epic kan du fordele kostnader og leggje til tidsbruk." },
+      "objective_weight": { "title": "Vekt for formål", "body": "Her kan du fordele nyttepoeng direkte, sidan formål representerer det øvste nivået i hierarkiet." },
+      "estimation_nav": { "title": "Estimering", "body": "Resten av nyttepoenga blir fordelte i estimeringsfana." }
+    },
+    "estimation": {
+      "relation": { "title": "Relasjonsevaluering", "body": "Her vel du kva relasjon du ønskjer å evaluere for å leggje til nyttepoeng." },
+      "distribute": { "title": "Fordel nyttepoeng", "body": "I denne tabellen fordeler du nyttepoeng til kvar oppgåve for å vurdere kor mykje ho bidreg til måla." },
+      "analysis_nav": { "title": "Periodisering", "body": "Vidare har vi periodisering, som blir brukt til å fordele nyttepoenga over tid." }
+    }
+  },
+  "estimation_labels": {
+    "weight_tooltip": "Relativ vekt for målet",
+    "monetary_tooltip": "Monetær verdi for målet",
+    "distributed_points_tooltip": "Poeng fordelte / totalt som skal fordelast",
+    "portfolio_contribution": "Bidrag frå porteføljeelement",
+    "even_benefit_points": "Jamne nyttepoeng",
+    "benefit_points": "Nyttepoeng",
+    "benefit_cost_ratio": "Nytte / kostnad",
+    "points_distributed": "Poeng fordelte",
+    "balanced_points": "Balanserte poeng",
+    "distributed_all": "Poeng fordelte til alle overordna mål",
+    "not_submitted": "Vil ikkje bli lagra",
+    "clear_or_distribute": "Tøm eller fordel poeng til alle overordna mål",
+    "clear_points": "Tøm fordelte poeng",
+    "toggle_collection": "Opne / lukk samling",
+    "total_points_distributed": "Totalt tal poeng fordelte",
+    "portfolio_item_weight": "Vekt for porteføljeelement"
+  },
+  "clear_points_modal": {
+    "title": "Åtvaring: Tøm poeng",
+    "body": "Denne handlinga vil slette alle fordelte poeng. Er du sikker på at du vil halde fram?",
+    "cancel": "Avbryt",
+    "confirm": "Tøm poeng"
+  },
+  "nav_sidebar": {
+    "header_description": "Fordeling av nyttepoeng",
+    "project_section": "Prosjekt",
+    "introduction_section": "Introduksjon",
+    "introduction_item": "Introduksjon"
+  },
+  "introduction_page": {
+    "title": "Velkomen til BenefitOKR",
+    "intro_text": "BenefitOKR management er ein strategisk tilnærming for å vurdere om investeringar i eit prosjekt kan rettferdiggjerast ut frå nytta det gir. Meir informasjon om BenefitOKR management finn du nedanfor.",
+    "understand_title": "Forstå BenefitOKR Management",
+    "understand_box": {
+      "subtitle": "Inneber:",
+      "bullet_1": "Å vurdere kva nytte eit prosjekt er venta å levere, til dømes betre tenester eller auka sal.",
+      "bullet_2": "Å samanlikne denne nytta med dei tilhøyrande livssykluskostnadene.",
+      "bullet_3": "Å kontinuerleg overvake og evaluere utviklingsaktivitetar for å sikre at produkt med høg nytte-kostnadsverdi blir leverte.",
+      "footer": "Dette gir deg eit grunnlag for å estimere verdien av utviklingsaktivitetar, i tillegg til dei tradisjonelle måla for tid, kostnad og omfang."
+    },
+    "procedure_title": "Vanleg framgangsmåte",
+    "procedure_box": {
+      "subtitle": "Dette er nokre av dei typiske stega i BenefitOKR-prosessen som du vil utføre i denne appen:",
+      "step_1": "Opprette ei målsamling og leggje til mål for prosjektet (målstruktur-sida)",
+      "step_2": "Tilordne verdiar – anten vekting eller pengeverdi (verdipoeng) – til alle måla (målstruktur-sida)",
+      "step_3": "Tilordne kostnad og tid til kvar epic (målstruktur-sida)",
+      "step_4": "Tilordne nyttepoeng for å estimere kor mykje kvar epic er venta å bidra (nytte) til måla (estimeringssida)",
+      "step_5": "Sjå og vurdere rekkjefølgja for korleis epics bør fullførast (periodiseringssida)"
+    },
+    "analysis_title": "Periodisering",
+    "analysis_box": "Periodisering handlar om å fordele nytte (BP) og kostnad (SP) over tid for å gi eit meir realistisk bilete av den økonomiske utviklinga i eit prosjekt. I staden for å gå ut frå at gevinstar og kostnader oppstår med ein gong, blir det nytta førehandsdefinerte periodiseringsprofilar som viser korleis verdiskaping og utgifter fordeler seg gjennom levetida til prosjektet. Ved å bruke slike profilar kan ein estimere samla nytte og kostnad for kvar epic, og deretter berekne indikatorar som netto noverdi (NPV) og akkumulert netto noverdi (akkumulert NPV). Dette gir eit heilskapleg grunnlag for å vurdere økonomisk verdi og risiko over tid."
+  }
+}

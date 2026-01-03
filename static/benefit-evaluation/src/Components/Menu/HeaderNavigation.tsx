@@ -55,7 +55,6 @@ export const HeaderNavigation = () => {
     setSelectedTab(index?.id);
   }, [location, t]);
 
-  // FJERN_INSTILLINGER_HER: Vi har fjernet settings fra denne listen
   const tabLinks = [
     {
       name: t("nav.goal_structure"),
@@ -85,7 +84,13 @@ export const HeaderNavigation = () => {
                 isSelected={currentLocale === "no-NO"}
                 onClick={() => handleLanguageChange("no-NO")}
               >
-                Norsk
+                Norsk (bokmål)
+              </ButtonItem>
+              <ButtonItem
+                isSelected={currentLocale === "da-DK"} // Endret fra ny-NO
+                onClick={() => handleLanguageChange("da-DK")} // Endret fra ny-NO
+              >
+                Norsk (nynorsk)
               </ButtonItem>
               <ButtonItem
                 isSelected={currentLocale === "en-US"}
@@ -140,7 +145,6 @@ export const HeaderNavigation = () => {
           </SpotlightTarget>
         </Flex>
       )}
-      // IKONET_BLIR_RENDRET_HER: Dette holder for innstillinger
       renderSettings={() => (
         <SpotlightTarget name="settings">
           <Settings

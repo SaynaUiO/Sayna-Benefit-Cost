@@ -4,7 +4,35 @@
     "loading": "Laster målstruktur...",
     "edit_goal_prefix": "Rediger",
     "new_goal": "Nytt Mål",
-    "debug_title": "Alle Hentede Goals (DEBUG)"
+    "debug_title": "Alle Hentede Goals (DEBUG)", 
+   "purpose": {
+        "description": "Formålet forklarer hvorfor initiativet gjennomføres og hvilken visjon det skal realisere. Det gir retning og motivasjon gjennom hele prosjektløpet.",
+        "parts_title": "Formålet består av to deler:",
+        "part_1": "1. Narrativ del (ustrukturert): En beskrivende tekst som maler det store bildet og visjonen til prosjektet.",
+        "part_2": "2. Objektiver (strukturert): Underliggende objektiver som konkretiserer ambisjonen (FORM-1, FORM-2 ...)",
+        "example_title": "Eksempel:",
+        "example_narrative_label": "Narrativ beskrivelse:",
+        "example_narrative_text": "Prosjektet skal utvikle en tjeneste som gir innehavere av enkeltpersonforetak full oversikt og kontroll over egen økonomi. Ved å tilby veiledning om rapporteringsplikter og risiko, skal vi skape trygghet og redusere sjansen for økonomiske problemer i oppstartsfasen.",
+        "example_objectives_label": "Objektiver:",
+        "example_objective_1": "FORM-1: Gi nyetablerte bedre forutsetninger for effektiv ressursbruk og hindre økonomisk uføre.",
+        "example_objective_2": "FORM-2: Bidra til at støttesystemet for økonomiske spørsmål blir mer effektivt og brukervennlig for målgruppen."
+    },
+    "benefits": {
+        "description": "Nyttevirkninger (Key Results) er de konkrete og målbare resultatene som må oppnås for å realisere formålet. De fungerer som milesteiner som viser vei mot målet.",
+        "smarc_title": "Gode nyttevirkninger bør følge SMARC-prinsippene:",
+        "smarc_list": "Spesifikke, Målbare, Ansvarliggjorte, Realistiske og Omfattende (SMARC).",
+        "example_title": "Eksempel:",
+        "example_benefit_1": "PLAN-1: 20% reduksjon i antall konkurser blant enkeltpersonforetak i løpet av de første to årene.",
+        "example_benefit_2": "PLAN-2: Oppnå en brukertilfredshet på over 80% for den nye veiledningstjenesten."
+}, 
+"products": {
+  "description": "Produkter og tiltak (Initiatives) beskriver selve innsatsen og leveransene i prosjektet. Dette er de konkrete aktivitetene som skal gjennomføres for å oppnå de planlagte nyttevirkningene.",
+  "focus_title": "Fokus for produkter:",
+  "focus_text": "Her definerer du hva som skal utvikles (f.eks. programvare, prosesser eller fysiske leveranser) og estimerer ressursbruk i form av tid og kostnad.",
+  "example_title": "Eksempel:",
+  "example_product_1": "EPIC-1: Utvikle en automatisert varslingstjeneste for viktige skattefrister.",
+  "example_product_2": "EPIC-2: Etablere en kunnskapsportal med interaktive veiledere for økonomistyring."
+}
   },
   "delete_modal": {
     "title_prefix": "Slett Målet:",
@@ -272,4 +300,5 @@
   "analysis_title": "Periodisering",
   "analysis_box": "Periodisering handler om å fordele nytte (BP) og kostnad (SP) over tid for å gi et mer realistisk bilde av et prosjekts økonomiske utvikling. I stedet for å anta at gevinster og kostnader oppstår umiddelbart, benyttes forhåndsdefinerte periodiseringsprofiler som viser hvordan verdiskapning og utgifter fordeler seg gjennom prosjektets levetid. Ved å bruke slike profiler kan man estimere den totale nytten og kostnaden for hver Epic, og deretter beregne indikatorer som netto nåverdi (NPV) og akkumulert netto nåverdi (Accumulated NPV). Dette gir et helhetlig grunnlag for å vurdere økonomisk verdi og risiko over tid."
 }
+
 }
